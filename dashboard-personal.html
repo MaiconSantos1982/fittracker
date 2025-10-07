@@ -81,16 +81,35 @@
                     </div>
                 </div>
 
-                <!-- Alunos Section -->
-                <div id="section-alunos" class="content-section" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Gerenciar Alunos</h2>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#alunoModal" onclick="openAlunoModal()">
-                            <i class="bi bi-plus-circle"></i> Novo Aluno
-                        </button>
-                    </div>
-                    <div id="alunosContainer" class="row g-3"></div>
-                </div>
+               <!-- Alunos Section -->
+<div id="section-alunos" class="content-section" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gerenciar Alunos</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#alunoModal" onclick="openAlunoModal()">
+            <i class="bi bi-plus-circle"></i> Novo Aluno
+        </button>
+    </div>
+    
+    <!-- Campo de busca -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input 
+                    type="text" 
+                    class="form-control search-input" 
+                    id="searchAluno" 
+                    placeholder="Buscar aluno por nome, email ou telefone..."
+                    onkeyup="filterAlunos()"
+                >
+            </div>
+            <small class="text-muted d-block mt-2" id="searchResults"></small>
+        </div>
+    </div>
+    
+    <div id="alunosContainer" class="row g-3"></div>
+</div>
+
 
                 <!-- Treinos Section -->
                 <div id="section-treinos" class="content-section" style="display: none;">
