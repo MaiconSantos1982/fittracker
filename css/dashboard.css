@@ -1,48 +1,21 @@
 /* ========================================
-   FITTRACKER - APPLE INSPIRED DESIGN
-   Mobile-First & Minimalist
+   RESET E VARIÁVEIS
 ======================================== */
-
-/* Importar San Francisco Font (Apple) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 :root {
-    /* Paleta de cores estilo Apple */
-    --primary: #007AFF;
-    --primary-dark: #0051D5;
-    --secondary: #5856D6;
-    --success: #34C759;
-    --danger: #FF3B30;
-    --warning: #FF9500;
-    --light-bg: #F2F2F7;
-    --white: #FFFFFF;
-    --text-primary: #000000;
-    --text-secondary: #8E8E93;
-    --border-color: #E5E5EA;
-    --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
-    --shadow-sm: 0 1px 8px rgba(0, 0, 0, 0.04);
-    
-    /* Espaçamentos */
-    --spacing-xs: 8px;
-    --spacing-sm: 12px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
-    
-    /* Tipografia */
-    --font-system: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-    --font-size-xs: 12px;
-    --font-size-sm: 14px;
-    --font-size-base: 16px;
-    --font-size-lg: 18px;
-    --font-size-xl: 24px;
-    --font-size-2xl: 32px;
-    
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --primary-color: #3498db;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --info-color: #1abc9c;
+    --sidebar-bg: #ffffff;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+    --border-radius: 16px;
 }
 
 * {
@@ -52,398 +25,582 @@
 }
 
 body {
-    font-family: var(--font-system);
-    background-color: var(--light-bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    background-color: var(--bg-color);
     color: var(--text-primary);
-    font-size: var(--font-size-base);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
 }
 
 /* ========================================
-   MOBILE-FIRST LAYOUT (ALUNO)
+   WRAPPER E LAYOUT
 ======================================== */
-
 .wrapper {
     display: flex;
-    flex-direction: column;
+    width: 100%;
     min-height: 100vh;
 }
 
-/* Sidebar para Mobile (Bottom Navigation) */
+#content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+    background-color: var(--bg-color);
+}
+
+/* ========================================
+   SIDEBAR
+======================================== */
 #sidebar {
+    min-width: 260px;
+    max-width: 260px;
+    background: var(--sidebar-bg);
+    color: var(--text-primary);
+    transition: all 0.3s;
     position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
-    right: 0;
-    background: var(--white);
-    border-top: 1px solid var(--border-color);
-    padding: var(--spacing-xs) 0;
-    z-index: 1000;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    height: 100vh;
+    z-index: 999;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.06);
+    overflow-y: auto;
 }
 
 #sidebar .p-4 {
-    display: none; /* Esconder header no mobile */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-#sidebar ul {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-#sidebar ul li {
-    flex: 1;
-    text-align: center;
-}
-
-#sidebar ul li a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: var(--spacing-xs);
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-#sidebar ul li a i {
-    font-size: 20px;
+#sidebar h3 {
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 700;
     margin-bottom: 4px;
 }
 
-#sidebar ul li a:hover,
+#sidebar .text-muted {
+    color: var(--text-secondary) !important;
+    font-size: 14px;
+}
+
+/* Lista de navegação */
+#sidebar ul.components {
+    padding: 20px 16px;
+}
+
+#sidebar ul li {
+    margin-bottom: 8px;
+}
+
+#sidebar ul li a {
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+#sidebar ul li a i {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+#sidebar ul li a:hover {
+    background: rgba(52, 152, 219, 0.08);
+    color: var(--primary-color);
+    transform: translateX(4px);
+}
+
 #sidebar ul li a.active {
-    color: var(--primary);
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 }
 
-/* Content área */
+/* Ajuste do content para compensar sidebar fixa */
 #content {
-    flex: 1;
-    padding-bottom: 80px; /* Espaço para bottom nav */
+    margin-left: 260px;
+    width: calc(100% - 260px);
 }
 
-/* Navbar Mobile */
+/* ========================================
+   NAVBAR TOP
+======================================== */
 .navbar {
-    background: var(--white) !important;
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md);
-    position: sticky;
-    top: 0;
-    z-index: 999;
+    background: white !important;
     box-shadow: var(--shadow-sm);
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.navbar .navbar-brand {
-    font-size: var(--font-size-lg);
+.navbar-brand {
+    font-size: 20px;
     font-weight: 600;
     color: var(--text-primary) !important;
 }
 
+/* Esconder botão hamburguer no desktop */
 #sidebarCollapse {
-    display: none; /* Não necessário no mobile */
-}
-
-/* Container Mobile-First */
-.container-fluid {
-    padding: var(--spacing-md);
+    display: none;
 }
 
 /* ========================================
-   CARDS ESTILO APPLE
+   CARDS DO DASHBOARD
 ======================================== */
-
 .card {
-    background: var(--white);
+    background: var(--card-bg);
     border: none;
-    border-radius: var(--radius-lg);
+    border-radius: var(--border-radius);
     box-shadow: var(--shadow-sm);
-    margin-bottom: var(--spacing-md);
+    transition: all 0.3s ease;
     overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card:active {
-    transform: scale(0.98);
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
 }
 
-.card-header {
-    background: var(--white);
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md);
-    font-weight: 600;
-    font-size: var(--font-size-lg);
-}
-
-.card-body {
-    padding: var(--spacing-md);
-}
-
-.card-body h5 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-}
-
-.card-body p {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-sm);
-}
-
-/* Cards de estatísticas */
-.card.text-white {
-    color: var(--white) !important;
-    border: none;
+/* Cards coloridos do dashboard */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-info {
+    background: var(--card-bg) !important;
+    box-shadow: var(--shadow-md);
 }
 
 .card.bg-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+    border-left: 4px solid var(--primary-color);
 }
 
 .card.bg-success {
-    background: linear-gradient(135deg, var(--success) 0%, #28A745 100%) !important;
-}
-
-.card.bg-info {
-    background: linear-gradient(135deg, #5AC8FA 0%, var(--primary) 100%) !important;
+    border-left: 4px solid var(--success-color);
 }
 
 .card.bg-warning {
-    background: linear-gradient(135deg, var(--warning) 0%, #FF9500 100%) !important;
+    border-left: 4px solid var(--warning-color);
 }
 
-/* ========================================
-   BOTÕES ESTILO APPLE
-======================================== */
+.card.bg-info {
+    border-left: 4px solid var(--info-color);
+}
 
-.btn {
-    font-family: var(--font-system);
+.card.bg-primary .card-body p,
+.card.bg-success .card-body p,
+.card.bg-warning .card-body p,
+.card.bg-info .card-body p {
+    color: var(--text-secondary) !important;
+    opacity: 1 !important;
+    font-size: 13px;
     font-weight: 500;
-    font-size: var(--font-size-base);
-    padding: 12px 20px;
-    border-radius: var(--radius-md);
-    border: none;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs);
-    min-height: 44px; /* Touch target mínimo Apple */
-}
-
-.btn:active {
-    transform: scale(0.96);
-}
-
-.btn-primary {
-    background: var(--primary);
-    color: var(--white);
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-    color: var(--white);
-}
-
-.btn-success {
-    background: var(--success);
-    color: var(--white);
-}
-
-.btn-success:hover {
-    background: #28A745;
-    color: var(--white);
-}
-
-.btn-danger {
-    background: var(--danger);
-    color: var(--white);
-}
-
-.btn-danger:hover {
-    background: #D70015;
-    color: var(--white);
-}
-
-.btn-secondary {
-    background: var(--light-bg);
-    color: var(--text-primary);
-}
-
-.btn-secondary:hover {
-    background: var(--border-color);
-    color: var(--text-primary);
-}
-
-.btn-sm {
-    padding: 8px 16px;
-    font-size: var(--font-size-sm);
-    min-height: 36px;
-}
-
-/* ========================================
-   FORMULÁRIOS ESTILO APPLE
-======================================== */
-
-.form-control,
-.form-select {
-    font-family: var(--font-system);
-    font-size: var(--font-size-base);
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background: var(--white);
-    transition: all 0.2s ease;
-    min-height: 44px;
-}
-
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
-    outline: none;
-}
-
-.form-label {
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-}
-
-textarea.form-control {
-    resize: vertical;
-    min-height: 80px;
-}
-
-/* ========================================
-   LISTAS E TABELAS
-======================================== */
-
-.list-group-item {
-    border: none;
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md);
-    background: transparent;
-}
-
-.list-group-item:last-child {
-    border-bottom: none;
-}
-
-.table {
-    font-size: var(--font-size-sm);
-}
-
-.table thead {
-    background: var(--light-bg);
-    font-weight: 600;
-    font-size: var(--font-size-xs);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.table td,
-.table th {
-    padding: var(--spacing-md);
-    vertical-align: middle;
-    border-color: var(--border-color);
+.card.bg-primary .card-body h2,
+.card.bg-success .card-body h2,
+.card.bg-warning .card-body h2,
+.card.bg-info .card-body h2 {
+    color: var(--text-primary) !important;
+    font-weight: 700;
+    font-size: 36px;
 }
 
-/* ========================================
-   BADGES E ALERTS
-======================================== */
-
-.badge {
-    font-weight: 500;
-    padding: 4px 12px;
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-xs);
+.card.bg-primary .card-body h2 {
+    color: var(--primary-color) !important;
 }
 
-.alert {
-    border: none;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    font-size: var(--font-size-sm);
+.card.bg-success .card-body h2 {
+    color: var(--success-color) !important;
 }
 
-.alert-info {
-    background: rgba(0, 122, 255, 0.1);
-    color: var(--primary);
+.card.bg-warning .card-body h2 {
+    color: var(--warning-color) !important;
 }
 
-.alert-warning {
-    background: rgba(255, 149, 0, 0.1);
-    color: var(--warning);
+.card.bg-info .card-body h2 {
+    color: var(--info-color) !important;
 }
 
-/* ========================================
-   MODALS ESTILO APPLE
-======================================== */
-
-.modal-content {
-    border: none;
-    border-radius: var(--radius-xl);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+/* Efeito 3D com sombra interna */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-info {
+    position: relative;
 }
 
-.modal-header {
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-lg);
+.card.bg-primary::before,
+.card.bg-success::before,
+.card.bg-warning::before,
+.card.bg-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: var(--border-radius);
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
-.modal-title {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
+.card.bg-primary:hover::before {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(52, 152, 219, 0.02) 100%);
+    opacity: 1;
 }
 
-.modal-body {
-    padding: var(--spacing-lg);
+.card.bg-success:hover::before {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(46, 204, 113, 0.02) 100%);
+    opacity: 1;
 }
 
-.modal-footer {
-    border-top: 1px solid var(--border-color);
-    padding: var(--spacing-md) var(--spacing-lg);
-    gap: var(--spacing-sm);
+.card.bg-warning:hover::before {
+    background: linear-gradient(135deg, rgba(243, 156, 18, 0.05) 0%, rgba(243, 156, 18, 0.02) 100%);
+    opacity: 1;
 }
 
-.btn-close {
-    opacity: 0.5;
-}
-
-.btn-close:hover {
+.card.bg-info:hover::before {
+    background: linear-gradient(135deg, rgba(26, 188, 156, 0.05) 0%, rgba(26, 188, 156, 0.02) 100%);
     opacity: 1;
 }
 
 /* ========================================
-   VÍDEOS E MÍDIA
+   CARDS DE ALUNOS
 ======================================== */
+.card.h-100 {
+    height: 100%;
+}
 
-video {
-    border-radius: var(--radius-md);
-    width: 100%;
-    height: auto;
-    background: #000;
+.card.h-100 h5 {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.card.h-100 small {
+    color: var(--text-secondary);
 }
 
 /* ========================================
-   ANIMAÇÕES SUAVES
+   BOTÕES
 ======================================== */
+.btn {
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 500;
+    border: none;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+}
+
+.btn-success {
+    background: var(--success-color);
+}
+
+.btn-warning {
+    background: var(--warning-color);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+}
+
+.btn-info {
+    background: var(--info-color);
+}
+
+.btn-outline-primary,
+.btn-outline-success,
+.btn-outline-info,
+.btn-outline-warning,
+.btn-outline-danger {
+    box-shadow: none;
+    border: 1px solid;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-success:hover {
+    background: var(--success-color);
+    border-color: var(--success-color);
+}
+
+/* ========================================
+   BADGES
+======================================== */
+.badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+/* ========================================
+   MODALS
+======================================== */
+.modal-content {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 20px 24px;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 16px 24px;
+}
+
+/* ========================================
+   FORMS
+======================================== */
+.form-control,
+.form-select {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 10px 16px;
+    transition: all 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+/* ========================================
+   TABLES
+======================================== */
+.table {
+    background: white;
+}
+
+.table thead th {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 16px;
+}
+
+.table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* ========================================
+   ALERTS
+======================================== */
+.alert {
+    border: none;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-info {
+    background: rgba(26, 188, 156, 0.1);
+    color: #16a085;
+}
+
+.alert-warning {
+    background: rgba(243, 156, 18, 0.1);
+    color: #d68910;
+}
+
+.alert-danger {
+    background: rgba(231, 76, 60, 0.1);
+    color: #c0392b;
+}
+
+/* ========================================
+   TABS
+======================================== */
+.nav-tabs {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 12px 20px;
+    transition: all 0.2s;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background: transparent;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* ========================================
+   SCROLLBAR
+======================================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   RESPONSIVO
+======================================== */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -260px;
+    }
+    
+    #sidebar.active {
+        margin-left: 0;
+    }
+    
+    #content {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    #sidebarCollapse {
+        display: block !important;
+    }
+}
+
+/* ========================================
+   UTILITÁRIOS
+======================================== */
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Animações suaves */
+* {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ========================================
+   SPINNER DE CARREGAMENTO
+======================================== */
+.spinner-border {
+    color: var(--primary-color);
+}
+/* ========================================
+   CAMPO DE BUSCA
+======================================== */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box i {
+    position: absolute;
+    left: 16px;
+    color: var(--text-secondary);
+    font-size: 18px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.search-input {
+    padding-left: 48px !important;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    height: 48px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+    background: white;
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+/* Animação no resultado da busca */
+#searchResults {
+    font-size: 13px;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+}
+
+#searchResults i {
+    margin-right: 4px;
+}
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(-4px);
     }
     to {
         opacity: 1;
@@ -451,217 +608,18 @@ video {
     }
 }
 
-.content-section {
-    animation: fadeIn 0.3s ease;
+/* Destacar cards filtrados */
+#alunosContainer .col-md-6 {
+    animation: slideIn 0.3s ease;
 }
 
-/* ========================================
-   RESPONSIVO - TABLET (768px+)
-======================================== */
-
-@media (min-width: 768px) {
-    .container-fluid {
-        padding: var(--spacing-lg);
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
-    
-    .card {
-        margin-bottom: var(--spacing-lg);
-    }
-    
-    /* Modals maiores em tablet */
-    .modal-dialog {
-        max-width: 600px;
-    }
-}
-
-/* ========================================
-   RESPONSIVO - DESKTOP (992px+)
-   Sidebar lateral para Personal Trainer
-======================================== */
-
-@media (min-width: 992px) {
-    .wrapper {
-        flex-direction: row;
-    }
-    
-    /* Sidebar Desktop (Personal) */
-    #sidebar {
-        position: relative;
-        width: 260px;
-        min-height: 100vh;
-        bottom: auto;
-        left: auto;
-        right: auto;
-        border-top: none;
-        border-right: 1px solid var(--border-color);
-        padding: 0;
-        box-shadow: none;
-    }
-    
-    #sidebar .p-4 {
-        display: block;
-        padding: var(--spacing-xl) var(--spacing-lg);
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    #sidebar h3 {
-        font-size: var(--font-size-xl);
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-    
-    #sidebar p {
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-        margin-top: var(--spacing-xs);
-    }
-    
-    #sidebar ul {
-        flex-direction: column;
-        padding: var(--spacing-md) 0;
-    }
-    
-    #sidebar ul li {
-        width: 100%;
-        text-align: left;
-    }
-    
-    #sidebar ul li a {
-        flex-direction: row;
-        justify-content: flex-start;
-        padding: var(--spacing-md) var(--spacing-lg);
-        font-size: var(--font-size-base);
-        border-radius: 0;
-        margin: 2px var(--spacing-md);
-    }
-    
-    #sidebar ul li a i {
-        font-size: 18px;
-        margin-bottom: 0;
-        margin-right: var(--spacing-sm);
-        width: 24px;
-    }
-    
-    #sidebar ul li a:hover {
-        background: var(--light-bg);
-        border-radius: var(--radius-md);
-    }
-    
-    #sidebar ul li a.active {
-        background: rgba(0, 122, 255, 0.1);
-        color: var(--primary);
-        border-radius: var(--radius-md);
-    }
-    
-    /* Content Desktop */
-    #content {
-        flex: 1;
-        padding-bottom: 0;
-    }
-    
-    #sidebarCollapse {
-        display: inline-block;
-    }
-    
-    .container-fluid {
-        padding: var(--spacing-xl);
-        max-width: 1400px;
-    }
-    
-    /* Cards em grid no desktop */
-    .row > [class*='col-'] {
-        margin-bottom: var(--spacing-lg);
-    }
-}
-
-/* ========================================
-   DESKTOP LARGE (1200px+)
-======================================== */
-
-@media (min-width: 1200px) {
-    .container-fluid {
-        padding: var(--spacing-xl) 48px;
-    }
-    
-    .modal-dialog.modal-lg {
-        max-width: 900px;
-    }
-}
-
-/* ========================================
-   TEMA ESCURO (Dark Mode)
-======================================== */
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --light-bg: #000000;
-        --white: #1C1C1E;
-        --text-primary: #FFFFFF;
-        --text-secondary: #98989D;
-        --border-color: #38383A;
-    }
-    
-    body {
-        background-color: var(--light-bg);
-    }
-    
-    .navbar,
-    #sidebar,
-    .card {
-        background: var(--white);
-        border-color: var(--border-color);
-    }
-    
-    .form-control,
-    .form-select {
-        background: var(--white);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-    
-    .table thead {
-        background: var(--white);
-    }
-}
-
-/* ========================================
-   LOADING STATES
-======================================== */
-
-.skeleton {
-    background: linear-gradient(90deg, var(--border-color) 25%, var(--light-bg) 50%, var(--border-color) 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s ease-in-out infinite;
-    border-radius: var(--radius-md);
-    height: 20px;
-}
-
-@keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-/* ========================================
-   ACESSIBILIDADE
-======================================== */
-
-:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
-button:disabled,
-.btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-/* Aumentar área de toque em mobile */
-@media (max-width: 767px) {
-    button,
-    .btn,
-    a {
-        min-height: 44px;
-        min-width: 44px;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
