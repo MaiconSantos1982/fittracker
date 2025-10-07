@@ -692,3 +692,75 @@ body {
 #content {
     transition: margin-left 0.3s ease;
 }
+
+/* ========================================
+   CORREÇÕES DASHBOARD ALUNO
+   ======================================== */
+
+/* Menu inferior do aluno - remover asteriscos e melhorar espaçamento */
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#sidebar ul li::before {
+    content: none !important; /* Remove asteriscos */
+}
+
+#sidebar ul li {
+    margin: 0;
+    padding: 0;
+}
+
+#sidebar ul li a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 12px;
+    gap: 4px;
+}
+
+#sidebar ul li a i {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+#sidebar ul li a.active {
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 8px;
+}
+
+/* Melhorar margens do conteúdo do aluno */
+@media (max-width: 768px) {
+    #content {
+        padding-bottom: 80px; /* Espaço para menu inferior */
+    }
+    
+    .container-fluid {
+        padding: 16px !important;
+    }
+    
+    .content-section {
+        padding: 16px;
+    }
+    
+    .card {
+        margin-bottom: 16px;
+    }
+    
+    /* Mais espaço entre cards */
+    .card + .card {
+        margin-top: 16px;
+    }
+    
+    h2, h3 {
+        margin-bottom: 16px;
+    }
+}
