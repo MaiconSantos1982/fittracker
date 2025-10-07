@@ -1424,13 +1424,19 @@ async function loadAgendaData(agendaId) {
             document.getElementById('agendaId').value = data.id;
             document.getElementById('agendaAluno').value = data.aluno_id;
             
-            const dataConsulta = new Date(data.data_consulta);
+            // Converter data do Supabase para datetime-local sem conversão UTC
+            const dataConsulta = new Date(data.data_consulta + 'Z'); // Força interpretar como UTC
+            
+            // Ajustar para timezone local
             const year = dataConsulta.getFullYear();
             const month = String(dataConsulta.getMonth() + 1).padStart(2, '0');
             const day = String(dataConsulta.getDate()).padStart(2, '0');
             const hours = String(dataConsulta.getHours()).padStart(2, '0');
             const minutes = String(dataConsulta.getMinutes()).padStart(2, '0');
             const datetimeLocal = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+            console.log('Data original do banco:', data.data_consulta);
+            console.log('Data ajustada para input:', datetimeLocal);
             
             document.getElementById('agendaDataHora').value = datetimeLocal;
             document.getElementById('agendaTipo').value = data.tipo_consulta;
@@ -1456,10 +1462,20 @@ async function saveAgenda() {
             return;
         }
 
+        // Capturar data/hora local
+        const dataHoraLocal = document.getElementById('agendaDataHora').value;
+        
+        // Converter para formato que o Supabase entende (sem conversão UTC)
+        // Adiciona timezone offset para manter horário local
+        const dataConsulta = new Date(dataHoraLocal);
+        const offset = dataConsulta.getTimezoneOffset() * 60000; // offset em milissegundos
+        const dataLocalAjustada = new Date(dataConsulta.getTime() - offset);
+        const dataFormatada = dataLocalAjustada.toISOString().slice(0, 19).replace('T', ' ');
+
         const agendaData = {
             personal_id: currentUser.id,
             aluno_id: alunoId,
-            data_consulta: document.getElementById('agendaDataHora').value,
+            data_consulta: dataFormatada, // Usa data formatada sem conversão UTC
             tipo_consulta: document.getElementById('agendaTipo').value,
             observacoes: document.getElementById('agendaObs').value
         };
@@ -1475,6 +1491,7 @@ async function saveAgenda() {
 
         if (agendaId) {
             console.log('Atualizando consulta:', agendaId);
+            console.log('Data sendo salva:', dataFormatada);
             const result = await supabase
                 .from('fit_agenda')
                 .update(agendaData)
@@ -1486,6 +1503,7 @@ async function saveAgenda() {
             }
         } else {
             console.log('Criando nova consulta');
+            console.log('Data sendo salva:', dataFormatada);
             const result = await supabase
                 .from('fit_agenda')
                 .insert(agendaData);
