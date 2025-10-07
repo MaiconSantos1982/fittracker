@@ -1585,3 +1585,13 @@ function filterAlunos() {
     // Renderizar alunos filtrados
     renderAlunosTable(filteredAlunos);
 }
+// ========================================
+// FUNÇÃO AUXILIAR MOBILE
+// ========================================
+
+function closeSidebar() {
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('active');
+        document.getElementById('sidebar-overlay')?.classList.remove('active');
+    }
+}
