@@ -37,9 +37,16 @@ function setupNavigation() {
     const sidebarCollapseBtn = document.getElementById('sidebarCollapse');
     if (sidebarCollapseBtn) {
         sidebarCollapseBtn.addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+            
+            // Toggle overlay no mobile
+            if (window.innerWidth <= 768 && overlay) {
+                overlay.classList.toggle('active');
+            }
         });
     }
+}
     
     // Fechar sidebar ao clicar fora (mobile)
     document.addEventListener('click', (e) => {
@@ -1404,41 +1411,50 @@ function renderMedidasChart(medidas) {
 // AGENDA
 // ========================================
 
-function openAgendaModal() {
+function openAgendaModal(agendaId = null) {
     document.getElementById('agendaForm').reset();
+    document.getElementById('agendaId').value = '';
+    
+    if (agendaId) {
+        // Modo edição - buscar dados
+        loadAgendaData(agendaId);
+        document.querySelector('#agendaModal .modal-title').textContent = 'Editar Consulta';
+    } else {
+        // Modo criação
+        document.querySelector('#agendaModal .modal-title').textContent = 'Agendar Consulta';
+    }
 }
 
-async function saveAgenda() {
+async function loadAgendaData(agendaId) {
     try {
-        const alunoId = document.getElementById('agendaAluno').value;
-        
-        if (!alunoId) {
-            alert('Selecione um aluno!');
-            return;
-        }
-
-        const agendaData = {
-            personal_id: currentUser.id,
-            aluno_id: alunoId,
-            data_consulta: document.getElementById('agendaDataHora').value,
-            tipo_consulta: document.getElementById('agendaTipo').value,
-            observacoes: document.getElementById('agendaObs').value,
-            status: 'agendada'
-        };
-
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('fit_agenda')
-            .insert(agendaData);
+            .select('*')
+            .eq('id', agendaId)
+            .single();
 
         if (error) throw error;
 
-        alert('Consulta agendada com sucesso!');
-        bootstrap.Modal.getInstance(document.getElementById('agendaModal')).hide();
-        loadAgenda();
-        loadDashboardData();
+        if (data) {
+            document.getElementById('agendaId').value = data.id;
+            document.getElementById('agendaAluno').value = data.aluno_id;
+            
+            // Converter data para formato datetime-local
+            const dataConsulta = new Date(data.data_consulta);
+            const year = dataConsulta.getFullYear();
+            const month = String(dataConsulta.getMonth() + 1).padStart(2, '0');
+            const day = String(dataConsulta.getDate()).padStart(2, '0');
+            const hours = String(dataConsulta.getHours()).padStart(2, '0');
+            const minutes = String(dataConsulta.getMinutes()).padStart(2, '0');
+            const datetimeLocal = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+            document.getElementById('agendaDataHora').value = datetimeLocal;
+            document.getElementById('agendaTipo').value = data.tipo_consulta;
+            document.getElementById('agendaObs').value = data.observacoes || '';
+        }
     } catch (error) {
-        console.error('Erro ao salvar agenda:', error);
-        alert('Erro ao agendar consulta: ' + error.message);
+        console.error('Erro ao carregar dados da agenda:', error);
+        alert('Erro ao carregar dados da consulta');
     }
 }
 
@@ -1481,23 +1497,38 @@ function renderAgenda(consultas) {
         
         container.innerHTML += `
             <div class="list-group-item ${isPast ? 'bg-light' : ''}">
-                <div class="d-flex justify-content-between">
-                    <h6>${consulta.aluno?.profile?.full_name || 'N/A'}</h6>
-                    <span class="badge bg-${isPast ? 'secondary' : consulta.status === 'agendada' ? 'primary' : 'success'}">
-                        ${isPast ? 'Realizada' : consulta.status}
-                    </span>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">${consulta.aluno?.profile?.full_name || 'N/A'}</h6>
+                            <span class="badge bg-${isPast ? 'secondary' : consulta.status === 'agendada' ? 'primary' : 'success'}">
+                                ${isPast ? 'Realizada' : consulta.status}
+                            </span>
+                        </div>
+                        <p class="mb-1">
+                            <i class="bi bi-calendar"></i> ${data.toLocaleDateString('pt-BR')} às ${data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}
+                        </p>
+                        <p class="mb-1"><strong>${consulta.tipo_consulta}</strong></p>
+                        ${consulta.observacoes ? `<p class="mb-0 text-muted small">${consulta.observacoes}</p>` : ''}
+                    </div>
+                    <div class="ms-3 d-flex flex-column gap-2">
+                        ${!isPast ? `
+                            <button class="btn btn-sm btn-outline-primary" onclick="editAgenda('${consulta.id}')" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAgenda('${consulta.id}')" title="Excluir">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
                 </div>
-                <p class="mb-1">
-                    <i class="bi bi-calendar"></i> ${data.toLocaleDateString('pt-BR')} às ${data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}
-                </p>
-                <p class="mb-1"><strong>${consulta.tipo_consulta}</strong></p>
-                ${consulta.observacoes ? `<p class="mb-0 text-muted">${consulta.observacoes}</p>` : ''}
             </div>
         `;
     });
 
     container.innerHTML += '</div>';
 }
+
 
 // ========================================
 // NOTIFICAÇÕES
