@@ -218,46 +218,166 @@ function editAluno(alunoId) {
 
 async function saveAluno() {
     try {
-        const email = document.getElementById('alunoEmail').value;
-        
-        // Buscar usuário pelo email
-        const { data: profile, error: profileError } = await supabase
-            .from('fit_profiles')
-            .select('id')
-            .eq('email', email)
-            .eq('user_type', 'aluno')
-            .single();
+        const nome = document.getElementById('alunoNome').value.trim();
+        const email = document.getElementById('alunoEmail').value.trim().toLowerCase();
+        const telefone = document.getElementById('alunoTelefone').value.trim();
+        const senha = document.getElementById('alunoSenha').value;
+        const dataNasc = document.getElementById('alunoDataNasc').value;
+        const objetivo = document.getElementById('alunoObjetivo').value.trim();
+        const observacoes = document.getElementById('alunoObs').value.trim();
 
-        if (profileError || !profile) {
-            alert('Aluno não encontrado com este email. O aluno precisa estar cadastrado no sistema como "Aluno".');
+        // Validações
+        if (!nome || !email || !senha) {
+            alert('Preencha todos os campos obrigatórios!');
             return;
         }
 
+        if (senha.length < 6) {
+            alert('A senha deve ter no mínimo 6 caracteres!');
+            return;
+        }
+
+        console.log('Iniciando cadastro de aluno:', email);
+
+        // 1. Verificar se o email já existe em fit_profiles
+        const { data: existingProfile, error: checkError } = await supabase
+            .from('fit_profiles')
+            .select('id, user_type')
+            .eq('email', email)
+            .maybeSingle();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+            throw checkError;
+        }
+
+        let profileId = null;
+
+        if (existingProfile) {
+            // Email já existe
+            console.log('Email já cadastrado:', existingProfile);
+
+            // Verificar se já é aluno deste personal
+            const { data: alunoExistente } = await supabase
+                .from('fit_alunos')
+                .select('id')
+                .eq('personal_id', currentUser.id)
+                .eq('profile_id', existingProfile.id)
+                .maybeSingle();
+
+            if (alunoExistente) {
+                alert('Este aluno já está cadastrado na sua lista!');
+                return;
+            }
+
+            // Usar o profile existente
+            profileId = existingProfile.id;
+            
+            // Atualizar dados do profile (se necessário)
+            await supabase
+                .from('fit_profiles')
+                .update({
+                    full_name: nome,
+                    phone: telefone || null,
+                    user_type: 'aluno'
+                })
+                .eq('id', profileId);
+
+            console.log('Profile existente atualizado');
+
+        } else {
+            // Email NÃO existe - criar novo usuário
+            console.log('Criando novo usuário no Auth...');
+
+            // 2. Criar usuário no Supabase Auth
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: email,
+                password: senha,
+                options: {
+                    data: {
+                        full_name: nome,
+                        user_type: 'aluno'
+                    }
+                }
+            });
+
+            if (authError) {
+                console.error('Erro no Auth:', authError);
+                throw authError;
+            }
+
+            if (!authData.user) {
+                throw new Error('Erro ao criar usuário no sistema de autenticação.');
+            }
+
+            profileId = authData.user.id;
+            console.log('Usuário criado no Auth:', profileId);
+
+            // 3. Criar perfil em fit_profiles
+            const { error: profileError } = await supabase
+                .from('fit_profiles')
+                .insert({
+                    id: profileId,
+                    email: email,
+                    full_name: nome,
+                    phone: telefone || null,
+                    user_type: 'aluno'
+                });
+
+            if (profileError) {
+                console.error('Erro ao criar profile:', profileError);
+                throw profileError;
+            }
+
+            console.log('Profile criado em fit_profiles');
+        }
+
+        // 4. Criar vínculo em fit_alunos
         const alunoData = {
             personal_id: currentUser.id,
-            profile_id: profile.id,
-            data_nascimento: document.getElementById('alunoDataNasc').value || null,
-            objetivo: document.getElementById('alunoObjetivo').value || null,
-            observacoes: document.getElementById('alunoObs').value || null,
+            profile_id: profileId,
+            data_nascimento: dataNasc || null,
+            objetivo: objetivo || null,
+            observacoes: observacoes || null,
             ativo: true
         };
 
-        const { error } = await supabase
+        const { error: alunoError } = await supabase
             .from('fit_alunos')
             .insert(alunoData);
 
-        if (error) throw error;
+        if (alunoError) {
+            console.error('Erro ao criar aluno:', alunoError);
+            throw alunoError;
+        }
 
-        alert('Aluno cadastrado com sucesso!');
+        console.log('Aluno vinculado com sucesso!');
+
+        alert('Aluno cadastrado com sucesso!\n\nCredenciais de acesso:\nEmail: ' + email + '\nSenha: (a senha cadastrada)\n\nO aluno já pode fazer login no sistema.');
+        
         bootstrap.Modal.getInstance(document.getElementById('alunoModal')).hide();
+        document.getElementById('alunoForm').reset();
+        
         loadAlunos();
         loadAlunoSelects();
         loadDashboardData();
+
     } catch (error) {
         console.error('Erro ao salvar aluno:', error);
-        alert('Erro ao salvar aluno: ' + error.message);
+        
+        let errorMsg = 'Erro ao cadastrar aluno: ';
+        
+        if (error.message.includes('duplicate key')) {
+            errorMsg += 'Este email já está cadastrado.';
+        } else if (error.message.includes('Password')) {
+            errorMsg += 'A senha deve ter no mínimo 6 caracteres.';
+        } else {
+            errorMsg += error.message;
+        }
+        
+        alert(errorMsg);
     }
 }
+
 
 async function deleteAluno(alunoId) {
     if (!confirm('Tem certeza que deseja excluir este aluno? Todos os treinos, dietas e medidas relacionados também serão excluídos.')) return;
