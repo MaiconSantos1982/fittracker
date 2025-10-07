@@ -8,26 +8,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FitTracker">
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Icons para iOS -->
-    <link rel="apple-touch-icon" href="/icon-192.png">
-    
-    <!-- OneSignal -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script>
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-          appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
-          serviceWorkerPath: "/OneSignalSDKWorker.js",
-          serviceWorkerParam: { scope: '/' },
-          allowLocalhostAsSecureOrigin: true
-        });
-      });
-    </script>
-    
     <title>FitTracker - Meus Treinos</title>
     
     <!-- Bootstrap e Icons -->
@@ -40,10 +20,10 @@
     <div class="wrapper">
         <!-- Content -->
         <div id="content">
-            <!-- Navbar Limpa -->
+            <!-- Navbar -->
             <nav class="navbar">
                 <div class="container-fluid px-3">
-                    <span class="navbar-brand mb-0" id="currentSection">Treinos</span>
+                    <span class="navbar-brand mb-0" id="currentSection">Início</span>
                     <button class="btn btn-sm btn-secondary" onclick="logout()">
                         <i class="bi bi-box-arrow-right"></i>
                     </button>
@@ -53,81 +33,72 @@
             <!-- Conteúdo -->
             <div class="container-fluid">
                 <!-- Dashboard -->
-               <!-- Dashboard Section -->
-<div id="section-dashboard" class="content-section">
-    <h2 class="mb-4" id="alunoGreeting">Olá! 👋</h2>
-    
-    <div class="row g-4 mb-4">
-        <!-- Card 1: Treinos Concluídos -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-primary">
-                <div class="card-body">
-                    <p class="text-white-50 mb-2">TREINOS CONCLUÍDOS</p>
-                    <h2 class="text-white mb-0" id="treinosConcluidos">0</h2>
-                    <small class="text-white-50">esta semana</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 2: Próxima Consulta -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-success">
-                <div class="card-body">
-                    <p class="text-white-50 mb-2">PRÓXIMA CONSULTA</p>
-                    <h5 class="text-white mb-0" id="proximaConsulta" style="font-size: 16px;">Nenhuma agendada</h5>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 3: Peso Atual -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-warning">
-                <div class="card-body">
-                    <p class="text-white-50 mb-2">PESO ATUAL</p>
-                    <h2 class="text-white mb-0"><span id="pesoAtual">--</span> kg</h2>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 4: Dieta Ativa -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-info">
-                <div class="card-body">
-                    <p class="text-white-50 mb-2">DIETA ATIVA</p>
-                    <h5 class="text-white mb-0" id="dietaAtiva" style="font-size: 16px;">--</h5>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Resumo Semanal -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-calendar-week"></i> Resumo da Semana</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <h6>Treinos Realizados</h6>
-                            <div id="treinosResumo" class="text-muted">Carregando...</div>
+                <div id="section-dashboard" class="content-section">
+                    <h2 class="mb-4" id="alunoGreeting">Olá! 👋</h2>
+                    
+                    <div class="row g-4 mb-4">
+                        <!-- Card 1: Treinos Concluídos -->
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card bg-primary">
+                                <div class="card-body">
+                                    <p class="text-white-50 mb-2">TREINOS CONCLUÍDOS</p>
+                                    <h2 class="text-white mb-0" id="treinosConcluidos">0</h2>
+                                    <small class="text-white-50">esta semana</small>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <h6>Refeições Registradas</h6>
-                            <div id="refeicoesResumo" class="text-muted">Carregando...</div>
+
+                        <!-- Card 2: Próxima Consulta -->
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card bg-success">
+                                <div class="card-body">
+                                    <p class="text-white-50 mb-2">PRÓXIMA CONSULTA</p>
+                                    <h5 class="text-white mb-0" id="proximaConsulta" style="font-size: 16px;">Nenhuma agendada</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Peso Atual -->
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card bg-warning">
+                                <div class="card-body">
+                                    <p class="text-white-50 mb-2">PESO ATUAL</p>
+                                    <h2 class="text-white mb-0"><span id="pesoAtual">--</span> kg</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Dieta Ativa -->
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card bg-info">
+                                <div class="card-body">
+                                    <p class="text-white-50 mb-2">DIETA ATIVA</p>
+                                    <h5 class="text-white mb-0" id="dietaAtiva" style="font-size: 16px;">--</h5>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="mb-1">Próxima Consulta</h6>
-                            <p class="mb-0 text-secondary" id="proximaConsulta">Nenhuma agendada</p>
+                    <!-- Resumo Semanal -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="bi bi-calendar-week"></i> Resumo da Semana</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <h6>Treinos Realizados</h6>
+                                            <div id="treinosResumo" class="text-muted">Carregando...</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <h6>Refeições Registradas</h6>
+                                            <div id="refeicoesResumo" class="text-muted">Carregando...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -280,48 +251,5 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/aluno-dashboard.js"></script>
-
-    <!-- Botão de instalação PWA -->
-    <div id="installPrompt" style="display: none; position: fixed; bottom: 80px; left: 20px; right: 20px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 9999;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-            <div style="flex: 1;">
-                <strong>Instalar FitTracker</strong>
-                <p style="margin: 4px 0 0 0; font-size: 14px; color: #666;">Adicione à tela inicial</p>
-            </div>
-            <button onclick="installPWA()" class="btn btn-sm btn-primary">Instalar</button>
-            <button onclick="closeInstallPrompt()" class="btn btn-sm btn-secondary">✕</button>
-        </div>
-    </div>
-
-    <script>
-    let deferredPrompt;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('installPrompt').style.display = 'block';
-    });
-
-    function installPWA() {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('PWA instalado');
-                }
-                deferredPrompt = null;
-                document.getElementById('installPrompt').style.display = 'none';
-            });
-        }
-    }
-
-    function closeInstallPrompt() {
-        document.getElementById('installPrompt').style.display = 'none';
-    }
-
-    window.addEventListener('appinstalled', () => {
-        console.log('FitTracker instalado com sucesso!');
-    });
-    </script>
 </body>
 </html>
