@@ -779,3 +779,405 @@ async function saveAgenda() {
         alert('Erro ao salvar agenda: ' + error.message);
     }
 }
+// ========================================
+// CARREGAR DADOS DAS SEÇÕES
+// ========================================
+
+// Carregar treinos na seção Treinos
+async function loadTreinosSection() {
+    try {
+        const { data: treinos, error } = await supabase
+            .from('fit_treinos')
+            .select(`
+                *,
+                aluno:aluno_id (
+                    id,
+                    profile:profile_id (
+                        full_name
+                    )
+                ),
+                exercicios:fit_exercicios(*)
+            `)
+            .eq('personal_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        renderTreinosSection(treinos);
+    } catch (error) {
+        console.error('Erro ao carregar treinos:', error);
+    }
+}
+
+function renderTreinosSection(treinos) {
+    const container = document.getElementById('treinosList');
+    
+    if (!treinos || treinos.length === 0) {
+        container.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> Nenhum treino cadastrado ainda.</div>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    treinos.forEach(treino => {
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        card.innerHTML = `
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">${treino.nome}</h5>
+                    <small class="text-muted">Aluno: ${treino.aluno?.profile?.full_name || 'N/A'}</small>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="deleteTreino('${treino.id}')">
+                    <i class="bi bi-trash"></i> Excluir
+                </button>
+            </div>
+            <div class="card-body">
+                ${treino.descricao ? `<p class="text-muted">${treino.descricao}</p>` : ''}
+                <h6 class="mt-3">Exercícios (${treino.exercicios?.length || 0}):</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Exercício</th>
+                                <th>Séries</th>
+                                <th>Repetições</th>
+                                <th>Descanso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${treino.exercicios?.map(ex => `
+                                <tr>
+                                    <td><strong>${ex.nome}</strong></td>
+                                    <td>${ex.series}</td>
+                                    <td>${ex.repeticoes}</td>
+                                    <td>${ex.descanso || '-'}</td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="4" class="text-center">Nenhum exercício</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+async function deleteTreino(treinoId) {
+    if (!confirm('Tem certeza que deseja excluir este treino?')) return;
+
+    try {
+        const { error } = await supabase
+            .from('fit_treinos')
+            .delete()
+            .eq('id', treinoId);
+
+        if (error) throw error;
+
+        alert('Treino excluído com sucesso!');
+        loadTreinosSection();
+    } catch (error) {
+        console.error('Erro ao excluir treino:', error);
+        alert('Erro ao excluir treino: ' + error.message);
+    }
+}
+
+// Carregar dietas na seção Dietas
+async function loadDietasSection() {
+    try {
+        const { data: dietas, error } = await supabase
+            .from('fit_dietas')
+            .select(`
+                *,
+                aluno:aluno_id (
+                    id,
+                    profile:profile_id (
+                        full_name
+                    )
+                ),
+                refeicoes:fit_refeicoes(*)
+            `)
+            .eq('personal_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        renderDietasSection(dietas);
+    } catch (error) {
+        console.error('Erro ao carregar dietas:', error);
+    }
+}
+
+function renderDietasSection(dietas) {
+    const container = document.getElementById('dietasList');
+    
+    if (!dietas || dietas.length === 0) {
+        container.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> Nenhuma dieta cadastrada ainda.</div>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    dietas.forEach(dieta => {
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        card.innerHTML = `
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">${dieta.nome}</h5>
+                    <small class="text-muted">Aluno: ${dieta.aluno?.profile?.full_name || 'N/A'}</small>
+                </div>
+                <div>
+                    <span class="badge bg-${dieta.ativa ? 'success' : 'secondary'} me-2">
+                        ${dieta.ativa ? 'Ativa' : 'Inativa'}
+                    </span>
+                    <button class="btn btn-sm btn-danger" onclick="deleteDieta('${dieta.id}')">
+                        <i class="bi bi-trash"></i> Excluir
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                ${dieta.descricao ? `<p class="text-muted">${dieta.descricao}</p>` : ''}
+                <p class="mb-2">
+                    <strong>Período:</strong> 
+                    ${new Date(dieta.data_inicio).toLocaleDateString('pt-BR')} 
+                    ${dieta.data_fim ? ` até ${new Date(dieta.data_fim).toLocaleDateString('pt-BR')}` : ''}
+                </p>
+                <h6 class="mt-3">Refeições (${dieta.refeicoes?.length || 0}):</h6>
+                <div class="row">
+                    ${dieta.refeicoes?.map(ref => `
+                        <div class="col-md-6 mb-2">
+                            <div class="card bg-light">
+                                <div class="card-body p-2">
+                                    <strong>${ref.tipo_refeicao}</strong> ${ref.horario ? `- ${ref.horario}` : ''}<br>
+                                    <small class="text-muted">${ref.alimentos}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('') || '<div class="col-12 text-center text-muted">Nenhuma refeição cadastrada</div>'}
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+async function deleteDieta(dietaId) {
+    if (!confirm('Tem certeza que deseja excluir esta dieta?')) return;
+
+    try {
+        const { error } = await supabase
+            .from('fit_dietas')
+            .delete()
+            .eq('id', dietaId);
+
+        if (error) throw error;
+
+        alert('Dieta excluída com sucesso!');
+        loadDietasSection();
+    } catch (error) {
+        console.error('Erro ao excluir dieta:', error);
+        alert('Erro ao excluir dieta: ' + error.message);
+    }
+}
+
+// Carregar medidas na seção Medidas
+async function loadMedidasSection() {
+    try {
+        const { data: alunos, error } = await supabase
+            .from('fit_alunos')
+            .select('id, profile:profile_id(full_name)')
+            .eq('personal_id', currentUser.id);
+
+        if (error) throw error;
+
+        const select = document.getElementById('alunoMedidasSelect');
+        select.innerHTML = '<option value="">Selecione um aluno...</option>';
+        
+        alunos.forEach(aluno => {
+            const option = document.createElement('option');
+            option.value = aluno.id;
+            option.textContent = aluno.profile?.full_name || 'Sem nome';
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar alunos para medidas:', error);
+    }
+}
+
+async function loadMedidas() {
+    const alunoId = document.getElementById('alunoMedidasSelect').value;
+    
+    if (!alunoId) {
+        document.getElementById('medidasContent').innerHTML = '<div class="alert alert-info">Selecione um aluno para ver as medidas</div>';
+        return;
+    }
+
+    try {
+        const { data: medidas, error } = await supabase
+            .from('fit_medidas')
+            .select('*')
+            .eq('aluno_id', alunoId)
+            .order('data_medicao', { ascending: false });
+
+        if (error) throw error;
+
+        if (!medidas || medidas.length === 0) {
+            document.getElementById('medidasContent').innerHTML = '<div class="alert alert-info">Nenhuma medida registrada para este aluno</div>';
+            return;
+        }
+
+        renderMedidasTable(medidas);
+    } catch (error) {
+        console.error('Erro ao carregar medidas:', error);
+    }
+}
+
+function renderMedidasTable(medidas) {
+    const container = document.getElementById('medidasContent');
+    
+    container.innerHTML = `
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Peso</th>
+                                <th>Altura</th>
+                                <th>% Gordura</th>
+                                <th>Cintura</th>
+                                <th>Quadril</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${medidas.map(m => `
+                                <tr>
+                                    <td>${new Date(m.data_medicao).toLocaleDateString('pt-BR')}</td>
+                                    <td>${m.peso ? m.peso + ' kg' : '-'}</td>
+                                    <td>${m.altura ? m.altura + ' cm' : '-'}</td>
+                                    <td>${m.percentual_gordura ? m.percentual_gordura + '%' : '-'}</td>
+                                    <td>${m.cintura ? m.cintura + ' cm' : '-'}</td>
+                                    <td>${m.quadril ? m.quadril + ' cm' : '-'}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteMedida('${m.id}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+async function deleteMedida(medidaId) {
+    if (!confirm('Tem certeza que deseja excluir esta medida?')) return;
+
+    try {
+        const { error } = await supabase
+            .from('fit_medidas')
+            .delete()
+            .eq('id', medidaId);
+
+        if (error) throw error;
+
+        alert('Medida excluída com sucesso!');
+        loadMedidas();
+    } catch (error) {
+        console.error('Erro ao excluir medida:', error);
+        alert('Erro ao excluir medida: ' + error.message);
+    }
+}
+
+// Carregar agenda na seção Agenda
+async function loadAgendaSection() {
+    try {
+        const { data: consultas, error } = await supabase
+            .from('fit_agenda')
+            .select(`
+                *,
+                aluno:aluno_id (
+                    id,
+                    profile:profile_id (
+                        full_name
+                    )
+                )
+            `)
+            .eq('personal_id', currentUser.id)
+            .order('data_consulta', { ascending: true });
+
+        if (error) throw error;
+
+        renderAgendaSection(consultas);
+    } catch (error) {
+        console.error('Erro ao carregar agenda:', error);
+    }
+}
+
+function renderAgendaSection(consultas) {
+    const container = document.getElementById('agendaCalendar');
+    
+    if (!consultas || consultas.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhuma consulta agendada</div>';
+        return;
+    }
+
+    container.innerHTML = '<div class="list-group">';
+
+    consultas.forEach(consulta => {
+        const data = new Date(consulta.data_consulta);
+        const isPast = data < new Date();
+        
+        container.innerHTML += `
+            <div class="list-group-item ${isPast ? 'bg-light' : ''}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">${consulta.aluno?.profile?.full_name || 'Sem nome'}</h6>
+                        <p class="mb-1">
+                            <i class="bi bi-calendar"></i> ${data.toLocaleDateString('pt-BR')} às 
+                            ${data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}
+                        </p>
+                        <p class="mb-1"><strong>${consulta.tipo_consulta}</strong></p>
+                        ${consulta.observacoes ? `<p class="mb-0 text-muted small">${consulta.observacoes}</p>` : ''}
+                    </div>
+                    <div>
+                        <span class="badge bg-${isPast ? 'secondary' : consulta.status === 'confirmada' ? 'success' : 'warning'}">
+                            ${isPast ? 'Realizada' : consulta.status}
+                        </span>
+                        <button class="btn btn-sm btn-danger ms-2" onclick="deleteAgenda('${consulta.id}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML += '</div>';
+}
+
+async function deleteAgenda(agendaId) {
+    if (!confirm('Tem certeza que deseja excluir esta consulta?')) return;
+
+    try {
+        const { error } = await supabase
+            .from('fit_agenda')
+            .delete()
+            .eq('id', agendaId);
+
+        if (error) throw error;
+
+        alert('Consulta excluída com sucesso!');
+        loadAgendaSection();
+        loadDashboardData();
+    } catch (error) {
+        console.error('Erro ao excluir consulta:', error);
+        alert('Erro ao excluir consulta: ' + error.message);
+    }
+}
