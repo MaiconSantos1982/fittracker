@@ -527,7 +527,11 @@ async function loadAlunoSelects() {
 // ========================================
 
 async function showAlunoDetails(alunoId) {
-    selectedAlunoId = alunoId;
+    try {
+        // Guarda o ID do aluno atual
+        currentAlunoDetailsId = alunoId;
+        
+        console.log('Carregando detalhes do aluno:', alunoId);
     const aluno = currentAlunos.find(a => a.id === alunoId);
     
     if (!aluno) return;
