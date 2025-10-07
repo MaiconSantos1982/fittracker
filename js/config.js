@@ -7,17 +7,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 console.log('Supabase inicializado:', supabase);
 
-// Configuração do OneSignal (adicione seu App ID quando tiver)
-const ONESIGNAL_APP_ID = 'SEU_ONESIGNAL_APP_ID'; // Substitua quando configurar o OneSignal
-
-// Inicializar OneSignal
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-        appId: ONESIGNAL_APP_ID,
-        allowLocalhostAsSecureOrigin: true
-    });
-});
 // OneSignal Push Notifications
 const ONESIGNAL_APP_ID = '84b83497-ef94-41bd-82e1-c5085a205bce';
 
