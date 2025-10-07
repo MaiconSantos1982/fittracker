@@ -623,3 +623,72 @@ body {
         transform: translateY(0);
     }
 }
+/* ========================================
+   OVERLAY MOBILE (quando sidebar aberta)
+======================================== */
+#sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* ========================================
+   MOBILE - MELHORIAS
+======================================== */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -260px;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    #sidebar.active {
+        margin-left: 0;
+    }
+    
+    /* Animação suave */
+    #sidebar {
+        transition: margin-left 0.3s ease;
+    }
+    
+    /* Navbar mobile */
+    .navbar {
+        padding: 12px 16px;
+    }
+    
+    .navbar-brand {
+        font-size: 18px;
+    }
+    
+    /* Cards menores no mobile */
+    .card.bg-primary .card-body h2,
+    .card.bg-success .card-body h2,
+    .card.bg-warning .card-body h2,
+    .card.bg-info .card-body h2 {
+        font-size: 28px;
+    }
+    
+    /* Busca de alunos */
+    .search-input {
+        font-size: 14px;
+        height: 44px;
+    }
+}
+
+/* ========================================
+   TRANSIÇÃO SUAVE DO CONTEÚDO
+======================================== */
+#content {
+    transition: margin-left 0.3s ease;
+}
