@@ -241,7 +241,466 @@
         </div>
     </div>
 
-    <!-- (AQUI VÃO TODOS OS MODALS - mantenha os que você já tem) -->
+    <!-- Modals -->
+    <!-- Modal Aluno -->
+    <div class="modal fade" id="alunoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cadastrar Aluno</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="alunoForm">
+                        <input type="hidden" id="alunoId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo *</label>
+                            <input type="text" class="form-control" id="alunoNome" required placeholder="Nome do aluno">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="alunoEmail" required placeholder="email@exemplo.com">
+                            <small class="text-muted">Será usado para login do aluno</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" class="form-control" id="alunoTelefone" placeholder="(00) 00000-0000">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control" id="alunoDataNasc">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Senha Inicial *</label>
+                            <input type="password" class="form-control" id="alunoSenha" minlength="6" required placeholder="Mínimo 6 caracteres">
+                            <small class="text-muted">O aluno poderá alterar depois do primeiro login</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Objetivo</label>
+                            <textarea class="form-control" id="alunoObjetivo" rows="3" placeholder="Ex: Perder peso, ganhar massa muscular..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" id="alunoObs" rows="3" placeholder="Restrições, histórico médico, etc."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAluno()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Treino -->
+    <div class="modal fade" id="treinoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Criar Treino</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="treinoForm">
+                        <div class="mb-3">
+                            <label class="form-label">Aluno</label>
+                            <select class="form-select" id="treinoAluno" required>
+                                <option value="">Selecione um aluno...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Treino</label>
+                            <input type="text" class="form-control" id="treinoNome" required placeholder="Ex: Treino A - Peito e Tríceps">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" id="treinoDesc" rows="2" placeholder="Descrição do treino..."></textarea>
+                        </div>
+                        <hr>
+                        <h6>Exercícios</h6>
+                        <div id="exerciciosContainer">
+                            <div class="exercicio-item card mb-2 p-3">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label>Nome do Exercício</label>
+                                        <input type="text" class="form-control exercicio-nome" required placeholder="Ex: Supino reto">
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label>Séries</label>
+                                        <input type="number" class="form-control exercicio-series" required placeholder="3">
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label>Repetições</label>
+                                        <input type="text" class="form-control exercicio-reps" required placeholder="10-12">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label>Descanso</label>
+                                        <input type="text" class="form-control exercicio-descanso" placeholder="60s">
+                                    </div>
+                                    <div class="col-md-8 mb-2">
+                                        <label>Vídeo Demonstrativo</label>
+                                        <input type="file" class="form-control exercicio-video" accept="video/*">
+                                    </div>
+                                    <div class="col-12">
+                                        <label>Observações</label>
+                                        <textarea class="form-control exercicio-obs" rows="2" placeholder="Técnica, dicas, etc."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-success" onclick="addExercicioField()">
+                            <i class="bi bi-plus"></i> Adicionar Exercício
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTreino()">Salvar Treino</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dieta -->
+    <div class="modal fade" id="dietaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Criar Dieta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dietaForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Aluno</label>
+                                <select class="form-select" id="dietaAluno" required>
+                                    <option value="">Selecione um aluno...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nome da Dieta</label>
+                                <input type="text" class="form-control" id="dietaNome" required placeholder="Ex: Dieta para Hipertrofia">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Data Início</label>
+                                <input type="date" class="form-control" id="dietaInicio" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Data Fim</label>
+                                <input type="date" class="form-control" id="dietaFim">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" id="dietaDesc" rows="2" placeholder="Orientações gerais..."></textarea>
+                        </div>
+                        <hr>
+                        <h6>Refeições</h6>
+                        <div id="refeicoesContainer">
+                            <div class="refeicao-item card mb-2 p-3">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label>Tipo de Refeição</label>
+                                        <select class="form-select refeicao-tipo">
+                                            <option>Café da Manhã</option>
+                                            <option>Lanche da Manhã</option>
+                                            <option>Almoço</option>
+                                            <option>Lanche da Tarde</option>
+                                            <option>Jantar</option>
+                                            <option>Ceia</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label>Horário</label>
+                                        <input type="time" class="form-control refeicao-horario">
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <label>Alimentos</label>
+                                        <textarea class="form-control refeicao-alimentos" rows="2" required placeholder="Ex: 2 ovos, 1 fatia de pão integral, 1 banana"></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <label>Observações</label>
+                                        <textarea class="form-control refeicao-obs" rows="1" placeholder="Opções, substituições, etc."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-success" onclick="addRefeicaoField()">
+                            <i class="bi bi-plus"></i> Adicionar Refeição
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDieta()">Salvar Dieta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Medidas -->
+    <div class="modal fade" id="medidaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Medidas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="medidaForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Aluno</label>
+                                <select class="form-select" id="medidaAluno" required>
+                                    <option value="">Selecione um aluno...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Data da Medição</label>
+                                <input type="date" class="form-control" id="medidaData" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Peso (kg)</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPeso">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Altura (cm)</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaAltura">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">% Gordura</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaGordura">
+                            </div>
+                        </div>
+                        <h6>Circunferências (cm)</h6>
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Pescoço</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPescoco">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Ombros</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaOmbros">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Peitoral</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPeitoral">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Cintura</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaCintura">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Abdômen</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaAbdomen">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Quadril</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaQuadril">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Braço D</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaBracoD">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Braço E</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaBracoE">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Coxa D</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaCoxaD">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Coxa E</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaCoxaE">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Panturrilha D</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPanturrilhaD">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Panturrilha E</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPanturrilhaE">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" id="medidaObs" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMedida()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agenda -->
+    <div class="modal fade" id="agendaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agendar Consulta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agendaForm">
+                        <input type="hidden" id="agendaId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Aluno</label>
+                            <select class="form-select" id="agendaAluno" required>
+                                <option value="">Selecione um aluno...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data e Hora</label>
+                            <input type="datetime-local" class="form-control" id="agendaDataHora" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Consulta</label>
+                            <select class="form-select" id="agendaTipo">
+                                <option>Avaliação Física</option>
+                                <option>Revisão de Treino</option>
+                                <option>Revisão de Dieta</option>
+                                <option>Reavaliação</option>
+                                <option>Outro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="agendaStatus">
+                                <option value="agendada">Agendada</option>
+                                <option value="confirmada">Confirmada</option>
+                                <option value="realizada">Realizada</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" id="agendaObs" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAgenda()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes do Aluno -->
+    <div class="modal fade" id="alunoDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="alunoDetailsName">Carregando...</h5>
+                        <small class="text-muted" id="alunoDetailsEmail"></small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="alunoDetailsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button">
+                                <i class="bi bi-info-circle"></i> Informações
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="treinos-tab" data-bs-toggle="tab" data-bs-target="#treinos-pane" type="button">
+                                <i class="bi bi-lightning"></i> Treinos
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="dietas-tab" data-bs-toggle="tab" data-bs-target="#dietas-pane" type="button">
+                                <i class="bi bi-egg-fried"></i> Dietas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="medidas-tab" data-bs-toggle="tab" data-bs-target="#medidas-pane" type="button">
+                                <i class="bi bi-rulers"></i> Medidas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="agenda-tab" data-bs-toggle="tab" data-bs-target="#agenda-pane" type="button">
+                                <i class="bi bi-calendar"></i> Agenda
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="alunoDetailsTabContent">
+                        <!-- Informações -->
+                        <div class="tab-pane fade show active" id="info-pane">
+                            <div id="alunoInfoContent"></div>
+                        </div>
+
+                        <!-- Treinos -->
+                        <div class="tab-pane fade" id="treinos-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Treinos do Aluno</h6>
+                                <button class="btn btn-sm btn-primary" onclick="quickAddTreinoFromDetails()">
+                                    <i class="bi bi-plus"></i> Novo Treino
+                                </button>
+                            </div>
+                            <div id="alunoTreinosContent"></div>
+                        </div>
+
+                        <!-- Dietas -->
+                        <div class="tab-pane fade" id="dietas-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Dietas do Aluno</h6>
+                                <button class="btn btn-sm btn-success" onclick="quickAddDietaFromDetails()">
+                                    <i class="bi bi-plus"></i> Nova Dieta
+                                </button>
+                            </div>
+                            <div id="alunoDietasContent"></div>
+                        </div>
+
+                        <!-- Medidas -->
+                        <div class="tab-pane fade" id="medidas-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Evolução de Medidas</h6>
+                                <button class="btn btn-sm btn-info" onclick="quickAddMedidaFromDetails()">
+                                    <i class="bi bi-plus"></i> Registrar Medidas
+                                </button>
+                            </div>
+                            <div id="alunoMedidasContent"></div>
+                        </div>
+
+                        <!-- Agenda -->
+                        <div class="tab-pane fade" id="agenda-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Consultas Agendadas</h6>
+                                <button class="btn btn-sm btn-warning" onclick="quickAddAgendaFromDetails()">
+                                    <i class="bi bi-plus"></i> Agendar Consulta
+                                </button>
+                            </div>
+                            <div id="alunoAgendaContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
