@@ -117,19 +117,26 @@ async function loadDashboardData() {
             console.log('Total de treinos:', treinos.length);
         }
 
-        // Consultas hoje
-        const today = new Date().toISOString().split('T')[0];
-        const { data: consultas } = await supabase
-            .from('fit_agenda')
-            .select('*', { count: 'exact' })
-            .eq('personal_id', currentUser.id)
-            .gte('data_consulta', today + ' 00:00:00')
-            .lte('data_consulta', today + ' 23:59:59');
+// Consultas hoje
+const today = new Date();
+const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
 
-        if (consultas) {
-            document.getElementById('consultasHoje').textContent = consultas.length;
-            console.log('Consultas hoje:', consultas.length);
-        }
+// Formatar para string sem timezone
+const startStr = todayStart.toISOString().slice(0, 19).replace('T', ' ');
+const endStr = todayEnd.toISOString().slice(0, 19).replace('T', ' ');
+
+const { data: consultas } = await supabase
+    .from('fit_agenda')
+    .select('*', { count: 'exact' })
+    .eq('personal_id', currentUser.id)
+    .gte('data_consulta', startStr)
+    .lte('data_consulta', endStr);
+
+if (consultas) {
+    document.getElementById('consultasHoje').textContent = consultas.length;
+    console.log('Consultas hoje:', consultas.length);
+}
     } catch (error) {
         console.error('Erro ao carregar dashboard:', error);
     }
@@ -1585,8 +1592,17 @@ function renderAgenda(consultas) {
     container.innerHTML = '<div class="list-group">';
 
     consultas.forEach(consulta => {
-        const data = new Date(consulta.data_consulta);
-        const isPast = data < new Date();
+        // Interpretar a data como está no banco (sem conversão UTC automática)
+        const dataStr = consulta.data_consulta.replace(' ', 'T');
+        const data = new Date(dataStr + 'Z'); // Força UTC
+        
+        // Ajustar para timezone local brasileiro (-03:00)
+        const dataLocal = new Date(data.getTime());
+        
+        const isPast = dataLocal < new Date();
+        
+        console.log('Data do banco:', consulta.data_consulta);
+        console.log('Data exibida:', dataLocal);
         
         container.innerHTML += `
             <div class="list-group-item ${isPast ? 'bg-light' : ''}">
@@ -1599,7 +1615,7 @@ function renderAgenda(consultas) {
                             </span>
                         </div>
                         <p class="mb-1">
-                            <i class="bi bi-calendar"></i> ${data.toLocaleDateString('pt-BR')} às ${data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}
+                            <i class="bi bi-calendar"></i> ${dataLocal.toLocaleDateString('pt-BR')} às ${dataLocal.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}
                         </p>
                         <p class="mb-1"><strong>${consulta.tipo_consulta}</strong></p>
                         ${consulta.observacoes ? `<p class="mb-0 text-muted small">${consulta.observacoes}</p>` : ''}
