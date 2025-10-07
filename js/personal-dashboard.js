@@ -15,12 +15,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Navegação entre seções
+// Navegação entre seções
 function setupNavigation() {
     const overlay = document.getElementById('sidebar-overlay');
     
     document.querySelectorAll('#sidebar a[data-section]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
+            
             const section = e.target.closest('a').dataset.section;
             showSection(section);
             
@@ -32,6 +34,94 @@ function setupNavigation() {
             closeSidebar();
         });
     });
+    
+    // Toggle sidebar
+    const sidebarCollapseBtn = document.getElementById('sidebarCollapse');
+    if (sidebarCollapseBtn) {
+        sidebarCollapseBtn.addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+            
+            // Toggle overlay no mobile
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains('active')) {
+                    overlay.style.display = 'block';
+                    setTimeout(() => overlay.classList.add('active'), 10);
+                } else {
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.style.display = 'none', 300);
+                }
+            }
+        });
+    }
+}
+
+function showSection(sectionName) {
+    console.log('Mostrando seção:', sectionName);
+    
+    // Esconde todas as seções
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Mostra a seção selecionada
+    const targetSection = document.getElementById('section-' + sectionName);
+    if (targetSection) {
+        targetSection.style.display = 'block';
+    } else {
+        console.error('Seção não encontrada:', 'section-' + sectionName);
+    }
+    
+    // Atualiza título da navbar
+    const titles = {
+        'dashboard': 'Dashboard',
+        'alunos': 'Alunos',
+        'treinos': 'Treinos',
+        'dietas': 'Dietas',
+        'medidas': 'Medidas',
+        'agenda': 'Agenda',
+        'notificacoes': 'Notificações'
+    };
+    
+    const navbar = document.getElementById('currentSection');
+    if (navbar) {
+        navbar.textContent = titles[sectionName] || sectionName;
+    }
+    
+    // Carrega dados específicos da seção
+    switch(sectionName) {
+        case 'alunos':
+            loadAlunos();
+            break;
+        case 'treinos':
+            loadTreinosSection();
+            break;
+        case 'dietas':
+            loadDietasSection();
+            break;
+        case 'medidas':
+            loadMedidasSection();
+            break;
+        case 'agenda':
+            loadAgendaSection();
+            break;
+    }
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    if (sidebar) {
+        sidebar.classList.remove('active');
+    }
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => overlay.style.display = 'none', 300);
+    }
+}
+
 
     // Toggle sidebar
     const sidebarCollapseBtn = document.getElementById('sidebarCollapse');
