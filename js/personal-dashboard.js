@@ -130,6 +130,7 @@ async function loadDashboardData() {
 async function loadAlunos() {
     try {
         console.log('Carregando alunos...');
+        console.log('Personal ID:', currentUser.id);
         
         const { data, error } = await supabase
             .from('fit_alunos')
@@ -141,17 +142,34 @@ async function loadAlunos() {
                     phone
                 )
             `)
-            .eq('personal_id', currentUser.id);
+            .eq('personal_id', currentUser.id)
+            .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Erro ao carregar alunos:', error);
+            throw error;
+        }
+
+        console.log('Alunos carregados:', data);
+        
+        // Debug: Ver cada aluno
+        data?.forEach(aluno => {
+            console.log('Aluno:', {
+                id: aluno.id,
+                profile_id: aluno.profile_id,
+                profile: aluno.profile,
+                nome: aluno.profile?.full_name
+            });
+        });
 
         currentAlunos = data || [];
-        console.log('Alunos carregados:', currentAlunos.length);
         renderAlunosTable(currentAlunos);
     } catch (error) {
         console.error('Erro ao carregar alunos:', error);
+        alert('Erro ao carregar alunos: ' + error.message);
     }
 }
+
 
 function renderAlunosTable(alunos) {
     const tbody = document.getElementById('alunosTable');
@@ -171,21 +189,30 @@ function renderAlunosTable(alunos) {
     tbody.innerHTML = '';
 
     alunos.forEach(aluno => {
+        // Debug: logar dados de cada aluno
+        console.log('Renderizando aluno:', aluno);
+        
         const tr = document.createElement('tr');
+        
+        // Verificar se o profile existe
+        const nomeAluno = aluno.profile?.full_name || 'Nome não disponível';
+        const emailAluno = aluno.profile?.email || 'Email não disponível';
+        const telefoneAluno = aluno.profile?.phone || '-';
+        
         tr.innerHTML = `
-            <td>${aluno.profile?.full_name || 'N/A'}</td>
-            <td>${aluno.profile?.email || 'N/A'}</td>
-            <td>${aluno.profile?.phone || '-'}</td>
+            <td>${nomeAluno}</td>
+            <td>${emailAluno}</td>
+            <td>${telefoneAluno}</td>
             <td>
                 <span class="badge ${aluno.ativo ? 'bg-success' : 'bg-secondary'}">
                     ${aluno.ativo ? 'Ativo' : 'Inativo'}
                 </span>
             </td>
             <td>
-                <button class="btn btn-sm btn-primary" onclick="editAluno('${aluno.id}')">
+                <button class="btn btn-sm btn-primary" onclick="editAluno('${aluno.id}')" title="Editar">
                     <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteAluno('${aluno.id}')">
+                <button class="btn btn-sm btn-danger" onclick="deleteAluno('${aluno.id}')" title="Excluir">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
