@@ -764,3 +764,138 @@ body {
         margin-bottom: 16px;
     }
 }
+/* ========================================
+   SIDEBAR ALUNO (DESKTOP)
+   ======================================== */
+@media (min-width: 769px) {
+    body.aluno-dashboard #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        background: var(--sidebar-bg);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 16px rgba(0, 0, 0, 0.06);
+        z-index: 999;
+    }
+    
+    body.aluno-dashboard #sidebar .components {
+        flex: 1;
+        overflow-y: auto;
+    }
+    
+    body.aluno-dashboard #content {
+        margin-left: 260px;
+        width: calc(100% - 260px);
+    }
+    
+    body.aluno-dashboard #sidebarCollapse {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   SIDEBAR ALUNO (MOBILE - BOTTOM NAV)
+   ======================================== */
+@media (max-width: 768px) {
+    body.aluno-dashboard #sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+        background: white;
+        box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        transition: none !important;
+        margin-left: 0 !important;
+    }
+    
+    body.aluno-dashboard #sidebar .p-4,
+    body.aluno-dashboard #sidebar .p-3,
+    body.aluno-dashboard #sidebar .border-bottom,
+    body.aluno-dashboard #sidebar .border-top {
+        display: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar .components {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        list-style: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul {
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li {
+        flex: 1 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li::before {
+        content: none !important;
+        display: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li a {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 8px 5px !important;
+        font-size: 11px !important;
+        text-decoration: none !important;
+        color: #6c757d !important;
+        transition: all 0.2s !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        transform: none !important;
+        gap: 4px !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li a:hover {
+        background: transparent !important;
+        transform: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li a i {
+        font-size: 20px !important;
+        margin-bottom: 4px !important;
+        width: auto !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li a.active {
+        color: #3498db !important;
+        background: rgba(52, 152, 219, 0.1) !important;
+        box-shadow: none !important;
+    }
+    
+    body.aluno-dashboard #content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-bottom: 90px !important;
+    }
+    
+    body.aluno-dashboard #sidebar-overlay {
+        display: none !important;
+    }
+    
+    body.aluno-dashboard #sidebarCollapse {
+        display: none !important;
+    }
+}
