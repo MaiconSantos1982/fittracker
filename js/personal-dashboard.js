@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Navegação entre seções
 function setupNavigation() {
+    const overlay = document.getElementById('sidebar-overlay');
+    
     document.querySelectorAll('#sidebar a[data-section]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -27,9 +29,7 @@ function setupNavigation() {
             e.target.closest('a').classList.add('active');
             
             // Fechar sidebar no mobile após seleção
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('active');
-            }
+            closeSidebar();
         });
     });
 
