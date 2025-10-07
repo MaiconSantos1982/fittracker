@@ -198,15 +198,28 @@ function openAlunoModal(alunoId = null) {
     document.getElementById('alunoForm').reset();
     document.getElementById('alunoId').value = '';
     
+    // Limpar validação
+    document.getElementById('alunoSenha').removeAttribute('required');
+    
     if (alunoId) {
         const aluno = currentAlunos.find(a => a.id === alunoId);
         if (aluno) {
             document.getElementById('alunoId').value = aluno.id;
+            document.getElementById('alunoNome').value = aluno.profile?.full_name || '';
             document.getElementById('alunoEmail').value = aluno.profile?.email || '';
+            document.getElementById('alunoTelefone').value = aluno.profile?.phone || '';
             document.getElementById('alunoDataNasc').value = aluno.data_nascimento || '';
             document.getElementById('alunoObjetivo').value = aluno.objetivo || '';
             document.getElementById('alunoObs').value = aluno.observacoes || '';
+            
+            // Senha não é obrigatória na edição
+            document.getElementById('alunoSenha').removeAttribute('required');
+            document.querySelector('#alunoModal .modal-title').textContent = 'Editar Aluno';
         }
+    } else {
+        // Senha é obrigatória no cadastro
+        document.getElementById('alunoSenha').setAttribute('required', 'required');
+        document.querySelector('#alunoModal .modal-title').textContent = 'Cadastrar Aluno';
     }
 }
 
