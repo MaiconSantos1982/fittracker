@@ -67,6 +67,25 @@ function showSection(sectionName) {
     document.getElementById('section-' + sectionName).style.display = 'block';
     document.getElementById('currentSection').textContent = 
         sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+    
+    // ✅ CARREGA OS DADOS ESPECÍFICOS DA SEÇÃO
+    switch(sectionName) {
+        case 'alunos':
+            loadAlunos();
+            break;
+        case 'treinos':
+            loadTreinosSection();
+            break;
+        case 'dietas':
+            loadDietasSection();
+            break;
+        case 'medidas':
+            loadMedidasSection();
+            break;
+        case 'agenda':
+            loadAgendaSection();
+            break;
+    }
 }
 
 function closeSidebar() {
