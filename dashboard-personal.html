@@ -522,49 +522,60 @@
         </div>
     </div>
 
-    <!-- Modal Agenda -->
-    <div class="modal fade" id="agendaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Agendar Consulta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="agendaForm">
-                        <div class="mb-3">
-                            <label class="form-label">Aluno</label>
-                            <select class="form-select" id="agendaAluno" required>
-                                <option value="">Selecione um aluno...</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Data e Hora</label>
-                            <input type="datetime-local" class="form-control" id="agendaDataHora" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tipo de Consulta</label>
-                            <select class="form-select" id="agendaTipo">
-                                <option>Avaliação Física</option>
-                                <option>Revisão de Treino</option>
-                                <option>Revisão de Dieta</option>
-                                <option>Reavaliação</option>
-                                <option>Outro</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Observações</label>
-                            <textarea class="form-control" id="agendaObs" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveAgenda()">Salvar</button>
-                </div>
+<!-- Modal Agenda -->
+<div class="modal fade" id="agendaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agendar Consulta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="agendaForm">
+                    <input type="hidden" id="agendaId">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Aluno</label>
+                        <select class="form-select" id="agendaAluno" required>
+                            <option value="">Selecione um aluno...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data e Hora</label>
+                        <input type="datetime-local" class="form-control" id="agendaDataHora" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Consulta</label>
+                        <select class="form-select" id="agendaTipo">
+                            <option>Avaliação Física</option>
+                            <option>Revisão de Treino</option>
+                            <option>Revisão de Dieta</option>
+                            <option>Reavaliação</option>
+                            <option>Outro</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="agendaStatus">
+                            <option value="agendada">Agendada</option>
+                            <option value="confirmada">Confirmada</option>
+                            <option value="realizada">Realizada</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observações</label>
+                        <textarea class="form-control" id="agendaObs" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveAgenda()">Salvar</button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal Detalhes do Aluno -->
     <div class="modal fade" id="alunoDetailsModal" tabindex="-1">
