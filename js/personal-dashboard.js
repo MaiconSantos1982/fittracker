@@ -1,5 +1,6 @@
 let currentUser = null;
 let currentAlunos = [];
+let selectedAlunoId = null;
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -152,7 +153,6 @@ async function loadAlunos() {
 
         console.log('Alunos carregados:', data);
         
-        // Debug: Ver cada aluno
         data?.forEach(aluno => {
             console.log('Aluno:', {
                 id: aluno.id,
@@ -170,29 +170,16 @@ async function loadAlunos() {
     }
 }
 
-
 function renderAlunosTable(alunos) {
-    const container = document.getElementById('alunosTable');
+    const container = document.getElementById('alunosContainer');
     
-    // Mudar de tbody para container de cards
-    const cardsContainer = document.getElementById('alunosContainer');
-    
-    // Se ainda não existe, criar
-    if (!cardsContainer) {
-        const alunosSection = document.getElementById('section-alunos');
-        alunosSection.querySelector('.table-responsive')?.remove();
-        
-        const newContainer = document.createElement('div');
-        newContainer.id = 'alunosContainer';
-        newContainer.className = 'row g-3';
-        alunosSection.querySelector('.card')?.remove();
-        alunosSection.appendChild(newContainer);
+    if (!container) {
+        console.error('Container alunosContainer não encontrado');
+        return;
     }
     
-    const finalContainer = document.getElementById('alunosContainer');
-    
     if (!alunos || alunos.length === 0) {
-        finalContainer.innerHTML = `
+        container.innerHTML = `
             <div class="col-12">
                 <div class="alert alert-info text-center">
                     <i class="bi bi-people" style="font-size: 48px; opacity: 0.3;"></i>
@@ -203,7 +190,7 @@ function renderAlunosTable(alunos) {
         return;
     }
 
-    finalContainer.innerHTML = '';
+    container.innerHTML = '';
 
     alunos.forEach(aluno => {
         const nomeAluno = aluno.profile?.full_name || 'Nome não disponível';
@@ -264,7 +251,7 @@ function renderAlunosTable(alunos) {
                 </div>
             </div>
         `;
-        finalContainer.appendChild(col);
+        container.appendChild(col);
     });
 }
 
@@ -272,7 +259,6 @@ function openAlunoModal(alunoId = null) {
     document.getElementById('alunoForm').reset();
     document.getElementById('alunoId').value = '';
     
-    // Limpar validação
     document.getElementById('alunoSenha').removeAttribute('required');
     
     if (alunoId) {
@@ -286,12 +272,10 @@ function openAlunoModal(alunoId = null) {
             document.getElementById('alunoObjetivo').value = aluno.objetivo || '';
             document.getElementById('alunoObs').value = aluno.observacoes || '';
             
-            // Senha não é obrigatória na edição
             document.getElementById('alunoSenha').removeAttribute('required');
             document.querySelector('#alunoModal .modal-title').textContent = 'Editar Aluno';
         }
     } else {
-        // Senha é obrigatória no cadastro
         document.getElementById('alunoSenha').setAttribute('required', 'required');
         document.querySelector('#alunoModal .modal-title').textContent = 'Cadastrar Aluno';
     }
@@ -313,7 +297,6 @@ async function saveAluno() {
         const objetivo = document.getElementById('alunoObjetivo').value.trim();
         const observacoes = document.getElementById('alunoObs').value.trim();
 
-        // Validações
         if (!nome || !email || !senha) {
             alert('Preencha todos os campos obrigatórios!');
             return;
@@ -326,7 +309,6 @@ async function saveAluno() {
 
         console.log('Iniciando cadastro de aluno:', email);
 
-        // 1. Verificar se o email já existe em fit_profiles
         const { data: existingProfile, error: checkError } = await supabase
             .from('fit_profiles')
             .select('id, user_type')
@@ -340,10 +322,8 @@ async function saveAluno() {
         let profileId = null;
 
         if (existingProfile) {
-            // Email já existe
             console.log('Email já cadastrado:', existingProfile);
 
-            // Verificar se já é aluno deste personal
             const { data: alunoExistente } = await supabase
                 .from('fit_alunos')
                 .select('id')
@@ -356,10 +336,8 @@ async function saveAluno() {
                 return;
             }
 
-            // Usar o profile existente
             profileId = existingProfile.id;
             
-            // Atualizar dados do profile (se necessário)
             await supabase
                 .from('fit_profiles')
                 .update({
@@ -372,10 +350,8 @@ async function saveAluno() {
             console.log('Profile existente atualizado');
 
         } else {
-            // Email NÃO existe - criar novo usuário
             console.log('Criando novo usuário no Auth...');
 
-            // 2. Criar usuário no Supabase Auth
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: email,
                 password: senha,
@@ -399,7 +375,6 @@ async function saveAluno() {
             profileId = authData.user.id;
             console.log('Usuário criado no Auth:', profileId);
 
-            // 3. Criar perfil em fit_profiles
             const { error: profileError } = await supabase
                 .from('fit_profiles')
                 .insert({
@@ -418,7 +393,6 @@ async function saveAluno() {
             console.log('Profile criado em fit_profiles');
         }
 
-        // 4. Criar vínculo em fit_alunos
         const alunoData = {
             personal_id: currentUser.id,
             profile_id: profileId,
@@ -465,7 +439,6 @@ async function saveAluno() {
     }
 }
 
-
 async function deleteAluno(alunoId) {
     if (!confirm('Tem certeza que deseja excluir este aluno? Todos os treinos, dietas e medidas relacionados também serão excluídos.')) return;
 
@@ -487,7 +460,6 @@ async function deleteAluno(alunoId) {
     }
 }
 
-// Carregar selects de alunos
 async function loadAlunoSelects() {
     try {
         const { data: alunos } = await supabase
@@ -514,7 +486,6 @@ async function loadAlunoSelects() {
             const select = document.getElementById(selectId);
             if (select) {
                 if (selectId === 'notifDestinatarios') {
-                    // Manter opção "todos"
                     select.innerHTML = '<option value="todos">Todos os Alunos</option>';
                 } else {
                     select.innerHTML = '<option value="">Selecione um aluno...</option>';
@@ -531,6 +502,295 @@ async function loadAlunoSelects() {
     } catch (error) {
         console.error('Erro ao carregar selects:', error);
     }
+}
+
+// ========================================
+// MODAL DETALHES DO ALUNO
+// ========================================
+
+async function showAlunoDetails(alunoId) {
+    selectedAlunoId = alunoId;
+    const aluno = currentAlunos.find(a => a.id === alunoId);
+    
+    if (!aluno) return;
+    
+    document.getElementById('alunoDetailsName').textContent = aluno.profile?.full_name || 'N/A';
+    document.getElementById('alunoDetailsEmail').textContent = aluno.profile?.email || 'N/A';
+    
+    loadAlunoInfo(aluno);
+    
+    const modal = new bootstrap.Modal(document.getElementById('alunoDetailsModal'));
+    modal.show();
+    
+    document.querySelectorAll('#alunoDetailsTabs button').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function(e) {
+            const target = e.target.getAttribute('data-bs-target');
+            switch(target) {
+                case '#treinos-pane':
+                    loadAlunoTreinos(alunoId);
+                    break;
+                case '#dietas-pane':
+                    loadAlunoDietas(alunoId);
+                    break;
+                case '#medidas-pane':
+                    loadAlunoMedidasDetails(alunoId);
+                    break;
+                case '#agenda-pane':
+                    loadAlunoAgenda(alunoId);
+                    break;
+            }
+        });
+    });
+}
+
+function loadAlunoInfo(aluno) {
+    const content = document.getElementById('alunoInfoContent');
+    content.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Nome:</strong> ${aluno.profile?.full_name || 'N/A'}</p>
+                <p><strong>Email:</strong> ${aluno.profile?.email || 'N/A'}</p>
+                <p><strong>Telefone:</strong> ${aluno.profile?.phone || 'Não informado'}</p>
+                <p><strong>Data de Nascimento:</strong> ${aluno.data_nascimento ? new Date(aluno.data_nascimento).toLocaleDateString('pt-BR') : 'Não informado'}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Status:</strong> 
+                    <span class="badge ${aluno.ativo ? 'bg-success' : 'bg-secondary'}">
+                        ${aluno.ativo ? 'Ativo' : 'Inativo'}
+                    </span>
+                </p>
+                <p><strong>Objetivo:</strong><br>${aluno.objetivo || 'Não informado'}</p>
+                ${aluno.observacoes ? `<p><strong>Observações:</strong><br>${aluno.observacoes}</p>` : ''}
+            </div>
+        </div>
+        <hr>
+        <button class="btn btn-sm btn-primary" onclick="editAluno('${aluno.id}')">
+            <i class="bi bi-pencil"></i> Editar Informações
+        </button>
+    `;
+}
+
+async function loadAlunoTreinos(alunoId) {
+    const content = document.getElementById('alunoTreinosContent');
+    content.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+    
+    try {
+        const { data: treinos, error } = await supabase
+            .from('fit_treinos')
+            .select(`
+                *,
+                exercicios:fit_exercicios(count)
+            `)
+            .eq('aluno_id', alunoId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!treinos || treinos.length === 0) {
+            content.innerHTML = '<div class="alert alert-info">Nenhum treino cadastrado</div>';
+            return;
+        }
+
+        content.innerHTML = treinos.map(t => `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h6>${t.nome}</h6>
+                    ${t.descricao ? `<p class="mb-1 small text-muted">${t.descricao}</p>` : ''}
+                    <small class="text-muted">
+                        <i class="bi bi-clipboard-check"></i> ${t.exercicios?.[0]?.count || 0} exercícios
+                    </small>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Erro ao carregar treinos:', error);
+        content.innerHTML = '<div class="alert alert-danger">Erro ao carregar treinos</div>';
+    }
+}
+
+async function loadAlunoDietas(alunoId) {
+    const content = document.getElementById('alunoDietasContent');
+    content.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+    
+    try {
+        const { data: dietas, error } = await supabase
+            .from('fit_dietas')
+            .select(`
+                *,
+                refeicoes:fit_refeicoes(count)
+            `)
+            .eq('aluno_id', alunoId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!dietas || dietas.length === 0) {
+            content.innerHTML = '<div class="alert alert-info">Nenhuma dieta cadastrada</div>';
+            return;
+        }
+
+        content.innerHTML = dietas.map(d => `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>${d.nome}</h6>
+                            ${d.descricao ? `<p class="mb-1 small text-muted">${d.descricao}</p>` : ''}
+                            <small class="text-muted">
+                                <i class="bi bi-egg-fried"></i> ${d.refeicoes?.[0]?.count || 0} refeições
+                            </small>
+                        </div>
+                        <span class="badge ${d.ativa ? 'bg-success' : 'bg-secondary'}">
+                            ${d.ativa ? 'Ativa' : 'Inativa'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Erro ao carregar dietas:', error);
+        content.innerHTML = '<div class="alert alert-danger">Erro ao carregar dietas</div>';
+    }
+}
+
+async function loadAlunoMedidasDetails(alunoId) {
+    const content = document.getElementById('alunoMedidasContent');
+    content.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+    
+    try {
+        const { data: medidas, error } = await supabase
+            .from('fit_medidas')
+            .select('*')
+            .eq('aluno_id', alunoId)
+            .order('data_medicao', { ascending: false })
+            .limit(5);
+
+        if (error) throw error;
+
+        if (!medidas || medidas.length === 0) {
+            content.innerHTML = '<div class="alert alert-info">Nenhuma medida registrada</div>';
+            return;
+        }
+
+        content.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Peso</th>
+                            <th>% Gordura</th>
+                            <th>Cintura</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${medidas.map(m => `
+                            <tr>
+                                <td>${new Date(m.data_medicao).toLocaleDateString('pt-BR')}</td>
+                                <td>${m.peso || '-'} kg</td>
+                                <td>${m.percentual_gordura || '-'}%</td>
+                                <td>${m.cintura || '-'} cm</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Erro ao carregar medidas:', error);
+        content.innerHTML = '<div class="alert alert-danger">Erro ao carregar medidas</div>';
+    }
+}
+
+async function loadAlunoAgenda(alunoId) {
+    const content = document.getElementById('alunoAgendaContent');
+    content.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+    
+    try {
+        const { data: consultas, error } = await supabase
+            .from('fit_agenda')
+            .select('*')
+            .eq('aluno_id', alunoId)
+            .order('data_consulta', { ascending: true });
+
+        if (error) throw error;
+
+        if (!consultas || consultas.length === 0) {
+            content.innerHTML = '<div class="alert alert-info">Nenhuma consulta agendada</div>';
+            return;
+        }
+
+        content.innerHTML = consultas.map(c => {
+            const data = new Date(c.data_consulta);
+            const isPast = data < new Date();
+            return `
+                <div class="card mb-2 ${isPast ? 'bg-light' : ''}">
+                    <div class="card-body py-2">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>${c.tipo_consulta}</strong><br>
+                                <small>${data.toLocaleDateString('pt-BR')} às ${data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</small>
+                            </div>
+                            <span class="badge ${isPast ? 'bg-secondary' : 'bg-primary'}">
+                                ${isPast ? 'Realizada' : c.status}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao carregar agenda:', error);
+        content.innerHTML = '<div class="alert alert-danger">Erro ao carregar agenda</div>';
+    }
+}
+
+function quickAddTreino(alunoId) {
+    selectedAlunoId = alunoId;
+    document.getElementById('treinoAluno').value = alunoId;
+    openTreinoModal();
+    const modal = new bootstrap.Modal(document.getElementById('treinoModal'));
+    modal.show();
+}
+
+function quickAddDieta(alunoId) {
+    selectedAlunoId = alunoId;
+    document.getElementById('dietaAluno').value = alunoId;
+    openDietaModal();
+    const modal = new bootstrap.Modal(document.getElementById('dietaModal'));
+    modal.show();
+}
+
+function quickAddMedida(alunoId) {
+    selectedAlunoId = alunoId;
+    document.getElementById('medidaAluno').value = alunoId;
+    openMedidaModal();
+    const modal = new bootstrap.Modal(document.getElementById('medidaModal'));
+    modal.show();
+}
+
+function quickAddAgenda(alunoId) {
+    selectedAlunoId = alunoId;
+    document.getElementById('agendaAluno').value = alunoId;
+    openAgendaModal();
+    const modal = new bootstrap.Modal(document.getElementById('agendaModal'));
+    modal.show();
+}
+
+function quickAddTreinoFromDetails() {
+    quickAddTreino(selectedAlunoId);
+}
+
+function quickAddDietaFromDetails() {
+    quickAddDieta(selectedAlunoId);
+}
+
+function quickAddMedidaFromDetails() {
+    quickAddMedida(selectedAlunoId);
+}
+
+function quickAddAgendaFromDetails() {
+    quickAddAgenda(selectedAlunoId);
 }
 
 // ========================================
@@ -595,7 +855,6 @@ async function saveTreino() {
             return;
         }
 
-        // Criar treino
         const { data: treino, error: treinoError } = await supabase
             .from('fit_treinos')
             .insert({
@@ -609,7 +868,6 @@ async function saveTreino() {
 
         if (treinoError) throw treinoError;
 
-        // Adicionar exercícios
         const exercicioItems = document.querySelectorAll('.exercicio-item');
         let ordem = 1;
 
@@ -625,7 +883,6 @@ async function saveTreino() {
 
             let videoUrl = null;
 
-            // Upload de vídeo se fornecido
             if (videoFile) {
                 const fileName = `${currentUser.id}/${Date.now()}_${videoFile.name}`;
                 const { data: uploadData, error: uploadError } = await supabase.storage
@@ -804,7 +1061,13 @@ async function saveDieta() {
             return;
         }
 
-        // Criar dieta
+        if (!nome) {
+            alert('Digite o nome da dieta!');
+            return;
+        }
+
+        console.log('Criando dieta...');
+
         const { data: dieta, error: dietaError } = await supabase
             .from('fit_dietas')
             .insert({
@@ -819,29 +1082,56 @@ async function saveDieta() {
             .select()
             .single();
 
-        if (dietaError) throw dietaError;
+        if (dietaError) {
+            console.error('Erro ao criar dieta:', dietaError);
+            throw dietaError;
+        }
 
-        // Adicionar refeições
+        console.log('Dieta criada:', dieta);
+
         const refeicaoItems = document.querySelectorAll('.refeicao-item');
+        let refeicoesAdicionadas = 0;
 
         for (const item of refeicaoItems) {
             const tipo = item.querySelector('.refeicao-tipo').value;
             const horario = item.querySelector('.refeicao-horario').value;
-            const alimentos = item.querySelector('.refeicao-alimentos').value;
-            const obs = item.querySelector('.refeicao-obs').value;
+            const alimentos = item.querySelector('.refeicao-alimentos').value.trim();
+            const obs = item.querySelector('.refeicao-obs').value.trim();
 
-            if (!alimentos) continue;
+            if (!alimentos) {
+                console.log('Refeição sem alimentos, pulando...');
+                continue;
+            }
 
-            await supabase.from('fit_refeicoes').insert({
-                dieta_id: dieta.id,
-                tipo_refeicao: tipo,
-                horario: horario || null,
-                alimentos: alimentos,
-                observacoes: obs
-            });
+            console.log('Inserindo refeição:', tipo);
+
+            const { data: refeicao, error: refeicaoError } = await supabase
+                .from('fit_refeicoes')
+                .insert({
+                    dieta_id: dieta.id,
+                    tipo_refeicao: tipo,
+                    horario: horario || null,
+                    alimentos: alimentos,
+                    observacoes: obs || null
+                })
+                .select()
+                .single();
+
+            if (refeicaoError) {
+                console.error('Erro ao inserir refeição:', refeicaoError);
+                throw refeicaoError;
+            }
+
+            console.log('Refeição inserida:', refeicao);
+            refeicoesAdicionadas++;
         }
 
-        alert('Dieta criada com sucesso!');
+        if (refeicoesAdicionadas === 0) {
+            alert('Atenção: Dieta criada, mas nenhuma refeição foi adicionada. Adicione pelo menos uma refeição!');
+        } else {
+            alert(`Dieta criada com sucesso com ${refeicoesAdicionadas} refeição(ões)!`);
+        }
+
         bootstrap.Modal.getInstance(document.getElementById('dietaModal')).hide();
         loadDietas();
         loadDashboardData();
@@ -988,7 +1278,6 @@ async function saveMedida() {
         alert('Medidas registradas com sucesso!');
         bootstrap.Modal.getInstance(document.getElementById('medidaModal')).hide();
         
-        // Recarregar medidas se o aluno selecionado for o mesmo
         if (document.getElementById('alunoMedidasSelect').value === alunoId) {
             loadMedidas();
         }
@@ -1028,7 +1317,6 @@ function renderMedidasChart(medidas) {
         return;
     }
 
-    // Criar gráfico de evolução de peso
     const labels = medidas.map(m => new Date(m.data_medicao).toLocaleDateString('pt-BR')).reverse();
     const pesoData = medidas.map(m => m.peso).reverse();
 
@@ -1070,7 +1358,6 @@ function renderMedidasChart(medidas) {
         </div>
     `;
 
-    // Criar gráfico
     const ctx = document.getElementById('pesoChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
@@ -1205,7 +1492,6 @@ document.getElementById('notificationForm')?.addEventListener('submit', async (e
         const titulo = document.getElementById('notifTitulo').value;
         const mensagem = document.getElementById('notifMensagem').value;
 
-        // Buscar Player IDs
         let playerIds = [];
         
         if (destinatarios.includes('todos')) {
@@ -1229,7 +1515,6 @@ document.getElementById('notificationForm')?.addEventListener('submit', async (e
             return;
         }
 
-        // Enviar notificação via OneSignal REST API
         alert('Recurso de notificações será implementado quando o OneSignal estiver configurado.');
         document.getElementById('notificationForm').reset();
         
