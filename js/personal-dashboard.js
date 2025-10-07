@@ -1523,3 +1523,46 @@ document.getElementById('notificationForm')?.addEventListener('submit', async (e
         alert('Erro ao enviar notificação: ' + error.message);
     }
 });
+// ========================================
+// BUSCA/FILTRO DE ALUNOS
+// ========================================
+
+function filterAlunos() {
+    const searchTerm = document.getElementById('searchAluno').value.toLowerCase().trim();
+    const resultsElement = document.getElementById('searchResults');
+    
+    if (!searchTerm) {
+        // Se não há busca, mostrar todos
+        renderAlunosTable(currentAlunos);
+        resultsElement.textContent = '';
+        return;
+    }
+    
+    // Filtrar alunos
+    const filteredAlunos = currentAlunos.filter(aluno => {
+        const nome = (aluno.profile?.full_name || '').toLowerCase();
+        const email = (aluno.profile?.email || '').toLowerCase();
+        const telefone = (aluno.profile?.phone || '').toLowerCase();
+        const objetivo = (aluno.objetivo || '').toLowerCase();
+        
+        return nome.includes(searchTerm) || 
+               email.includes(searchTerm) || 
+               telefone.includes(searchTerm) ||
+               objetivo.includes(searchTerm);
+    });
+    
+    // Atualizar resultado
+    if (filteredAlunos.length === 0) {
+        resultsElement.innerHTML = '<i class="bi bi-info-circle"></i> Nenhum aluno encontrado com estes critérios';
+        resultsElement.style.color = '#e74c3c';
+    } else if (filteredAlunos.length === 1) {
+        resultsElement.innerHTML = `<i class="bi bi-check-circle"></i> 1 aluno encontrado`;
+        resultsElement.style.color = '#2ecc71';
+    } else {
+        resultsElement.innerHTML = `<i class="bi bi-check-circle"></i> ${filteredAlunos.length} alunos encontrados`;
+        resultsElement.style.color = '#2ecc71';
+    }
+    
+    // Renderizar alunos filtrados
+    renderAlunosTable(filteredAlunos);
+}
