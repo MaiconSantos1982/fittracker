@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#3498db">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FitTracker">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Icons para iOS -->
-    <link rel="apple-touch-icon" href="/icon-192.png">
-    
-    <!-- OneSignal -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script>
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-          appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
-          serviceWorkerPath: "/OneSignalSDKWorker.js",
-          serviceWorkerParam: { scope: '/' },
-          allowLocalhostAsSecureOrigin: true
-        });
-      });
-    </script>
-    
-    <title>FitTracker - Personal Trainer</title>
-    <!-- resto do código... -->
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#3498db">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="FitTracker">
+        
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
+        <!-- Icons para iOS -->
+        <link rel="apple-touch-icon" href="/icon-192.png">
+        
+        <!-- OneSignal -->
+        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+        <script>
+          window.OneSignalDeferred = window.OneSignalDeferred || [];
+          OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+              appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
+              serviceWorkerPath: "/OneSignalSDKWorker.js",
+              serviceWorkerParam: { scope: '/' },
+              allowLocalhostAsSecureOrigin: true
+            });
+          });
+        </script>
+        
+        <title>FitTracker - Personal Trainer</title>
+        <!-- resto do código... -->
+    </head>    
 <body>
     <div class="wrapper">
         <!-- Content -->
@@ -228,5 +228,50 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/aluno-dashboard.js"></script>
+
+    <!-- Botão de instalação PWA (antes do fechamento do </body>) -->
+<div id="installPrompt" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 9999;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <strong>Instalar FitTracker</strong>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #666;">Adicione à sua tela inicial para acesso rápido</p>
+        </div>
+        <button onclick="installPWA()" class="btn btn-sm btn-primary">Instalar</button>
+        <button onclick="closeInstallPrompt()" class="btn btn-sm btn-secondary">Depois</button>
+    </div>
+</div>
+
+<script>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installPrompt').style.display = 'block';
+});
+
+function installPWA() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('PWA instalado');
+            }
+            deferredPrompt = null;
+            document.getElementById('installPrompt').style.display = 'none';
+        });
+    }
+}
+
+function closeInstallPrompt() {
+    document.getElementById('installPrompt').style.display = 'none';
+}
+
+// Detectar se já está instalado
+window.addEventListener('appinstalled', () => {
+    console.log('FitTracker instalado com sucesso!');
+});
+</script>
+
 </body>
 </html>
