@@ -1,6 +1,22 @@
 let currentUser = null;
 let currentAlunoId = null;
 
+// Função para atualizar menu ativo
+function updateActiveMenu(sectionName) {
+    // Remove active de todos os links
+    document.querySelectorAll('#sidebar a').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Adiciona active no link clicado
+    const activeLink = document.querySelector(`#sidebar a[data-section="${sectionName}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+    
+    console.log('Menu ativo atualizado:', sectionName);
+}
+
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
     currentUser = await checkAuth();
