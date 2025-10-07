@@ -793,23 +793,92 @@ function quickAddAgenda(alunoId) {
     openAgendaModal();
     const modal = new bootstrap.Modal(document.getElementById('agendaModal'));
     modal.show();
-}
+// ========================================
+// AÇÕES RÁPIDAS DO MODAL DE DETALHES
+// ========================================
 
+let currentAlunoDetailsId = null; // Variável global para guardar ID do aluno
+
+// Abrir modal de treino a partir dos detalhes do aluno
 function quickAddTreinoFromDetails() {
-    quickAddTreino(selectedAlunoId);
+    // Fecha o modal de detalhes
+    const detailsModal = bootstrap.Modal.getInstance(document.getElementById('alunoDetailsModal'));
+    if (detailsModal) {
+        detailsModal.hide();
+    }
+    
+    // Aguarda o modal fechar completamente
+    setTimeout(() => {
+        // Pré-seleciona o aluno
+        const alunoSelect = document.getElementById('treinoAluno');
+        if (alunoSelect && currentAlunoDetailsId) {
+            alunoSelect.value = currentAlunoDetailsId;
+        }
+        
+        // Abre o modal de treino
+        openTreinoModal();
+        const treinoModal = new bootstrap.Modal(document.getElementById('treinoModal'));
+        treinoModal.show();
+    }, 300);
 }
 
+// Abrir modal de dieta a partir dos detalhes do aluno
 function quickAddDietaFromDetails() {
-    quickAddDieta(selectedAlunoId);
+    const detailsModal = bootstrap.Modal.getInstance(document.getElementById('alunoDetailsModal'));
+    if (detailsModal) {
+        detailsModal.hide();
+    }
+    
+    setTimeout(() => {
+        const alunoSelect = document.getElementById('dietaAluno');
+        if (alunoSelect && currentAlunoDetailsId) {
+            alunoSelect.value = currentAlunoDetailsId;
+        }
+        
+        openDietaModal();
+        const dietaModal = new bootstrap.Modal(document.getElementById('dietaModal'));
+        dietaModal.show();
+    }, 300);
 }
 
+// Abrir modal de medidas a partir dos detalhes do aluno
 function quickAddMedidaFromDetails() {
-    quickAddMedida(selectedAlunoId);
+    const detailsModal = bootstrap.Modal.getInstance(document.getElementById('alunoDetailsModal'));
+    if (detailsModal) {
+        detailsModal.hide();
+    }
+    
+    setTimeout(() => {
+        const alunoSelect = document.getElementById('medidaAluno');
+        if (alunoSelect && currentAlunoDetailsId) {
+            alunoSelect.value = currentAlunoDetailsId;
+        }
+        
+        openMedidaModal();
+        const medidaModal = new bootstrap.Modal(document.getElementById('medidaModal'));
+        medidaModal.show();
+    }, 300);
 }
 
+// Abrir modal de agenda a partir dos detalhes do aluno
 function quickAddAgendaFromDetails() {
-    quickAddAgenda(selectedAlunoId);
+    const detailsModal = bootstrap.Modal.getInstance(document.getElementById('alunoDetailsModal'));
+    if (detailsModal) {
+        detailsModal.hide();
+    }
+    
+    setTimeout(() => {
+        const alunoSelect = document.getElementById('agendaAluno');
+        if (alunoSelect && currentAlunoDetailsId) {
+            alunoSelect.value = currentAlunoDetailsId;
+        }
+        
+        openAgendaModal();
+        const agendaModal = new bootstrap.Modal(document.getElementById('agendaModal'));
+        agendaModal.show();
+    }, 300);
 }
+
 
 // ========================================
 // CRUD TREINOS
