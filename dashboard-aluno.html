@@ -21,14 +21,71 @@
         <!-- Content -->
         <div id="content">
             <!-- Navbar -->
-            <nav class="navbar">
-                <div class="container-fluid px-3">
-                    <span class="navbar-brand mb-0" id="currentSection">Início</span>
-                    <button class="btn btn-sm btn-secondary" onclick="logout()">
-                        <i class="bi bi-box-arrow-right"></i>
-                    </button>
-                </div>
-            </nav>
+            <!-- Navbar -->
+<nav class="navbar">
+    <div class="container-fluid px-3">
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary d-md-none" id="sidebarCollapse">
+                <i class="bi bi-list"></i>
+            </button>
+            <span class="navbar-brand mb-0" id="currentSection">Início</span>
+        </div>
+        <button class="btn btn-sm btn-secondary d-none d-md-block" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i> Sair
+        </button>
+    </div>
+</nav>
+
+<!-- Sidebar Overlay (Mobile) -->
+<div id="sidebar-overlay"></div>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+    <div class="p-4 border-bottom">
+        <h3>FitTracker</h3>
+        <p class="text-muted mb-0">Meus Treinos</p>
+    </div>
+    
+    <ul class="components">
+        <li>
+            <a href="#" data-section="dashboard" class="active">
+                <i class="bi bi-house-fill"></i>
+                Início
+            </a>
+        </li>
+        <li>
+            <a href="#" data-section="treinos">
+                <i class="bi bi-lightning-fill"></i>
+                Treinos
+            </a>
+        </li>
+        <li>
+            <a href="#" data-section="dietas">
+                <i class="bi bi-heart-fill"></i>
+                Dieta
+            </a>
+        </li>
+        <li>
+            <a href="#" data-section="medidas">
+                <i class="bi bi-graph-up"></i>
+                Evolução
+            </a>
+        </li>
+        <li>
+            <a href="#" data-section="agenda">
+                <i class="bi bi-calendar"></i>
+                Agenda
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Botão Sair -->
+    <div class="p-3 border-top mt-auto">
+        <button class="btn btn-outline-danger w-100" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i> Sair
+        </button>
+    </div>
+</nav>
 
             <!-- Conteúdo -->
             <div class="container-fluid">
