@@ -44,13 +44,50 @@ async function loadAlunoData() {
 
 // Navegação entre seções
 function setupNavigation() {
-    document.querySelectorAll('#sidebar a[data-section]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = e.target.closest('a').dataset.section;
-            showSection(section);
+    // Navegação entre seções
+document.querySelectorAll('#sidebar a[data-section]').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        const section = link.dataset.section;
+        
+        // Esconde todas as seções
+        document.querySelectorAll('.content-section').forEach(s => {
+            s.style.display = 'none';
         });
+        
+        // Mostra a seção selecionada
+        const targetSection = document.getElementById(`section-${section}`);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+        
+        // Atualiza menu ativo
+        updateActiveMenu(section);
+        
+        // Atualiza título da navbar
+        const titles = {
+            'dashboard': 'Início',
+            'treinos': 'Treinos',
+            'dietas': 'Dieta',
+            'medidas': 'Evolução',
+            'agenda': 'Agenda'
+        };
+        document.getElementById('currentSection').textContent = titles[section] || section;
+        
+        // Carrega dados específicos da seção
+        if (section === 'treinos') loadTreinos();
+        if (section === 'dietas') loadDietas();
+        if (section === 'medidas') loadMedidas();
+        if (section === 'agenda') loadAgenda();
     });
+});
+
+// Setar dashboard como ativo ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+    updateActiveMenu('dashboard');
+});
+
 
     document.getElementById('sidebarCollapse')?.addEventListener('click', () => {
         document.getElementById('sidebar').classList.toggle('active');
