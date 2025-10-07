@@ -172,52 +172,99 @@ async function loadAlunos() {
 
 
 function renderAlunosTable(alunos) {
-    const tbody = document.getElementById('alunosTable');
+    const container = document.getElementById('alunosTable');
+    
+    // Mudar de tbody para container de cards
+    const cardsContainer = document.getElementById('alunosContainer');
+    
+    // Se ainda não existe, criar
+    if (!cardsContainer) {
+        const alunosSection = document.getElementById('section-alunos');
+        alunosSection.querySelector('.table-responsive')?.remove();
+        
+        const newContainer = document.createElement('div');
+        newContainer.id = 'alunosContainer';
+        newContainer.className = 'row g-3';
+        alunosSection.querySelector('.card')?.remove();
+        alunosSection.appendChild(newContainer);
+    }
+    
+    const finalContainer = document.getElementById('alunosContainer');
     
     if (!alunos || alunos.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" class="text-center text-muted py-4">
+        finalContainer.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info text-center">
                     <i class="bi bi-people" style="font-size: 48px; opacity: 0.3;"></i>
-                    <p class="mt-2">Nenhum aluno cadastrado ainda</p>
-                </td>
-            </tr>
+                    <p class="mt-2 mb-0">Nenhum aluno cadastrado ainda</p>
+                </div>
+            </div>
         `;
         return;
     }
 
-    tbody.innerHTML = '';
+    finalContainer.innerHTML = '';
 
     alunos.forEach(aluno => {
-        // Debug: logar dados de cada aluno
-        console.log('Renderizando aluno:', aluno);
-        
-        const tr = document.createElement('tr');
-        
-        // Verificar se o profile existe
         const nomeAluno = aluno.profile?.full_name || 'Nome não disponível';
         const emailAluno = aluno.profile?.email || 'Email não disponível';
         const telefoneAluno = aluno.profile?.phone || '-';
         
-        tr.innerHTML = `
-            <td>${nomeAluno}</td>
-            <td>${emailAluno}</td>
-            <td>${telefoneAluno}</td>
-            <td>
-                <span class="badge ${aluno.ativo ? 'bg-success' : 'bg-secondary'}">
-                    ${aluno.ativo ? 'Ativo' : 'Inativo'}
-                </span>
-            </td>
-            <td>
-                <button class="btn btn-sm btn-primary" onclick="editAluno('${aluno.id}')" title="Editar">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteAluno('${aluno.id}')" title="Excluir">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4';
+        col.innerHTML = `
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="mb-1">${nomeAluno}</h5>
+                            <small class="text-muted">${emailAluno}</small>
+                        </div>
+                        <span class="badge ${aluno.ativo ? 'bg-success' : 'bg-secondary'}">
+                            ${aluno.ativo ? 'Ativo' : 'Inativo'}
+                        </span>
+                    </div>
+                    
+                    ${telefoneAluno !== '-' ? `
+                        <p class="mb-2">
+                            <i class="bi bi-telephone"></i> ${telefoneAluno}
+                        </p>
+                    ` : ''}
+                    
+                    ${aluno.objetivo ? `
+                        <p class="mb-2 text-muted small">
+                            <i class="bi bi-bullseye"></i> ${aluno.objetivo}
+                        </p>
+                    ` : ''}
+                    
+                    <hr>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-sm btn-primary" onclick="showAlunoDetails('${aluno.id}')">
+                            <i class="bi bi-eye"></i> Ver Detalhes
+                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="quickAddTreino('${aluno.id}')" title="Adicionar Treino">
+                                <i class="bi bi-lightning"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="quickAddDieta('${aluno.id}')" title="Adicionar Dieta">
+                                <i class="bi bi-egg-fried"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="quickAddMedida('${aluno.id}')" title="Registrar Medidas">
+                                <i class="bi bi-rulers"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="quickAddAgenda('${aluno.id}')" title="Agendar Consulta">
+                                <i class="bi bi-calendar"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAluno('${aluno.id}')">
+                            <i class="bi bi-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
         `;
-        tbody.appendChild(tr);
+        finalContainer.appendChild(col);
     });
 }
 
