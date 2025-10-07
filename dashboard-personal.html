@@ -1,36 +1,37 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#3498db">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FitTracker">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#3498db">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="FitTracker">
+        
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
+        <!-- Icons para iOS -->
+        <link rel="apple-touch-icon" href="/icon-192.png">
+        
+        <!-- OneSignal -->
+        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+        <script>
+          window.OneSignalDeferred = window.OneSignalDeferred || [];
+          OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+              appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
+              serviceWorkerPath: "/OneSignalSDKWorker.js",
+              serviceWorkerParam: { scope: '/' },
+              allowLocalhostAsSecureOrigin: true
+            });
+          });
+        </script>
+        
+        <title>FitTracker - Personal Trainer</title>
+        <!-- resto do código... -->
+    </head>
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Icons para iOS -->
-    <link rel="apple-touch-icon" href="/icon-192.png">
-    
-    <!-- OneSignal -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script>
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-          appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
-          serviceWorkerPath: "/OneSignalSDKWorker.js",
-          serviceWorkerParam: { scope: '/' },
-          allowLocalhostAsSecureOrigin: true
-        });
-      });
-    </script>
-    
-    <title>FitTracker - Personal Trainer</title>
-    <!-- resto do código... -->
-</head>
 <body>
     <div class="wrapper">
         <!-- Overlay para mobile -->
@@ -704,5 +705,284 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/personal-dashboard.js"></script>
+
+    <!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#3498db">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="FitTracker">
+        
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
+        <!-- Icons para iOS -->
+        <link rel="apple-touch-icon" href="/icon-192.png">
+        
+        <!-- OneSignal -->
+        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+        <script>
+          window.OneSignalDeferred = window.OneSignalDeferred || [];
+          OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+              appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
+              serviceWorkerPath: "/OneSignalSDKWorker.js",
+              serviceWorkerParam: { scope: '/' },
+              allowLocalhostAsSecureOrigin: true
+            });
+          });
+        </script>
+        
+        <title>FitTracker - Personal Trainer</title>
+        <!-- resto do código... -->
+    </head>    
+<body>
+    <div class="wrapper">
+        <!-- Content -->
+        <div id="content">
+            <!-- Navbar Limpa -->
+            <nav class="navbar">
+                <div class="container-fluid px-3">
+                    <span class="navbar-brand mb-0" id="currentSection">Treinos</span>
+                    <button class="btn btn-sm btn-secondary" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Conteúdo -->
+            <div class="container-fluid">
+                <!-- Dashboard -->
+                <div id="section-dashboard" class="content-section">
+                    <h2 class="mb-3">Olá! 👋</h2>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="card text-white bg-primary h-100">
+                                <div class="card-body">
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Treinos</p>
+                                    <h2 class="mb-0" id="treinosConcluidos">0</h2>
+                                    <small style="opacity: 0.8;">esta semana</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card text-white bg-success h-100">
+                                <div class="card-body">
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Peso</p>
+                                    <h2 class="mb-0" id="pesoAtual">--</h2>
+                                    <small style="opacity: 0.8;">kg</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-1">Próxima Consulta</h6>
+                            <p class="mb-0 text-secondary" id="proximaConsulta">Nenhuma agendada</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Treinos -->
+                <div id="section-treinos" class="content-section" style="display: none;">
+                    <h2 class="mb-3">Meus Treinos</h2>
+                    <div id="treinosList"></div>
+                </div>
+
+                <!-- Dietas -->
+                <div id="section-dietas" class="content-section" style="display: none;">
+                    <h2 class="mb-3">Minha Dieta</h2>
+                    <div id="dietaContent"></div>
+                </div>
+
+                <!-- Medidas -->
+                <div id="section-medidas" class="content-section" style="display: none;">
+                    <h2 class="mb-3">Evolução</h2>
+                    <div id="medidasContent"></div>
+                </div>
+
+                <!-- Agenda -->
+                <div id="section-agenda" class="content-section" style="display: none;">
+                    <h2 class="mb-3">Consultas</h2>
+                    <div id="agendaList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (Mobile) -->
+        <nav id="sidebar">
+            <ul>
+                <li>
+                    <a href="#" data-section="dashboard" class="active">
+                        <i class="bi bi-house-fill"></i>
+                        Início
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="treinos">
+                        <i class="bi bi-lightning-fill"></i>
+                        Treinos
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="dietas">
+                        <i class="bi bi-heart-fill"></i>
+                        Dieta
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="medidas">
+                        <i class="bi bi-graph-up"></i>
+                        Evolução
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="agenda">
+                        <i class="bi bi-calendar"></i>
+                        Agenda
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Modal Executar Treino -->
+    <div class="modal fade" id="executarTreinoModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen-md-down modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Executar Treino</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="exerciciosList"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="finalizarTreino()">
+                        <i class="bi bi-check-circle"></i> Concluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Registrar Dieta -->
+    <div class="modal fade" id="registrarDietaModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen-md-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Refeição</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dietaRegistroForm">
+                        <input type="hidden" id="refeicaoId">
+                        <div class="mb-3">
+                            <label class="form-label">O que você comeu?</label>
+                            <textarea class="form-control" id="dietaOQueComeu" rows="3" required placeholder="Descreva sua refeição..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Como se sentiu?</label>
+                            <select class="form-select" id="dietaComoSentiu">
+                                <option value="Muito bem">😃 Muito bem</option>
+                                <option value="Bem">🙂 Bem</option>
+                                <option value="Normal">😐 Normal</option>
+                                <option value="Não muito bem">😕 Não muito bem</option>
+                                <option value="Mal">😞 Mal</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Foi suficiente?</label>
+                                <select class="form-select" id="dietaSuficiente">
+                                    <option value="true">✓ Sim</option>
+                                    <option value="false">✗ Não</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Sentiu fome?</label>
+                                <select class="form-select" id="dietaSentiuFome">
+                                    <option value="false">✓ Não</option>
+                                    <option value="true">✗ Sim</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" id="dietaObs" rows="2" placeholder="Observações adicionais..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDietaRegistro()">
+                        <i class="bi bi-check-circle"></i> Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/aluno-dashboard.js"></script>
+
+    <!-- Botão de instalação PWA (antes do fechamento do </body>) -->
+<div id="installPrompt" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 9999;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <strong>Instalar FitTracker</strong>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #666;">Adicione à sua tela inicial para acesso rápido</p>
+        </div>
+        <button onclick="installPWA()" class="btn btn-sm btn-primary">Instalar</button>
+        <button onclick="closeInstallPrompt()" class="btn btn-sm btn-secondary">Depois</button>
+    </div>
+</div>
+
+<script>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installPrompt').style.display = 'block';
+});
+
+function installPWA() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('PWA instalado');
+            }
+            deferredPrompt = null;
+            document.getElementById('installPrompt').style.display = 'none';
+        });
+    }
+}
+
+function closeInstallPrompt() {
+    document.getElementById('installPrompt').style.display = 'none';
+}
+
+// Detectar se já está instalado
+window.addEventListener('appinstalled', () => {
+    console.log('FitTracker instalado com sucesso!');
+});
+</script>
+
+</body>
+</html>
+
 </body>
 </html>
