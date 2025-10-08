@@ -574,3 +574,158 @@ body {
         height: 44px;
     }
 }
+/* ========================================
+   DESIGN APPLE-LIKE - EXERCÍCIOS
+======================================== */
+
+.exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.exercise-item {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.exercise-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 12px rgba(52, 152, 219, 0.1);
+}
+
+.exercise-number {
+    min-width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--primary-color), #5dade2);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.exercise-content {
+    flex: 1;
+}
+
+.exercise-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.exercise-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.exercise-meta .badge {
+    font-weight: 500;
+    font-size: 11px;
+    padding: 4px 10px;
+}
+
+.exercise-tip {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #fff9e6;
+    border-left: 3px solid #f39c12;
+    border-radius: 6px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.exercise-tip i {
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.exercise-tip small {
+    color: #856404;
+    line-height: 1.5;
+}
+
+.exercise-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.exercise-item:hover .exercise-actions {
+    opacity: 1;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--primary-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.btn-icon:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.05);
+}
+
+.btn-icon-danger {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+.btn-icon-danger:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+.series-details {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.serie-row {
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.serie-row:last-child {
+    border-bottom: none;
+}
+
+/* Animação suave ao expandir */
+.collapse {
+    transition: all 0.3s ease;
+}
+
+/* Melhorias nos badges */
+.badge.rounded-pill {
+    padding: 5px 12px;
+    font-weight: 500;
+}
