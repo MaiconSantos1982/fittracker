@@ -554,7 +554,7 @@ async function openAdicionarRefeicaoModal(dietaId) {
     delete window.editingRefeicaoId;
     document.getElementById('refeicaoForm').reset();
     document.getElementById('refeicaoOutroDiv').style.display = 'none';
-    document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para comeÃ§ar</div>';
+    document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>';
     window.alimentosTemp = [];
     new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
 }
@@ -627,7 +627,7 @@ function removerLinhaAlimento(button) {
     
     // Se não houver mais alimentos, mostrar mensagem
     if (window.alimentosTemp.length === 0) {
-        document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para comeÃ§ar</div>';
+        document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>';
     }
 }
 
@@ -714,7 +714,7 @@ async function editRefeicao(refeicaoId, dietaId) {
         window.editingRefeicaoId = refeicaoId;
 
         // Preencher tipo de refeição
-        const tiposPreDefinidos = ['CafÃ© da manhã', 'Lanche da manhã', 'AlmoÃ§o', 'Lanche da tarde', 'Jantar', 'Ceia'];
+        const tiposPreDefinidos = ['CafÃ© da manhã', 'Lanche da manhã', 'Almoço', 'Lanche da tarde', 'Jantar', 'Ceia'];
         if (tiposPreDefinidos.includes(refeicao.tipo_refeicao)) {
             document.getElementById('refeicaoTipo').value = refeicao.tipo_refeicao;
             document.getElementById('refeicaoOutroDiv').style.display = 'none';
