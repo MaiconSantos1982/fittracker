@@ -846,6 +846,270 @@ function renderTreinosDoProtocolo(protocoloId, treinos) {
     });
 }
 
+// ============================================
+// FUNÇÕES DO MODAL GERENCIAR TREINOS
+// ============================================
+
+async function openGerenciarTreinosModal(protocoloId, protocoloNome) {
+    currentProtocoloId = protocoloId;
+    document.getElementById('currentProtocoloId').value = protocoloId;
+    document.getElementById('gerenciarTreinosTitle').textContent = 'Gerenciar Treinos';
+    document.getElementById('gerenciarTreinosSubtitle').textContent = `Protocolo: ${protocoloNome}`;
+    
+    await loadTreinosProtocolo(protocoloId);
+    
+    new bootstrap.Modal(document.getElementById('gerenciarTreinosModal')).show();
+}
+
+async function loadTreinosProtocolo(protocoloId) {
+    try {
+        const { data: treinos, error } = await supabase
+            .from('fit_treinos')
+            .select(`
+                *,
+                exercicios_count:fit_exercicios(count)
+            `)
+            .eq('protocolo_id', protocoloId)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        renderTreinosProtocolo(treinos);
+    } catch (error) {
+        console.error('Erro ao carregar treinos:', error);
+        alert('Erro ao carregar treinos: ' + error.message);
+    }
+}
+
+function renderTreinosProtocolo(treinos) {
+    const container = document.getElementById('treinosProtocoloList');
+    if (!container) return;
+
+    if (!treinos || treinos.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum treino adicionado ainda. Clique em "Adicionar Treino" para começar.</div>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    treinos.forEach((treino) => {
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        const numExercicios = treino.exercicios_count?.[0]?.count || 0;
+        
+        card.innerHTML = `
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-0">
+                        <button class="btn btn-link text-decoration-none p-0" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#treino-modal-${treino.id}" 
+                                aria-expanded="false">
+                            <i class="bi bi-chevron-right collapse-icon"></i>
+                            ${treino.nome}
+                        </button>
+                    </h6>
+                    ${treino.descricao ? `<small class="text-muted">${treino.descricao}</small>` : ''}
+                </div>
+                <div>
+                    <span class="badge bg-info me-2">${numExercicios} exercícios</span>
+                    <button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); editTreinoProtocolo('${treino.id}')">
+                        <i class="bi bi-pencil"></i> Editar Treino
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteTreinoConfirm('${treino.id}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="collapse" id="treino-modal-${treino.id}">
+                <div class="card-body">
+                    <div id="exercicios-treino-${treino.id}">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm" role="status"></div>
+                            <span class="ms-2">Carregando exercícios...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+
+        // Adicionar evento para carregar exercícios quando expandir
+        const collapseElement = document.getElementById(`treino-modal-${treino.id}`);
+        collapseElement.addEventListener('show.bs.collapse', async () => {
+            await loadExerciciosTreino(treino.id);
+        });
+
+        // Rotacionar ícone ao expandir/colapsar
+        collapseElement.addEventListener('show.bs.collapse', function() {
+            const icon = this.previousElementSibling.querySelector('.collapse-icon');
+            icon.classList.remove('bi-chevron-right');
+            icon.classList.add('bi-chevron-down');
+        });
+        collapseElement.addEventListener('hide.bs.collapse', function() {
+            const icon = this.previousElementSibling.querySelector('.collapse-icon');
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-right');
+        });
+    });
+}
+
+async function loadExerciciosTreino(treinoId) {
+    try {
+        const { data: exercicios, error } = await supabase
+            .from('fit_exercicios')
+            .select('*')
+            .eq('treino_id', treinoId)
+            .order('ordem', { ascending: true });
+
+        if (error) throw error;
+
+        // Verificar se está dentro do modal gerenciarTreinos
+        const modalOpen = document.getElementById('gerenciarTreinosModal').classList.contains('show');
+        
+        if (modalOpen) {
+            renderExerciciosModal(treinoId, exercicios);
+        } else {
+            renderExerciciosTreino(treinoId, exercicios);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar exercícios:', error);
+        document.getElementById(`exercicios-treino-${treinoId}`).innerHTML = 
+            '<div class="alert alert-danger">Erro ao carregar exercícios</div>';
+    }
+}
+
+function renderExerciciosModal(treinoId, exercicios) {
+    const container = document.getElementById(`exercicios-treino-${treinoId}`);
+    if (!container) return;
+
+    if (!exercicios || exercicios.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum exercício cadastrado neste treino.</div>';
+        return;
+    }
+
+    let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0">';
+    html += '<thead><tr>';
+    html += '<th style="width: 40px;">#</th>';
+    html += '<th>Exercício</th>';
+    html += '<th>Grupo</th>';
+    html += '<th>Séries</th>';
+    html += '<th>Método</th>';
+    html += '<th style="width: 120px;">Ações</th>';
+    html += '</tr></thead><tbody>';
+
+    exercicios.forEach((ex, index) => {
+        const seriesInfo = ex.series_detalhes && ex.series_detalhes.length > 0 
+            ? `${ex.series_detalhes.length}x ${ex.series_detalhes[0].numero || '-'} reps`
+            : `${ex.numero_series || '-'} séries`;
+
+        html += `<tr>`;
+        html += `<td><strong>${index + 1}</strong></td>`;
+        html += `<td>
+            <strong>${ex.nome}</strong>
+            ${ex.dica ? `<br><small class="text-muted"><i class="bi bi-lightbulb"></i> ${ex.dica.substring(0, 60)}${ex.dica.length > 60 ? '...' : ''}</small>` : ''}
+        </td>`;
+        html += `<td><span class="badge bg-secondary">${ex.grupo_muscular || '-'}</span></td>`;
+        html += `<td>${seriesInfo}</td>`;
+        html += `<td>${ex.metodo || '-'}</td>`;
+        html += `<td>
+            <button class="btn btn-sm btn-warning" onclick="editExercicioModal('${ex.id}', '${treinoId}')" title="Editar">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteExercicioModal('${ex.id}', '${treinoId}')" title="Excluir">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>`;
+        html += `</tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+async function editExercicioModal(exercicioId, treinoId) {
+    const gerenciarModal = bootstrap.Modal.getInstance(document.getElementById('gerenciarTreinosModal'));
+    if (gerenciarModal) {
+        gerenciarModal.hide();
+    }
+
+    setTimeout(async () => {
+        await editExercicio(exercicioId, treinoId);
+    }, 300);
+}
+
+async function deleteExercicioModal(exercicioId, treinoId) {
+    if (!confirm('Tem certeza que deseja excluir este exercício?')) return;
+
+    try {
+        const { error } = await supabase
+            .from('fit_exercicios')
+            .delete()
+            .eq('id', exercicioId);
+
+        if (error) throw error;
+
+        alert('Exercício excluído com sucesso!');
+        
+        const { data: exercicios, error: exError } = await supabase
+            .from('fit_exercicios')
+            .select('*')
+            .eq('treino_id', treinoId)
+            .order('ordem', { ascending: true });
+
+        if (!exError) {
+            renderExerciciosModal(treinoId, exercicios);
+        }
+
+        await loadTreinosProtocolo(currentProtocoloId);
+    } catch (error) {
+        console.error('Erro ao excluir exercício:', error);
+        alert('Erro ao excluir exercício: ' + error.message);
+    }
+}
+
+async function deleteTreinoConfirm(treinoId) {
+    if (!confirm('Tem certeza que deseja excluir este treino?')) {
+        return;
+    }
+
+    try {
+        const { data: treino } = await supabase
+            .from('fit_treinos')
+            .select('protocolo_id')
+            .eq('id', treinoId)
+            .single();
+
+        const { error } = await supabase
+            .from('fit_treinos')
+            .delete()
+            .eq('id', treinoId);
+
+        if (error) throw error;
+
+        alert('Treino excluído com sucesso!');
+        
+        if (treino) {
+            await loadTreinosProtocolo(treino.protocolo_id);
+        }
+    } catch (error) {
+        console.error('Erro ao excluir treino:', error);
+        alert('Erro ao excluir treino: ' + error.message);
+    }
+}
+
+// ============================================
+// FUNÇÕES DE ADICIONAR/EDITAR TREINO
+// ============================================
+
+function openAdicionarTreinoModal() {
+    document.getElementById('treinoForm').reset();
+    document.getElementById('treinoProtocoloId').value = currentProtocoloId;
+    exerciciosTempList = [];
+    renderExerciciosTempList();
+    
+    new bootstrap.Modal(document.getElementById('adicionarTreinoModal')).show();
+}
+
 async function openGerenciarTreinosModal(protocoloId, protocoloNome) {
     currentProtocoloId = protocoloId;
     document.getElementById('currentProtocoloId').value = protocoloId;
