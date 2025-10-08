@@ -1981,17 +1981,78 @@ function removerExercicioTemp(index) {
 // INICIALIZAÇÃO DA SEÇÃO DE PROTOCOLOS
 // ============================================
 
-// Adicionar no setupNavigation() existente
-const originalSetupNavigation = setupNavigation;
-setupNavigation = function() {
-    originalSetupNavigation();
-    
-    // Adicionar listener para seção de protocolos
+// ============================================
+// FUNÇÃO AUXILIAR PARA CARREGAR SELECT DE ALUNOS
+// ============================================
+async function loadAlunosSelect(selectId) {
+    try {
+        const { data: alunos, error } = await supabase
+            .from('fit_alunos')
+            .select(`
+                id,
+                profile:profile_id (
+                    full_name
+                )
+            `)
+            .eq('personal_id', currentUser.id)
+            .eq('ativo', true);
+
+        if (error) throw error;
+
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        // Limpar opções existentes (exceto a primeira)
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+
+        // Adicionar alunos
+        alunos.forEach(aluno => {
+            const option = document.createElement('option');
+            option.value = aluno.id;
+            option.textContent = aluno.profile?.full_name || 'Sem nome';
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar alunos no select:', error);
+    }
+}
+
+// ============================================
+// LOGOUT
+// ============================================
+async function logout() {
+    try {
+        await supabase.auth.signOut();
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+    }
+}
+
+// ============================================
+// INICIALIZAÇÃO AUTOMÁTICA DE FILTROS
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar event listener para o contador de caracteres da dica
+    const dicaTextarea = document.getElementById('exercicioDica');
+    if (dicaTextarea) {
+        dicaTextarea.addEventListener('input', function() {
+            const counter = document.getElementById('dicaCounter');
+            if (counter) {
+                counter.textContent = this.value.length;
+            }
+        });
+    }
+
+    // Carregar protocolos quando clicar na seção
     const protocolosLink = document.querySelector('[data-section="protocolos"]');
     if (protocolosLink) {
-        protocolosLink.addEventListener('click', async () => {
+        protocolosLink.addEventListener('click', async function() {
             await loadAlunosSelect('filtroAlunoProtocolos');
             loadProtocolos();
         });
     }
-};
+});
+
