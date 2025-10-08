@@ -624,13 +624,13 @@ function removerLinhaAlimento(button) {
     document.querySelectorAll('.alimento-row').forEach((row, newIndex) => {
         row.dataset.index = newIndex;
     
-    });
+    });  // ❌ PROBLEMA AQUI - FALTA O FECHAMENTO DA FUNÇÃO!
     
     // Se não houver mais alimentos, mostrar mensagem
     if (window.alimentosTemp.length === 0) {
         document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>';
     }
-}
+}  // ✅ FALTA ESTE }
 
 function coletarAlimentosDosInputs() {
     const alimentos = [];
