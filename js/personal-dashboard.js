@@ -1616,23 +1616,52 @@ async function saveExercicio() {
             video_url: currentExercicioVideoUrl
         };
 
-        exerciciosTempList.push(exercicio);
+        // Verificar se está editando
+        if (window.editingExercicioId) {
+            // MODO EDIÇÃO
+            const { error } = await supabase
+                .from('fit_exercicios')
+                .update(exercicio)
+                .eq('id', window.editingExercicioId);
 
-        if (dicaPadrao && dica) {
-            await supabase
-                .from('fit_exercicios_biblioteca')
-                .update({ descricao: dica })
-                .eq('id', exercicioBibliotecaId);
+            if (error) throw error;
+
+            alert('Exercício atualizado com sucesso!');
+            
+            // Buscar treino_id para recarregar
+            const { data: ex } = await supabase
+                .from('fit_exercicios')
+                .select('treino_id')
+                .eq('id', window.editingExercicioId)
+                .single();
+
+            window.editingExercicioId = null;
+            bootstrap.Modal.getInstance(document.getElementById('adicionarExercicioModal')).hide();
+            
+            if (ex) {
+                await loadExerciciosTreino(ex.treino_id);
+            }
+        } else {
+            // MODO NOVO (mantém o código original)
+            exerciciosTempList.push(exercicio);
+
+            if (dicaPadrao && dica) {
+                await supabase
+                    .from('fit_exercicios_biblioteca')
+                    .update({ descricao: dica })
+                    .eq('id', exercicioBibliotecaId);
+            }
+
+            alert('Exercício adicionado ao treino!');
+            bootstrap.Modal.getInstance(document.getElementById('adicionarExercicioModal')).hide();
+            renderExerciciosTempList();
         }
-
-        alert('Exercício adicionado ao treino!');
-        bootstrap.Modal.getInstance(document.getElementById('adicionarExercicioModal')).hide();
-        renderExerciciosTempList();
     } catch (error) {
-        console.error('Erro ao adicionar exercício:', error);
-        alert('Erro ao adicionar exercício: ' + error.message);
+        console.error('Erro ao salvar exercício:', error);
+        alert('Erro ao salvar exercício: ' + error.message);
     }
 }
+
 
 function renderExerciciosTempList() {
     const container = document.getElementById('exerciciosTreinoList');
@@ -1756,6 +1785,113 @@ async function deleteExercicio(exercicioId, treinoId) {
     } catch (error) {
         console.error('Erro ao excluir exercício:', error);
         alert('Erro ao excluir exercício: ' + error.message);
+    }
+}
+
+async function editExercicio(exercicioId, treinoId) {
+    try {
+        // Buscar exercício completo
+        const { data: exercicio, error } = await supabase
+            .from('fit_exercicios')
+            .select('*')
+            .eq('id', exercicioId)
+            .single();
+
+        if (error) throw error;
+
+        // Armazenar ID para edição
+        window.editingExercicioId = exercicioId;
+
+        // Buscar grupo muscular ID
+        const { data: grupos } = await supabase
+            .from('fit_grupos_musculares')
+            .select('id, nome')
+            .ilike('nome', exercicio.grupo_muscular);
+
+        const grupoId = grupos && grupos.length > 0 ? grupos[0].id : null;
+
+        // Preencher modal
+        document.getElementById('exercicioNumSeries').value = exercicio.numero_series || 4;
+        document.getElementById('exercicioMetodo').value = exercicio.metodo || '';
+        document.getElementById('exercicioObjetivo').value = exercicio.objetivo_exercicio || '';
+        document.getElementById('exercicioDica').value = exercicio.dica || '';
+        
+        // Carregar grupos e selecionar
+        await loadGruposMusculares();
+        if (grupoId) {
+            document.getElementById('exercicioGrupoMuscular').value = grupoId;
+            await loadExerciciosBiblioteca();
+        }
+
+        // Selecionar exercício
+        if (exercicio.exercicio_biblioteca_id) {
+            document.getElementById('exercicioBiblioteca').value = exercicio.exercicio_biblioteca_id;
+            loadExercicioDetalhes();
+        }
+
+        // Renderizar séries existentes
+        const container = document.getElementById('seriesDetalhesContainer');
+        container.innerHTML = '';
+        
+        if (exercicio.series_detalhes && exercicio.series_detalhes.length > 0) {
+            exercicio.series_detalhes.forEach((serie, index) => {
+                const row = document.createElement('div');
+                row.className = 'row mb-3 align-items-end serie-row';
+                row.dataset.serie = index + 1;
+                row.innerHTML = `
+                    <div class="col-md-2">
+                        <label class="form-label">Unidade de medida</label>
+                        <select class="form-select serie-unidade">
+                            <option value="">Selecione uma opção</option>
+                            <option value="Repetições" ${serie.unidade_medida === 'Repetições' ? 'selected' : ''}>Repetições</option>
+                            <option value="Tempo" ${serie.unidade_medida === 'Tempo' ? 'selected' : ''}>Tempo</option>
+                            <option value="Distância" ${serie.unidade_medida === 'Distância' ? 'selected' : ''}>Distância</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Número de repetições</label>
+                        <input type="number" class="form-control serie-numero" value="${serie.numero || ''}" placeholder="Ex: 12">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Carga / Intensidade</label>
+                        <input type="text" class="form-control serie-carga" value="${serie.carga || ''}" placeholder="Ex: 20kg">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Velocidade de execução</label>
+                        <select class="form-select serie-velocidade">
+                            <option value="">Selecione uma opção</option>
+                            <option value="Lenta" ${serie.velocidade === 'Lenta' ? 'selected' : ''}>Lenta</option>
+                            <option value="Moderada" ${serie.velocidade === 'Moderada' ? 'selected' : ''}>Moderada</option>
+                            <option value="Rápida" ${serie.velocidade === 'Rápida' ? 'selected' : ''}>Rápida</option>
+                            <option value="Explosiva" ${serie.velocidade === 'Explosiva' ? 'selected' : ''}>Explosiva</option>
+                            <option value="Controlada" ${serie.velocidade === 'Controlada' ? 'selected' : ''}>Controlada</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label">Pausa mín (s)</label>
+                        <input type="number" class="form-control serie-pausa-min" value="${serie.pausa_min || ''}" placeholder="60">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label">Pausa máx (s)</label>
+                        <input type="number" class="form-control serie-pausa-max" value="${serie.pausa_max || ''}" placeholder="90">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger w-100" onclick="removerSerie(this)">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        } else {
+            gerarLinhasSeries();
+        }
+
+        // Abrir modal
+        new bootstrap.Modal(document.getElementById('adicionarExercicioModal')).show();
+    } catch (error) {
+        console.error('Erro ao carregar exercício para edição:', error);
+        alert('Erro ao carregar exercício: ' + error.message);
     }
 }
 
