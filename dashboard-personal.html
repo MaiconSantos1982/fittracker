@@ -20,13 +20,13 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <nav id="sidebar">
-        <div class="sidebar-header">
+    <div id="sidebar">
+        <div class="p-4 border-bottom">
             <h3>FitTracker</h3>
-            <small>Personal Trainer</small>
+            <small class="text-muted">Personal Trainer</small>
         </div>
 
-        <ul class="list-unstyled">
+        <ul class="components">
             <li>
                 <a href="#" data-section="dashboard" class="active">
                     <i class="bi bi-house-door"></i>
@@ -82,12 +82,12 @@
                 </a>
             </li>
         </ul>
-    </nav>
+    </div>
 
     <!-- Page Content -->
     <div id="content">
         <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
             <div class="container-fluid">
                 <button type="button" id="sidebarCollapse" class="btn btn-light">
                     <i class="bi bi-list"></i>
@@ -97,89 +97,56 @@
         </nav>
 
         <!-- Main Content Area -->
-        <div class="container-fluid">
+        <div class="container-fluid p-4">
             
-            <!-- ============================================
-                 SEÇÃO: DASHBOARD
-                 ============================================ -->
+            <!-- SEÇÃO: DASHBOARD -->
             <div id="section-dashboard" class="content-section">
-                <div class="section-header">
+                <div class="mb-4">
                     <h3>Dashboard</h3>
                 </div>
 
-                <!-- Cards de Estatísticas -->
-                <div class="row">
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stat-card">
+                <div class="row g-4">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card bg-primary h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <p class="text-muted mb-1">Total de Alunos</p>
-                                        <h3 class="mb-0" id="totalAlunos">0</h3>
-                                    </div>
-                                    <div class="stat-icon bg-primary">
-                                        <i class="bi bi-people"></i>
-                                    </div>
-                                </div>
+                                <p class="mb-1">Total de Alunos</p>
+                                <h2 class="mb-0" id="totalAlunos">0</h2>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stat-card">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card bg-success h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <p class="text-muted mb-1">Alunos Ativos</p>
-                                        <h3 class="mb-0" id="alunosAtivos">0</h3>
-                                    </div>
-                                    <div class="stat-icon bg-success">
-                                        <i class="bi bi-check-circle"></i>
-                                    </div>
-                                </div>
+                                <p class="mb-1">Alunos Ativos</p>
+                                <h2 class="mb-0" id="alunosAtivos">0</h2>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stat-card">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card bg-warning h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <p class="text-muted mb-1">Treinos Criados</p>
-                                        <h3 class="mb-0" id="totalTreinos">0</h3>
-                                    </div>
-                                    <div class="stat-icon bg-warning">
-                                        <i class="bi bi-calendar3"></i>
-                                    </div>
-                                </div>
+                                <p class="mb-1">Treinos Criados</p>
+                                <h2 class="mb-0" id="totalTreinos">0</h2>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stat-card">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card bg-info h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <p class="text-muted mb-1">Consultas Hoje</p>
-                                        <h3 class="mb-0" id="consultasHoje">0</h3>
-                                    </div>
-                                    <div class="stat-icon bg-danger">
-                                        <i class="bi bi-calendar-check"></i>
-                                    </div>
-                                </div>
+                                <p class="mb-1">Consultas Hoje</p>
+                                <h2 class="mb-0" id="consultasHoje">0</h2>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 SEÇÃO: ALUNOS
-                 ============================================ -->
+            <!-- SEÇÃO: ALUNOS -->
             <div id="section-alunos" class="content-section" style="display: none;">
-                <div class="section-header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3>Gerenciar Alunos</h3>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastrarAlunoModal">
                         <i class="bi bi-plus-circle"></i> Novo Aluno
@@ -199,27 +166,22 @@
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody id="alunosTableBody">
-                                    <!-- Carregado via JS -->
-                                </tbody>
+                                <tbody id="alunosTableBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 SEÇÃO: PROTOCOLOS (NOVA)
-                 ============================================ -->
+            <!-- SEÇÃO: PROTOCOLOS -->
             <div id="section-protocolos" class="content-section" style="display: none;">
-                <div class="section-header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3>Gerenciar Protocolos de Treino</h3>
                     <button class="btn btn-primary" onclick="openNovoProtocoloModal()">
                         <i class="bi bi-plus-circle"></i> Novo Protocolo
                     </button>
                 </div>
 
-                <!-- Filtros -->
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="row">
@@ -241,61 +203,47 @@
                     </div>
                 </div>
 
-                <!-- Lista de Protocolos -->
                 <div id="protocolosList"></div>
             </div>
 
-            <!-- ============================================
-                 SEÇÃO: TREINOS (LEGADO)
-                 ============================================ -->
+            <!-- SEÇÃO: TREINOS -->
             <div id="section-treinos" class="content-section" style="display: none;">
-                <div class="section-header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3>Gerenciar Treinos</h3>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#criarTreinoModal">
                         <i class="bi bi-plus-circle"></i> Novo Treino
                     </button>
                 </div>
-
                 <div class="card">
                     <div class="card-body">
-                        <div id="treinosList">
-                            <!-- Carregado via JS -->
-                        </div>
+                        <div id="treinosList"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 SEÇÃO: DIETAS
-                 ============================================ -->
+            <!-- SEÇÃO: DIETAS -->
             <div id="section-dietas" class="content-section" style="display: none;">
-                <div class="section-header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3>Gerenciar Dietas</h3>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#criarDietaModal">
                         <i class="bi bi-plus-circle"></i> Nova Dieta
                     </button>
                 </div>
-
                 <div class="card">
                     <div class="card-body">
-                        <div id="dietasList">
-                            <!-- Carregado via JS -->
-                        </div>
+                        <div id="dietasList"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 SEÇÃO: MEDIDAS
-                 ============================================ -->
+            <!-- SEÇÃO: MEDIDAS -->
             <div id="section-medidas" class="content-section" style="display: none;">
-                <div class="section-header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3>Medidas e Evolução</h3>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registrarMedidasModal">
                         <i class="bi bi-plus-circle"></i> Registrar Medidas
                     </button>
                 </div>
-
                 <div class="card mb-3">
                     <div class="card-body">
                         <label class="form-label">Selecionar Aluno</label>
@@ -304,40 +252,31 @@
                         </select>
                     </div>
                 </div>
-
                 <div id="medidasContent">
                     <div class="alert alert-info">Selecione um aluno para ver as medidas</div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 SEÇÃO: AGENDA
-                 ============================================ -->
+            <!-- SEÇÃO: AGENDA -->
             <div id="section-agenda" class="content-section" style="display: none;">
-                <div class="section-header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3>Agenda de Consultas</h3>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#novaConsultaModal">
                         <i class="bi bi-plus-circle"></i> Nova Consulta
                     </button>
                 </div>
-
                 <div class="card">
                     <div class="card-body">
-                        <div id="agendaList">
-                            <!-- Carregado via JS -->
-                        </div>
+                        <div id="agendaList"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 SEÇÃO: NOTIFICAÇÕES
-                 ============================================ -->
+            <!-- SEÇÃO: NOTIFICAÇÕES -->
             <div id="section-notificacoes" class="content-section" style="display: none;">
-                <div class="section-header">
+                <div class="mb-4">
                     <h3>Enviar Notificações Push</h3>
                 </div>
-
                 <div class="card">
                     <div class="card-body">
                         <form id="notificacaoForm">
@@ -345,21 +284,17 @@
                                 <label class="form-label">Destinatários</label>
                                 <select class="form-select" id="notificacaoDestinatarios" multiple size="5">
                                     <option value="all">Todos os Alunos</option>
-                                    <!-- Carregado via JS -->
                                 </select>
                                 <small class="text-muted">Use Ctrl+Click para selecionar múltiplos</small>
                             </div>
-
                             <div class="mb-3">
                                 <label class="form-label">Título</label>
                                 <input type="text" class="form-control" id="notificacaoTitulo" required>
                             </div>
-
                             <div class="mb-3">
                                 <label class="form-label">Mensagem</label>
                                 <textarea class="form-control" id="notificacaoMensagem" rows="4" required></textarea>
                             </div>
-
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-send"></i> Enviar Notificação
                             </button>
@@ -371,9 +306,7 @@
         </div>
     </div>
 
-    <!-- ============================================
-         MODAL: CADASTRAR ALUNO
-         ============================================ -->
+    <!-- MODAL: CADASTRAR ALUNO -->
     <div class="modal fade" id="cadastrarAlunoModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -422,9 +355,7 @@
         </div>
     </div>
 
-    <!-- ============================================
-         MODAL: CRIAR TREINO (LEGADO)
-         ============================================ -->
+    <!-- MODAL: CRIAR TREINO -->
     <div class="modal fade" id="criarTreinoModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -448,7 +379,6 @@
                             <label class="form-label">Descrição</label>
                             <textarea class="form-control" id="treinoDescricaoLegado" rows="2"></textarea>
                         </div>
-                        <!-- Exercícios seriam adicionados aqui -->
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -459,9 +389,7 @@
         </div>
     </div>
 
-    <!-- ============================================
-         MODAL: CRIAR DIETA
-         ============================================ -->
+    <!-- MODAL: CRIAR DIETA -->
     <div class="modal fade" id="criarDietaModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -481,7 +409,6 @@
                             <label class="form-label">Nome da Dieta</label>
                             <input type="text" class="form-control" id="dietaNome" required>
                         </div>
-                        <!-- Refeições seriam adicionadas aqui -->
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -492,300 +419,8 @@
         </div>
     </div>
 
-    <!-- ============================================
-         MODAL: NOVO/EDITAR PROTOCOLO
-         ============================================ -->
-    <div class="modal fade" id="protocoloModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="protocoloModalTitle">Novo Protocolo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="protocoloForm">
-                        <input type="hidden" id="protocoloId">
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Aluno *</label>
-                            <select class="form-select" id="protocoloAluno" required>
-                                <option value="">Selecione o aluno...</option>
-                            </select>
-                        </div>
+    <!-- MODAIS DE PROTOCOLOS (continuação na próxima mensagem por limite de caracteres) -->
 
-                        <div class="mb-3">
-                            <label class="form-label">Nome do Protocolo *</label>
-                            <input type="text" class="form-control" id="protocoloNome" 
-                                   placeholder="Ex: Treino ABC - Hipertrofia" required>
-                            <small class="text-muted">Nome livre para identificar o protocolo</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Objetivo Principal *</label>
-                            <select class="form-select" id="protocoloObjetivo" required onchange="toggleObjetivoOutros()">
-                                <option value="">Selecione...</option>
-                                <option value="Adaptação">Adaptação</option>
-                                <option value="Hipertrofia">Hipertrofia</option>
-                                <option value="Emagrecimento">Emagrecimento</option>
-                                <option value="Força">Força</option>
-                                <option value="Preparação Física">Preparação Física</option>
-                                <option value="Estética">Estética</option>
-                                <option value="Profilático">Profilático</option>
-                                <option value="Terapêutico">Terapêutico</option>
-                                <option value="Grupos Especiais">Grupos Especiais</option>
-                                <option value="Competitivos">Competitivos</option>
-                                <option value="Outros">Outros</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3" id="objetivoOutrosDiv" style="display: none;">
-                            <label class="form-label">Descreva o Objetivo</label>
-                            <textarea class="form-control" id="protocoloObjetivoOutros" rows="2" 
-                                      placeholder="Descreva o objetivo personalizado..."></textarea>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Data de Início</label>
-                                <input type="date" class="form-control" id="protocoloDataInicio">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Data de Término (Previsão)</label>
-                                <input type="date" class="form-control" id="protocoloDataFim">
-                            </div>
-                        </div>
-
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="protocoloAtivo" checked>
-                            <label class="form-check-label" for="protocoloAtivo">
-                                Protocolo Ativo
-                            </label>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveProtocolo()">Salvar Protocolo</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================
-         MODAL: GERENCIAR TREINOS DO PROTOCOLO
-         ============================================ -->
-    <div class="modal fade" id="gerenciarTreinosModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div>
-                        <h5 class="modal-title" id="gerenciarTreinosTitle">Gerenciar Treinos</h5>
-                        <small class="text-muted" id="gerenciarTreinosSubtitle"></small>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="currentProtocoloId">
-                    
-                    <button class="btn btn-primary mb-3" onclick="openAdicionarTreinoModal()">
-                        <i class="bi bi-plus-circle"></i> Adicionar Treino
-                    </button>
-
-                    <div id="treinosProtocoloList">
-                        <!-- Lista de treinos será carregada aqui -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================
-         MODAL: ADICIONAR TREINO
-         ============================================ -->
-    <div class="modal fade" id="adicionarTreinoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Adicionar Treino ao Protocolo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="treinoForm">
-                        <input type="hidden" id="treinoProtocoloId">
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Nome do Treino *</label>
-                            <input type="text" class="form-control" id="treinoNome" 
-                                   placeholder="Ex: Treino A - Peito e Tríceps" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Descrição (opcional)</label>
-                            <textarea class="form-control" id="treinoDescricao" rows="2" 
-                                      placeholder="Observações sobre o treino..."></textarea>
-                        </div>
-                    </form>
-
-                    <hr>
-                    <h6>Exercícios do Treino</h6>
-                    <button class="btn btn-sm btn-primary mb-3" onclick="openAdicionarExercicioModal()">
-                        <i class="bi bi-plus"></i> Adicionar Exercício
-                    </button>
-
-                    <div id="exerciciosTreinoList">
-                        <div class="alert alert-info">Nenhum exercício adicionado ainda</div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveTreino()">Salvar Treino</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================
-         MODAL: ADICIONAR EXERCÍCIO (COMPLEXO)
-         ============================================ -->
-    <div class="modal fade" id="adicionarExercicioModal" tabindex="-1">
-        <div class="modal-dialog modal-xl" style="max-width: 95%;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Adicionar Exercício</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
-                    <form id="exercicioForm">
-                        <!-- SELEÇÃO DO EXERCÍCIO -->
-                        <div class="card mb-3">
-                            <div class="card-header bg-primary text-white">
-                                <h6 class="mb-0"><i class="bi bi-search"></i> Selecionar Exercício</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Grupo Muscular *</label>
-                                        <select class="form-select" id="exercicioGrupoMuscular" 
-                                                required onchange="loadExerciciosBiblioteca()">
-                                            <option value="">Selecione o grupo...</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Exercício *</label>
-                                        <select class="form-select" id="exercicioBiblioteca" 
-                                                required onchange="loadExercicioDetalhes()">
-                                            <option value="">Selecione o exercício...</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Preview do Vídeo/Imagem -->
-                                <div id="exercicioPreview" style="display: none;">
-                                    <div class="text-center mb-3 p-3 bg-light rounded">
-                                        <video id="exercicioVideo" controls style="max-width: 500px; max-height: 350px; display: none;" class="rounded">
-                                            <source id="exercicioVideoSource" type="video/mp4">
-                                        </video>
-                                        <img id="exercicioImagem" class="rounded" style="max-width: 500px; max-height: 350px; display: none;">
-                                    </div>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="alterarVideoExercicio()">
-                                        <i class="bi bi-camera-video"></i> Alterar vídeo
-                                    </button>
-                                    <input type="file" id="exercicioVideoUpload" accept="video/*" style="display: none;" 
-                                           onchange="uploadVideoExercicio()">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CONFIGURAÇÕES GERAIS -->
-                        <div class="card mb-3">
-                            <div class="card-header bg-success text-white">
-                                <h6 class="mb-0"><i class="bi bi-gear"></i> Configurações Gerais</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Nº de séries *</label>
-                                        <input type="number" class="form-control" id="exercicioNumSeries" 
-                                               min="1" max="20" value="4" required onchange="gerarLinhasSeries()">
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Método</label>
-                                        <select class="form-select" id="exercicioMetodo">
-                                            <option value="">Selecione uma opção</option>
-                                            <option value="Ultra intensos">Ultra intensos</option>
-                                            <option value="Pré-exaustão">Pré-exaustão</option>
-                                            <option value="Drop set">Drop set</option>
-                                            <option value="Rest-pause">Rest-pause (pausa-descanso)</option>
-                                            <option value="Super série antagonista">Super série antagonista</option>
-                                            <option value="Super série agonista">Super série agonista</option>
-                                            <option value="Força máxima">Força máxima</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Objetivo</label>
-                                        <select class="form-select" id="exercicioObjetivo">
-                                            <option value="">Selecione uma opção</option>
-                                            <option value="Emagrecer">Emagrecer</option>
-                                            <option value="Hipertrofia">Hipertrofia</option>
-                                            <option value="Força">Força</option>
-                                            <option value="Preparação Física">Preparação Física</option>
-                                            <option value="Estética">Estética</option>
-                                            <option value="Profilático">Profilático</option>
-                                            <option value="Terapêutico">Terapêutico</option>
-                                            <option value="Grupos Especiais">Grupos Especiais</option>
-                                            <option value="Competitivos">Competitivos</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- DETALHES DAS SÉRIES (DINÂMICO) -->
-                        <div class="card mb-3">
-                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0"><i class="bi bi-list-ol"></i> Detalhes das Séries</h6>
-                                <button type="button" class="btn btn-sm btn-light" onclick="adicionarSerie()">
-                                    <i class="bi bi-plus"></i> Adicionar Série
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <div id="seriesDetalhesContainer">
-                                    <!-- Linhas de séries serão geradas dinamicamente aqui -->
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- DICA -->
-                        <div class="card mb-3">
-                            <div class="card-header bg-warning">
-                                <h6 class="mb-0"><i class="bi bi-lightbulb"></i> Dica</h6>
-                            </div>
-                            <div class="card-body">
-                                <textarea class="form-control mb-2" id="exercicioDica" rows="3" 
-                                          maxlength="1000" placeholder="Máximo de 1000 caracteres"></textarea>
-                                <small class="text-muted"><span id="dicaCounter">0</span>/1000 caracteres</small>
-                                
-                                <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" id="exercicioDicaPadrao">
-                                    <label class="form-check-label" for="exercicioDicaPadrao">
-                                        Usar dica como padrão para este exercício
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveExercicio()">
-                        <i class="bi bi-check-circle"></i> Salvar Exercício
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="config.js"></script>
     <script src="auth.js"></script>
