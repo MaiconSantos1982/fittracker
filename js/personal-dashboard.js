@@ -623,6 +623,7 @@ function removerLinhaAlimento(button) {
     // Reindexar as linhas restantes
     document.querySelectorAll('.alimento-row').forEach((row, newIndex) => {
         row.dataset.index = newIndex;
+    
     });
     
     // Se não houver mais alimentos, mostrar mensagem
@@ -647,7 +648,7 @@ function coletarAlimentosDosInputs() {
 
 async function saveRefeicao() {
     try {
-        const tipoSelectElement = document.getElementById('refeicaoTipo');
+        const tipoSelectElement = document.getElementById('refeicaoTipo');  // ✅ CORRETO!
         const tipoOutroElement = document.getElementById('refeicaoOutro');
         
         if (!tipoSelectElement) {
@@ -793,47 +794,6 @@ function renderAlimentosTemp() {
 function removerAlimento(index) {
     window.alimentosTemp.splice(index, 1);
     renderAlimentosTemp();
-}
-
-async function saveRefeicao() {
-    try {
-        const tipoRefeicao = document.getElementById('refeicaoNome').value;
-        const horario = document.getElementById('refeicaoHorario').value;
-        const observacoes = document.getElementById('refeicaoDescricao').value;
-
-        if (!tipoRefeicao) return alert('Informe o tipo de refeição!');
-
-        const refeicaoData = {
-            dieta_id: window.currentDietaId,
-            tipo_refeicao: tipoRefeicao,
-            horario: horario || null,
-            alimentos: window.alimentosTemp || [],
-            observacoes: observacoes || null
-        };
-
-        if (window.editingRefeicaoId) {
-            const { error } = await supabase
-                .from('fit_refeicoes')
-                .update(refeicaoData)
-                .eq('id', window.editingRefeicaoId);
-
-            if (error) throw error;
-            delete window.editingRefeicaoId;
-        } else {
-            const { error } = await supabase
-                .from('fit_refeicoes')
-                .insert(refeicaoData);
-
-            if (error) throw error;
-        }
-
-        alert('Refeição salva!');
-        bootstrap.Modal.getInstance(document.getElementById('adicionarRefeicaoModal')).hide();
-        await loadRefeicoesDieta(window.currentDietaId);
-        await loadDietas();
-    } catch (error) {
-        alert('Erro: ' + error.message);
-    }
 }
 
 async function editRefeicao(refeicaoId, dietaId) {
