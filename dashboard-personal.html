@@ -51,6 +51,7 @@
                 <li><a href="#" data-section="dashboard" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
                 <li><a href="#" data-section="alunos"><i class="bi bi-people"></i> Alunos</a></li>
                 <li><a href="#" data-section="treinos"><i class="bi bi-clipboard-check"></i> Treinos</a></li>
+                <a href="#" data-section="protocolos"><i class="bi bi-clipboard-check"></i><span>Protocolos</span></a>
                 <li><a href="#" data-section="dietas"><i class="bi bi-egg-fried"></i> Dietas</a></li>
                 <li><a href="#" data-section="medidas"><i class="bi bi-rulers"></i> Medidas</a></li>
                 <li><a href="#" data-section="agenda"><i class="bi bi-calendar-event"></i> Agenda</a></li>
@@ -170,6 +171,333 @@
                         </div>
                     </div>
                 </div>
+<!-- ============================================
+     SEÇÃO: PROTOCOLOS
+     ============================================ -->
+<div id="section-protocolos" class="content-section" style="display: none;">
+    <div class="section-header">
+        <h3>Gerenciar Protocolos de Treino</h3>
+        <button class="btn btn-primary" onclick="openNovoProtocoloModal()">
+            <i class="bi bi-plus-circle"></i> Novo Protocolo
+        </button>
+    </div>
+
+    <!-- Filtro por Aluno -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Filtrar por Aluno</label>
+                    <select class="form-select" id="filtroAlunoProtocolos" onchange="loadProtocolos()">
+                        <option value="">Todos os alunos</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Status</label>
+                    <select class="form-select" id="filtroStatusProtocolos" onchange="loadProtocolos()">
+                        <option value="">Todos</option>
+                        <option value="true" selected>Ativos</option>
+                        <option value="false">Inativos</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Protocolos -->
+    <div id="protocolosList"></div>
+</div>
+
+<!-- ============================================
+     MODAL: NOVO/EDITAR PROTOCOLO
+     ============================================ -->
+<div class="modal fade" id="protocoloModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="protocoloModalTitle">Novo Protocolo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="protocoloForm">
+                    <input type="hidden" id="protocoloId">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Aluno *</label>
+                        <select class="form-select" id="protocoloAluno" required>
+                            <option value="">Selecione o aluno...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Protocolo *</label>
+                        <input type="text" class="form-control" id="protocoloNome" 
+                               placeholder="Ex: Treino ABC - Hipertrofia" required>
+                        <small class="text-muted">Nome livre para identificar o protocolo</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Objetivo Principal *</label>
+                        <select class="form-select" id="protocoloObjetivo" required onchange="toggleObjetivoOutros()">
+                            <option value="">Selecione...</option>
+                            <option value="Adaptação">Adaptação</option>
+                            <option value="Hipertrofia">Hipertrofia</option>
+                            <option value="Emagrecimento">Emagrecimento</option>
+                            <option value="Força">Força</option>
+                            <option value="Preparação Física">Preparação Física</option>
+                            <option value="Estética">Estética</option>
+                            <option value="Profilático">Profilático</option>
+                            <option value="Terapêutico">Terapêutico</option>
+                            <option value="Grupos Especiais">Grupos Especiais</option>
+                            <option value="Competitivos">Competitivos</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="objetivoOutrosDiv" style="display: none;">
+                        <label class="form-label">Descreva o Objetivo</label>
+                        <textarea class="form-control" id="protocoloObjetivoOutros" rows="2" 
+                                  placeholder="Descreva o objetivo personalizado..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Data de Início</label>
+                            <input type="date" class="form-control" id="protocoloDataInicio">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Data de Término (Previsão)</label>
+                            <input type="date" class="form-control" id="protocoloDataFim">
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="protocoloAtivo" checked>
+                        <label class="form-check-label" for="protocoloAtivo">
+                            Protocolo Ativo
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveProtocolo()">Salvar Protocolo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================
+     MODAL: GERENCIAR TREINOS DO PROTOCOLO
+     ============================================ -->
+<div class="modal fade" id="gerenciarTreinosModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="gerenciarTreinosTitle">Gerenciar Treinos</h5>
+                    <small class="text-muted" id="gerenciarTreinosSubtitle"></small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="currentProtocoloId">
+                
+                <button class="btn btn-primary mb-3" onclick="openAdicionarTreinoModal()">
+                    <i class="bi bi-plus-circle"></i> Adicionar Treino
+                </button>
+
+                <div id="treinosProtocoloList">
+                    <!-- Lista de treinos será carregada aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================
+     MODAL: ADICIONAR TREINO
+     ============================================ -->
+<div class="modal fade" id="adicionarTreinoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Treino ao Protocolo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="treinoForm">
+                    <input type="hidden" id="treinoProtocoloId">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Treino *</label>
+                        <input type="text" class="form-control" id="treinoNome" 
+                               placeholder="Ex: Treino A - Peito e Tríceps" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descrição (opcional)</label>
+                        <textarea class="form-control" id="treinoDescricao" rows="2" 
+                                  placeholder="Observações sobre o treino..."></textarea>
+                    </div>
+                </form>
+
+                <hr>
+                <h6>Exercícios do Treino</h6>
+                <button class="btn btn-sm btn-primary mb-3" onclick="openAdicionarExercicioModal()">
+                    <i class="bi bi-plus"></i> Adicionar Exercício
+                </button>
+
+                <div id="exerciciosTreinoList">
+                    <div class="alert alert-info">Nenhum exercício adicionado ainda</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveTreino()">Salvar Treino</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================
+     MODAL: ADICIONAR EXERCÍCIO (COMPLEXO)
+     ============================================ -->
+<div class="modal fade" id="adicionarExercicioModal" tabindex="-1">
+    <div class="modal-dialog modal-xl" style="max-width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Exercício</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                <form id="exercicioForm">
+                    <!-- SELEÇÃO DO EXERCÍCIO -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Selecionar Exercício</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Grupo Muscular *</label>
+                                    <select class="form-select" id="exercicioGrupoMuscular" 
+                                            required onchange="loadExerciciosBiblioteca()">
+                                        <option value="">Selecione o grupo...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Exercício *</label>
+                                    <select class="form-select" id="exercicioBiblioteca" 
+                                            required onchange="loadExercicioDetalhes()">
+                                        <option value="">Selecione o exercício...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Preview do Vídeo/Imagem -->
+                            <div id="exercicioPreview" style="display: none;">
+                                <div class="text-center mb-3">
+                                    <video id="exercicioVideo" controls style="max-width: 400px; max-height: 300px; display: none;">
+                                        <source id="exercicioVideoSource" type="video/mp4">
+                                    </video>
+                                    <img id="exercicioImagem" style="max-width: 400px; max-height: 300px; display: none;">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="alterarVideoExercicio()">
+                                    Alterar vídeo
+                                </button>
+                                <input type="file" id="exercicioVideoUpload" accept="video/*" style="display: none;" 
+                                       onchange="uploadVideoExercicio()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONFIGURAÇÕES GERAIS -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Configurações Gerais</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Nº de séries *</label>
+                                    <input type="number" class="form-control" id="exercicioNumSeries" 
+                                           min="1" max="20" value="4" required onchange="gerarLinhasSeries()">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Método</label>
+                                    <select class="form-select" id="exercicioMetodo">
+                                        <option value="">Selecione uma opção</option>
+                                        <option value="Ultra intensos">Ultra intensos</option>
+                                        <option value="Pré-exaustão">Pré-exaustão</option>
+                                        <option value="Drop set">Drop set</option>
+                                        <option value="Rest-pause">Rest-pause (pausa-descanso)</option>
+                                        <option value="Super série antagonista">Super série antagonista</option>
+                                        <option value="Super série agonista">Super série agonista</option>
+                                        <option value="Força máxima">Força máxima</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Objetivo</label>
+                                    <select class="form-select" id="exercicioObjetivo">
+                                        <option value="">Selecione uma opção</option>
+                                        <option value="Emagrecer">Emagrecer</option>
+                                        <option value="Hipertrofia">Hipertrofia</option>
+                                        <option value="Força">Força</option>
+                                        <option value="Preparação Física">Preparação Física</option>
+                                        <option value="Estética">Estética</option>
+                                        <option value="Profilático">Profilático</option>
+                                        <option value="Terapêutico">Terapêutico</option>
+                                        <option value="Grupos Especiais">Grupos Especiais</option>
+                                        <option value="Competitivos">Competitivos</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DETALHES DAS SÉRIES (DINÂMICO) -->
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Detalhes das Séries</h6>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="adicionarSerie()">
+                                <i class="bi bi-plus"></i> Adicionar Série
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="seriesDetalhesContainer">
+                                <!-- Linhas de séries serão geradas dinamicamente aqui -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DICA -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Dica</h6>
+                        </div>
+                        <div class="card-body">
+                            <textarea class="form-control mb-2" id="exercicioDica" rows="3" 
+                                      maxlength="1000" placeholder="Máximo de 1000 caracteres"></textarea>
+                            <small class="text-muted"><span id="dicaCounter">0</span>/1000 caracteres</small>
+                            
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="exercicioDicaPadrao">
+                                <label class="form-check-label" for="exercicioDicaPadrao">
+                                    Usar dica como padrão para este exercício
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveExercicio()">Salvar Exercício</button>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Medidas Section -->
                 <div id="section-medidas" class="content-section" style="display: none;">
