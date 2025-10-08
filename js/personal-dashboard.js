@@ -417,8 +417,8 @@ function renderDietasList(dietas) {
                     </div>
                     <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-success" onclick="openAdicionarRefeicaoModal('${dieta.id}')">
-                            <i class="bi bi-plus-circle"></i> Adicionar RefeiÃ§Ã£o
-                        </button>
+    <i class="bi bi-plus-circle"></i> Adicionar Refeicao
+</button>
                         <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
                             <i class="bi bi-pencil"></i>
                         </button>
