@@ -17,15 +17,15 @@
     <!-- OneSignal -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({
-                appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
-                serviceWorkerPath: "/OneSignalSDKWorker.js",
-                serviceWorkerParam: { scope: '/' },
-                allowLocalhostAsSecureOrigin: true
-            });
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
+          serviceWorkerPath: "/OneSignalSDKWorker.js",
+          serviceWorkerParam: { scope: '/' },
+          allowLocalhostAsSecureOrigin: true
         });
+      });
     </script>
     
     <title>FitTracker - Personal Trainer</title>
@@ -47,48 +47,15 @@
                 <h3><i class="bi bi-activity"></i> FitTracker</h3>
                 <p class="text-muted">Personal Trainer</p>
             </div>
-
             <ul class="list-unstyled components">
-                <li>
-                    <a href="#" data-section="dashboard" class="active">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="alunos">
-                        <i class="bi bi-people"></i> Alunos
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="treinos">
-                        <i class="bi bi-clipboard-check"></i> Treinos
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="dietas">
-                        <i class="bi bi-egg-fried"></i> Dietas
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="medidas">
-                        <i class="bi bi-rulers"></i> Medidas
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="agenda">
-                        <i class="bi bi-calendar-event"></i> Agenda
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="notificacoes">
-                        <i class="bi bi-bell"></i> Notificações
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="btnSair">
-                        <i class="bi bi-box-arrow-right"></i> Sair
-                    </a>
-                </li>
+                <li><a href="#" data-section="dashboard" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="#" data-section="alunos"><i class="bi bi-people"></i> Alunos</a></li>
+                <li><a href="#" data-section="treinos"><i class="bi bi-clipboard-check"></i> Treinos</a></li>
+                <li><a href="#" data-section="dietas"><i class="bi bi-egg-fried"></i> Dietas</a></li>
+                <li><a href="#" data-section="medidas"><i class="bi bi-rulers"></i> Medidas</a></li>
+                <li><a href="#" data-section="agenda"><i class="bi bi-calendar-event"></i> Agenda</a></li>
+                <li><a href="#" data-section="notificacoes"><i class="bi bi-bell"></i> Notificações</a></li>
+                <li><a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
             </ul>
         </nav>
 
@@ -109,39 +76,35 @@
                 <!-- Dashboard Section -->
                 <div id="section-dashboard" class="content-section">
                     <h2 class="mb-4">Dashboard</h2>
-                    
                     <div class="row g-3">
                         <div class="col-md-3">
                             <div class="card text-white bg-primary">
                                 <div class="card-body">
-                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">TOTAL DE ALUNOS</p>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Total de Alunos</p>
                                     <h2 class="mb-0" id="totalAlunos">0</h2>
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <div class="card text-white bg-success">
                                 <div class="card-body">
-                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">ALUNOS ATIVOS</p>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Alunos Ativos</p>
                                     <h2 class="mb-0" id="alunosAtivos">0</h2>
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <div class="card text-white bg-warning">
                                 <div class="card-body">
-                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">TREINOS CRIADOS</p>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Treinos Criados</p>
                                     <h2 class="mb-0" id="totalTreinos">0</h2>
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <div class="card text-white bg-info">
                                 <div class="card-body">
-                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">CONSULTAS HOJE</p>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Consultas Hoje</p>
                                     <h2 class="mb-0" id="consultasHoje">0</h2>
                                 </div>
                             </div>
@@ -157,7 +120,7 @@
                             <i class="bi bi-plus-circle"></i> Novo Aluno
                         </button>
                     </div>
-
+                    
                     <!-- Campo de busca -->
                     <div class="card mb-3">
                         <div class="card-body">
@@ -174,7 +137,7 @@
                             <small class="text-muted d-block mt-2" id="searchResults"></small>
                         </div>
                     </div>
-
+                    
                     <div id="alunosContainer" class="row g-3"></div>
                 </div>
 
@@ -216,7 +179,6 @@
                             <i class="bi bi-plus-circle"></i> Registrar Medidas
                         </button>
                     </div>
-
                     <div class="card mb-3">
                         <div class="card-body">
                             <div class="row">
@@ -229,7 +191,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="medidasContent">
                         <div class="alert alert-info">Selecione um aluno para ver as medidas</div>
                     </div>
@@ -251,7 +212,6 @@
                 <!-- Notificações Section -->
                 <div id="section-notificacoes" class="content-section" style="display: none;">
                     <h2 class="mb-4">Enviar Notificações Push</h2>
-                    
                     <div class="card">
                         <div class="card-body">
                             <form id="notificationForm">
@@ -262,17 +222,14 @@
                                     </select>
                                     <small class="text-muted">Use Ctrl+Click para selecionar múltiplos</small>
                                 </div>
-
                                 <div class="mb-3">
                                     <label class="form-label">Título</label>
                                     <input type="text" class="form-control" id="notifTitulo" required>
                                 </div>
-
                                 <div class="mb-3">
                                     <label class="form-label">Mensagem</label>
                                     <textarea class="form-control" id="notifMensagem" rows="4" required></textarea>
                                 </div>
-
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-send"></i> Enviar Notificação
                                 </button>
@@ -301,34 +258,34 @@
                             <label class="form-label">Nome Completo *</label>
                             <input type="text" class="form-control" id="alunoNome" required placeholder="Nome do aluno">
                         </div>
-
+                        
                         <div class="mb-3">
                             <label class="form-label">Email *</label>
                             <input type="email" class="form-control" id="alunoEmail" required placeholder="email@exemplo.com">
                             <small class="text-muted">Será usado para login do aluno</small>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label class="form-label">Telefone</label>
                             <input type="tel" class="form-control" id="alunoTelefone" placeholder="(00) 00000-0000">
                         </div>
-
+                        
                         <div class="mb-3">
                             <label class="form-label">Data de Nascimento</label>
                             <input type="date" class="form-control" id="alunoDataNasc">
                         </div>
-
+                        
                         <div class="mb-3">
                             <label class="form-label">Senha Inicial *</label>
                             <input type="password" class="form-control" id="alunoSenha" minlength="6" required placeholder="Mínimo 6 caracteres">
                             <small class="text-muted">O aluno poderá alterar depois do primeiro login</small>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label class="form-label">Objetivo</label>
                             <textarea class="form-control" id="alunoObjetivo" rows="3" placeholder="Ex: Perder peso, ganhar massa muscular..."></textarea>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label class="form-label">Observações</label>
                             <textarea class="form-control" id="alunoObs" rows="3" placeholder="Restrições, histórico médico, etc."></textarea>
@@ -359,19 +316,15 @@
                                 <option value="">Selecione um aluno...</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Nome do Treino</label>
                             <input type="text" class="form-control" id="treinoNome" required placeholder="Ex: Treino A - Peito e Tríceps">
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Descrição</label>
                             <textarea class="form-control" id="treinoDesc" rows="2" placeholder="Descrição do treino..."></textarea>
                         </div>
-
                         <hr>
-
                         <h6>Exercícios</h6>
                         <div id="exerciciosContainer">
                             <div class="exercicio-item card mb-2 p-3">
@@ -403,7 +356,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <button type="button" class="btn btn-sm btn-success" onclick="addExercicioField()">
                             <i class="bi bi-plus"></i> Adicionar Exercício
                         </button>
@@ -416,6 +368,7 @@
             </div>
         </div>
     </div>
+
     <!-- Modal Dieta -->
     <div class="modal fade" id="dietaModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -438,7 +391,6 @@
                                 <input type="text" class="form-control" id="dietaNome" required placeholder="Ex: Dieta para Hipertrofia">
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Data Início</label>
@@ -449,14 +401,11 @@
                                 <input type="date" class="form-control" id="dietaFim">
                             </div>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Descrição</label>
                             <textarea class="form-control" id="dietaDesc" rows="2" placeholder="Orientações gerais..."></textarea>
                         </div>
-
                         <hr>
-
                         <h6>Refeições</h6>
                         <div id="refeicoesContainer">
                             <div class="refeicao-item card mb-2 p-3">
@@ -487,7 +436,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <button type="button" class="btn btn-sm btn-success" onclick="addRefeicaoField()">
                             <i class="bi bi-plus"></i> Adicionar Refeição
                         </button>
@@ -523,7 +471,6 @@
                                 <input type="date" class="form-control" id="medidaData" required>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Peso (kg)</label>
@@ -538,7 +485,6 @@
                                 <input type="number" step="0.01" class="form-control" id="medidaGordura">
                             </div>
                         </div>
-
                         <h6>Circunferências (cm)</h6>
                         <div class="row">
                             <div class="col-md-3 mb-2">
@@ -590,7 +536,6 @@
                                 <input type="number" step="0.01" class="form-control" id="medidaPanturrilhaE">
                             </div>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Observações</label>
                             <textarea class="form-control" id="medidaObs" rows="2"></textarea>
@@ -623,12 +568,10 @@
                                 <option value="">Selecione um aluno...</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Data e Hora</label>
                             <input type="datetime-local" class="form-control" id="agendaDataHora" required>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Tipo de Consulta</label>
                             <select class="form-select" id="agendaTipo">
@@ -639,7 +582,6 @@
                                 <option>Outro</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Status</label>
                             <select class="form-select" id="agendaStatus">
@@ -649,7 +591,6 @@
                                 <option value="cancelada">Cancelada</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Observações</label>
                             <textarea class="form-control" id="agendaObs" rows="3"></textarea>
@@ -663,6 +604,7 @@
             </div>
         </div>
     </div>
+
     <!-- Modal Detalhes do Aluno -->
     <div class="modal fade" id="alunoDetailsModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -760,7 +702,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -769,4 +710,3 @@
     <script src="js/personal-dashboard.js"></script>
 </body>
 </html>
-
