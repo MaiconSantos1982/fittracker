@@ -884,19 +884,27 @@ function renderTreinosProtocolo(treinos) {
 
     container.innerHTML = '';
 
-    treinos.forEach((treino) => {
+    treinos.forEach((treino, index) => {
         const card = document.createElement('div');
         card.className = 'card mb-3';
         const numExercicios = treino.exercicios_count?.[0]?.count || 0;
+        
         card.innerHTML = `
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="mb-0">${treino.nome}</h6>
+                    <h6 class="mb-0">
+                        <button class="btn btn-link text-decoration-none p-0" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#treino-${treino.id}" 
+                                aria-expanded="false">
+                            <i class="bi bi-chevron-right collapse-icon"></i>
+                            ${treino.nome}
+                        </button>
+                    </h6>
                     ${treino.descricao ? `<small class="text-muted">${treino.descricao}</small>` : ''}
                 </div>
                 <div>
                     <span class="badge bg-info me-2">${numExercicios} exercícios</span>
-                    <button class="btn btn-sm btn-primary" onclick="editTreino('${treino.id}')">
+                    <button class="btn btn-sm btn-warning" onclick="editTreinoProtocolo('${treino.id}')">
                         <i class="bi bi-pencil"></i> Editar
                     </button>
                     <button class="btn btn-sm btn-danger" onclick="deleteTreino('${treino.id}')">
@@ -904,9 +912,141 @@ function renderTreinosProtocolo(treinos) {
                     </button>
                 </div>
             </div>
+            <div class="collapse" id="treino-${treino.id}">
+                <div class="card-body">
+                    <div id="exercicios-treino-${treino.id}">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm" role="status"></div>
+                            <span class="ms-2">Carregando exercícios...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
         container.appendChild(card);
+
+        // Adicionar evento para carregar exercícios quando expandir
+        const collapseElement = document.getElementById(`treino-${treino.id}`);
+        collapseElement.addEventListener('show.bs.collapse', async () => {
+            await loadExerciciosTreino(treino.id);
+        });
+
+        // Rotacionar ícone ao expandir/colapsar
+        collapseElement.addEventListener('show.bs.collapse', function() {
+            const icon = this.previousElementSibling.querySelector('.collapse-icon');
+            icon.classList.remove('bi-chevron-right');
+            icon.classList.add('bi-chevron-down');
+        });
+        collapseElement.addEventListener('hide.bs.collapse', function() {
+            const icon = this.previousElementSibling.querySelector('.collapse-icon');
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-right');
+        });
     });
+}
+
+async function loadExerciciosTreino(treinoId) {
+    try {
+        const { data: exercicios, error } = await supabase
+            .from('fit_exercicios')
+            .select('*')
+            .eq('treino_id', treinoId)
+            .order('ordem', { ascending: true });
+
+        if (error) throw error;
+
+        renderExerciciosTreino(treinoId, exercicios);
+    } catch (error) {
+        console.error('Erro ao carregar exercícios:', error);
+        document.getElementById(`exercicios-treino-${treinoId}`).innerHTML = 
+            '<div class="alert alert-danger">Erro ao carregar exercícios</div>';
+    }
+}
+
+function renderExerciciosTreino(treinoId, exercicios) {
+    const container = document.getElementById(`exercicios-treino-${treinoId}`);
+    if (!container) return;
+
+    if (!exercicios || exercicios.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum exercício cadastrado neste treino.</div>';
+        return;
+    }
+
+    let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0">';
+    html += '<thead><tr>';
+    html += '<th style="width: 40px;">#</th>';
+    html += '<th>Exercício</th>';
+    html += '<th>Grupo</th>';
+    html += '<th>Séries</th>';
+    html += '<th>Método</th>';
+    html += '<th style="width: 100px;">Ações</th>';
+    html += '</tr></thead><tbody>';
+
+    exercicios.forEach((ex, index) => {
+        const seriesInfo = ex.series_detalhes && ex.series_detalhes.length > 0 
+            ? `${ex.series_detalhes.length}x ${ex.series_detalhes[0].numero || '-'} reps`
+            : `${ex.numero_series || '-'} séries`;
+
+        html += `<tr>`;
+        html += `<td><strong>${index + 1}</strong></td>`;
+        html += `<td>
+            <strong>${ex.nome}</strong>
+            ${ex.dica ? `<br><small class="text-muted"><i class="bi bi-lightbulb"></i> ${ex.dica.substring(0, 60)}${ex.dica.length > 60 ? '...' : ''}</small>` : ''}
+        </td>`;
+        html += `<td><span class="badge bg-secondary">${ex.grupo_muscular || '-'}</span></td>`;
+        html += `<td>${seriesInfo}</td>`;
+        html += `<td>${ex.metodo || '-'}</td>`;
+        html += `<td>
+            <button class="btn btn-sm btn-info" onclick="viewExercicioDetalhes('${ex.id}')" title="Ver detalhes">
+                <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteExercicio('${ex.id}', '${treinoId}')" title="Excluir">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>`;
+        html += `</tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+async function editTreinoProtocolo(treinoId) {
+    try {
+        const { data: treino, error } = await supabase
+            .from('fit_treinos')
+            .select('*')
+            .eq('id', treinoId)
+            .single();
+
+        if (error) throw error;
+
+        // Preencher modal de edição
+        document.getElementById('treinoProtocoloId').value = treino.protocolo_id;
+        document.getElementById('treinoNome').value = treino.nome;
+        document.getElementById('treinoDescricao').value = treino.descricao || '';
+
+        // Carregar exercícios existentes
+        const { data: exercicios, error: exError } = await supabase
+            .from('fit_exercicios')
+            .select('*')
+            .eq('treino_id', treinoId)
+            .order('ordem', { ascending: true });
+
+        if (!exError && exercicios) {
+            exerciciosTempList = exercicios;
+            renderExerciciosTempList();
+        }
+
+        // Armazenar ID do treino sendo editado
+        window.editingTreinoId = treinoId;
+
+        // Abrir modal
+        new bootstrap.Modal(document.getElementById('adicionarTreinoModal')).show();
+    } catch (error) {
+        console.error('Erro ao carregar treino para edição:', error);
+        alert('Erro ao carregar treino: ' + error.message);
+    }
 }
 
 function openAdicionarTreinoModal() {
@@ -940,23 +1080,51 @@ async function saveTreino() {
             .eq('id', protocoloId)
             .single();
 
-        const { data: treino, error: treinoError } = await supabase
-            .from('fit_treinos')
-            .insert({
-                protocolo_id: protocoloId,
-                aluno_id: protocolo.aluno_id,
-                personal_id: currentUser.id,
-                nome: nome,
-                descricao: descricao
-            })
-            .select()
-            .single();
+        let treinoId;
 
-        if (treinoError) throw treinoError;
+        // Verificar se está editando ou criando novo
+        if (window.editingTreinoId) {
+            // EDIÇÃO
+            const { error: updateError } = await supabase
+                .from('fit_treinos')
+                .update({
+                    nome: nome,
+                    descricao: descricao
+                })
+                .eq('id', window.editingTreinoId);
 
+            if (updateError) throw updateError;
+
+            // Deletar exercícios antigos
+            await supabase
+                .from('fit_exercicios')
+                .delete()
+                .eq('treino_id', window.editingTreinoId);
+
+            treinoId = window.editingTreinoId;
+            window.editingTreinoId = null;
+        } else {
+            // NOVO TREINO
+            const { data: treino, error: treinoError } = await supabase
+                .from('fit_treinos')
+                .insert({
+                    protocolo_id: protocoloId,
+                    aluno_id: protocolo.aluno_id,
+                    personal_id: currentUser.id,
+                    nome: nome,
+                    descricao: descricao
+                })
+                .select()
+                .single();
+
+            if (treinoError) throw treinoError;
+            treinoId = treino.id;
+        }
+
+        // Inserir exercícios
         for (let i = 0; i < exerciciosTempList.length; i++) {
-            const ex = exerciciosTempList[i];
-            ex.treino_id = treino.id;
+            const ex = { ...exerciciosTempList[i] };
+            ex.treino_id = treinoId;
             ex.protocolo_id = protocoloId;
             ex.ordem = i + 1;
 
@@ -1387,5 +1555,30 @@ async function loadAlunosSelect(selectId) {
         console.error('Erro ao carregar alunos no select:', error);
     }
 }
+
+function viewExercicioDetalhes(exercicioId) {
+    alert('Função de visualizar detalhes do exercício em desenvolvimento. ID: ' + exercicioId);
+}
+
+async function deleteExercicio(exercicioId, treinoId) {
+    if (!confirm('Tem certeza que deseja excluir este exercício?')) return;
+
+    try {
+        const { error } = await supabase
+            .from('fit_exercicios')
+            .delete()
+            .eq('id', exercicioId);
+
+        if (error) throw error;
+
+        alert('Exercício excluído com sucesso!');
+        await loadExerciciosTreino(treinoId);
+        await loadTreinosProtocolo(currentProtocoloId);
+    } catch (error) {
+        console.error('Erro ao excluir exercício:', error);
+        alert('Erro ao excluir exercício: ' + error.message);
+    }
+}
+
 
 // FIM DO ARQUIVO - NÃO ADICIONE MAIS NADA AQUI
