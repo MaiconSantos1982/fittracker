@@ -1,138 +1,112 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitTracker - Dashboard Personal</title>
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FitTracker">
     
-    <!-- Bootstrap CSS -->
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icons para iOS -->
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    
+    <!-- OneSignal -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
+          serviceWorkerPath: "/OneSignalSDKWorker.js",
+          serviceWorkerParam: { scope: '/' },
+          allowLocalhostAsSecureOrigin: true
+        });
+      });
+    </script>
+    
+    <title>FitTracker - Personal Trainer</title>
+    
+    <!-- Bootstrap e Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
 <body>
     <div class="wrapper">
+        <!-- Overlay para mobile -->
+        <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+        
         <!-- Sidebar -->
         <nav id="sidebar">
-            <div class="p-4 border-bottom">
-                <h3>FitTracker</h3>
-                <p class="text-muted mb-0">Personal Trainer</p>
+            <div class="p-4">
+                <h3><i class="bi bi-activity"></i> FitTracker</h3>
+                <p class="text-muted">Personal Trainer</p>
             </div>
-
-            <ul class="components">
-                <li>
-                    <a href="#" data-section="dashboard" class="active">
-                        <i class="bi bi-speedometer2"></i>
-                        Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="alunos">
-                        <i class="bi bi-people"></i>
-                        Alunos
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="treinos">
-                        <i class="bi bi-lightning"></i>
-                        Treinos
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="dietas">
-                        <i class="bi bi-heart"></i>
-                        Dietas
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="medidas">
-                        <i class="bi bi-graph-up"></i>
-                        Medidas
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="agenda">
-                        <i class="bi bi-calendar"></i>
-                        Agenda
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="notificacoes">
-                        <i class="bi bi-bell"></i>
-                        Notificações
-                    </a>
-                </li>
+            <ul class="list-unstyled components">
+                <li><a href="#" data-section="dashboard" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="#" data-section="alunos"><i class="bi bi-people"></i> Alunos</a></li>
+                <li><a href="#" data-section="treinos"><i class="bi bi-clipboard-check"></i> Treinos</a></li>
+                <li><a href="#" data-section="dietas"><i class="bi bi-egg-fried"></i> Dietas</a></li>
+                <li><a href="#" data-section="medidas"><i class="bi bi-rulers"></i> Medidas</a></li>
+                <li><a href="#" data-section="agenda"><i class="bi bi-calendar-event"></i> Agenda</a></li>
+                <li><a href="#" data-section="notificacoes"><i class="bi bi-bell"></i> Notificações</a></li>
+                <li><a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
             </ul>
-
-            <!-- Botão Sair -->
-            <div class="p-3 border-top mt-auto">
-                <button class="btn btn-outline-danger w-100" onclick="logout()">
-                    <i class="bi bi-box-arrow-right"></i> Sair
-                </button>
-            </div>
         </nav>
 
-        <!-- Overlay Mobile -->
-        <div id="sidebar-overlay"></div>
-
-        <!-- Page Content -->
+        <!-- Conteúdo Principal -->
         <div id="content">
             <!-- Navbar -->
-            <nav class="navbar">
-                <div class="container-fluid px-3">
-                    <div class="d-flex align-items-center gap-2">
-                        <button class="btn btn-sm btn-outline-secondary" id="sidebarCollapse">
-                            <i class="bi bi-list"></i>
-                        </button>
-                        <span class="navbar-brand mb-0" id="currentSection">Dashboard</span>
-                    </div>
-                    <button class="btn btn-sm btn-secondary d-none d-md-block" onclick="logout()">
-                        <i class="bi bi-box-arrow-right"></i> Sair
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                        <i class="bi bi-list"></i>
                     </button>
+                    <span class="navbar-brand ms-3" id="currentSection">Dashboard</span>
                 </div>
             </nav>
 
+            <!-- Seções -->
             <div class="container-fluid p-4">
                 <!-- Dashboard Section -->
                 <div id="section-dashboard" class="content-section">
                     <h2 class="mb-4">Dashboard</h2>
-                    
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card bg-primary">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-primary">
                                 <div class="card-body">
-                                    <p class="text-white-50 mb-2">TOTAL DE ALUNOS</p>
-                                    <h2 class="text-white mb-0" id="totalAlunos">0</h2>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Total de Alunos</p>
+                                    <h2 class="mb-0" id="totalAlunos">0</h2>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card bg-success">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success">
                                 <div class="card-body">
-                                    <p class="text-white-50 mb-2">ALUNOS ATIVOS</p>
-                                    <h2 class="text-white mb-0" id="alunosAtivos">0</h2>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Alunos Ativos</p>
+                                    <h2 class="mb-0" id="alunosAtivos">0</h2>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card bg-warning">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-warning">
                                 <div class="card-body">
-                                    <p class="text-white-50 mb-2">TOTAL TREINOS</p>
-                                    <h2 class="text-white mb-0" id="totalTreinos">0</h2>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Treinos Criados</p>
+                                    <h2 class="mb-0" id="totalTreinos">0</h2>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card bg-info">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-info">
                                 <div class="card-body">
-                                    <p class="text-white-50 mb-2">CONSULTAS HOJE</p>
-                                    <h2 class="text-white mb-0" id="consultasHoje">0</h2>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Consultas Hoje</p>
+                                    <h2 class="mb-0" id="consultasHoje">0</h2>
                                 </div>
                             </div>
                         </div>
@@ -142,143 +116,491 @@
                 <!-- Alunos Section -->
                 <div id="section-alunos" class="content-section" style="display: none;">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="mb-0">Meus Alunos</h2>
-                        <button class="btn btn-primary" onclick="openAlunoModal()">
+                        <h2>Gerenciar Alunos</h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#alunoModal" onclick="openAlunoModal()">
                             <i class="bi bi-plus-circle"></i> Novo Aluno
                         </button>
                     </div>
-
-                    <!-- Campo de Busca -->
-                    <div class="card mb-4">
+                    
+                    <!-- Campo de busca -->
+                    <div class="card mb-3">
                         <div class="card-body">
                             <div class="search-box">
                                 <i class="bi bi-search"></i>
-                                <input type="text" id="searchAluno" class="form-control search-input" 
-                                       placeholder="Buscar por nome, email ou telefone..." 
-                                       onkeyup="filterAlunos()">
+                                <input 
+                                    type="text" 
+                                    class="form-control search-input" 
+                                    id="searchAluno" 
+                                    placeholder="Buscar aluno por nome, email ou telefone..."
+                                    onkeyup="filterAlunos()"
+                                >
                             </div>
-                            <div id="searchResults" class="mt-2 text-primary"></div>
+                            <small class="text-muted d-block mt-2" id="searchResults"></small>
                         </div>
                     </div>
-
+                    
                     <div id="alunosContainer" class="row g-3"></div>
                 </div>
 
                 <!-- Treinos Section -->
                 <div id="section-treinos" class="content-section" style="display: none;">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="mb-0">Treinos</h2>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#treinoModal">
+                        <h2>Gerenciar Treinos</h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#treinoModal" onclick="openTreinoModal()">
                             <i class="bi bi-plus-circle"></i> Novo Treino
                         </button>
                     </div>
-                    <div id="treinosList"></div>
+                    <div id="treinosList">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Cadastre alunos primeiro para criar treinos.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Dietas Section -->
                 <div id="section-dietas" class="content-section" style="display: none;">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="mb-0">Dietas</h2>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dietaModal">
+                        <h2>Gerenciar Dietas</h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dietaModal" onclick="openDietaModal()">
                             <i class="bi bi-plus-circle"></i> Nova Dieta
                         </button>
                     </div>
-                    <div id="dietasList"></div>
+                    <div id="dietasList">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Cadastre alunos primeiro para criar dietas.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Medidas Section -->
                 <div id="section-medidas" class="content-section" style="display: none;">
-                    <h2 class="mb-4">Medidas e Evolução</h2>
-                    <div class="card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Medidas e Evolução</h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#medidaModal" onclick="openMedidaModal()">
+                            <i class="bi bi-plus-circle"></i> Registrar Medidas
+                        </button>
+                    </div>
+                    <div class="card mb-3">
                         <div class="card-body">
-                            <label class="form-label">Selecione o Aluno:</label>
-                            <select class="form-select" id="alunoMedidasSelect" onchange="loadMedidas()">
-                                <option value="">Selecione...</option>
-                            </select>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label>Selecionar Aluno</label>
+                                    <select class="form-select" id="alunoMedidasSelect" onchange="loadMedidas()">
+                                        <option value="">Selecione um aluno...</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div id="medidasContent"></div>
+                    <div id="medidasContent">
+                        <div class="alert alert-info">Selecione um aluno para ver as medidas</div>
+                    </div>
                 </div>
 
                 <!-- Agenda Section -->
                 <div id="section-agenda" class="content-section" style="display: none;">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="mb-0">Agenda</h2>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agendaModal">
+                        <h2>Agenda de Consultas</h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agendaModal" onclick="openAgendaModal()">
                             <i class="bi bi-plus-circle"></i> Nova Consulta
                         </button>
                     </div>
-                    <div id="agendaCalendar"></div>
+                    <div id="agendaCalendar">
+                        <div class="alert alert-info">Nenhuma consulta agendada</div>
+                    </div>
                 </div>
 
                 <!-- Notificações Section -->
                 <div id="section-notificacoes" class="content-section" style="display: none;">
-                    <h2 class="mb-4">Notificações</h2>
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> Sistema de notificações em desenvolvimento
+                    <h2 class="mb-4">Enviar Notificações Push</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="notificationForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Destinatários</label>
+                                    <select class="form-select" id="notifDestinatarios" multiple>
+                                        <option value="todos">Todos os Alunos</option>
+                                    </select>
+                                    <small class="text-muted">Use Ctrl+Click para selecionar múltiplos</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Título</label>
+                                    <input type="text" class="form-control" id="notifTitulo" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mensagem</label>
+                                    <textarea class="form-control" id="notifMensagem" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Enviar Notificação
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Cadastro de Aluno -->
+    <!-- Modals -->
+    <!-- Modal Aluno -->
     <div class="modal fade" id="alunoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Cadastrar Novo Aluno</h5>
+                    <h5 class="modal-title">Cadastrar Aluno</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="alunoForm">
                         <input type="hidden" id="alunoId">
                         
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nome Completo *</label>
-                                <input type="text" class="form-control" id="alunoNome" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="alunoEmail" required>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo *</label>
+                            <input type="text" class="form-control" id="alunoNome" required placeholder="Nome do aluno">
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Telefone</label>
-                                <input type="tel" class="form-control" id="alunoTelefone">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Data de Nascimento</label>
-                                <input type="date" class="form-control" id="alunoDataNasc">
-                            </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="alunoEmail" required placeholder="email@exemplo.com">
+                            <small class="text-muted">Será usado para login do aluno</small>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Senha *</label>
-                                <input type="password" class="form-control" id="alunoSenha" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Objetivo</label>
-                                <input type="text" class="form-control" id="alunoObjetivo" 
-                                       placeholder="Ex: Hipertrofia, Emagrecimento">
-                            </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" class="form-control" id="alunoTelefone" placeholder="(00) 00000-0000">
                         </div>
-
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control" id="alunoDataNasc">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Senha Inicial *</label>
+                            <input type="password" class="form-control" id="alunoSenha" minlength="6" required placeholder="Mínimo 6 caracteres">
+                            <small class="text-muted">O aluno poderá alterar depois do primeiro login</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Objetivo</label>
+                            <textarea class="form-control" id="alunoObjetivo" rows="3" placeholder="Ex: Perder peso, ganhar massa muscular..."></textarea>
+                        </div>
+                        
                         <div class="mb-3">
                             <label class="form-label">Observações</label>
-                            <textarea class="form-control" id="alunoObs" rows="3"></textarea>
+                            <textarea class="form-control" id="alunoObs" rows="3" placeholder="Restrições, histórico médico, etc."></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveAluno()">
-                        <i class="bi bi-check-circle"></i> Salvar
-                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveAluno()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Treino -->
+    <div class="modal fade" id="treinoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Criar Treino</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="treinoForm">
+                        <div class="mb-3">
+                            <label class="form-label">Aluno</label>
+                            <select class="form-select" id="treinoAluno" required>
+                                <option value="">Selecione um aluno...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Treino</label>
+                            <input type="text" class="form-control" id="treinoNome" required placeholder="Ex: Treino A - Peito e Tríceps">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" id="treinoDesc" rows="2" placeholder="Descrição do treino..."></textarea>
+                        </div>
+                        <hr>
+                        <h6>Exercícios</h6>
+                        <div id="exerciciosContainer">
+                            <div class="exercicio-item card mb-2 p-3">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label>Nome do Exercício</label>
+                                        <input type="text" class="form-control exercicio-nome" required placeholder="Ex: Supino reto">
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label>Séries</label>
+                                        <input type="number" class="form-control exercicio-series" required placeholder="3">
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label>Repetições</label>
+                                        <input type="text" class="form-control exercicio-reps" required placeholder="10-12">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label>Descanso</label>
+                                        <input type="text" class="form-control exercicio-descanso" placeholder="60s">
+                                    </div>
+                                    <div class="col-md-8 mb-2">
+                                        <label>Vídeo Demonstrativo</label>
+                                        <input type="file" class="form-control exercicio-video" accept="video/*">
+                                    </div>
+                                    <div class="col-12">
+                                        <label>Observações</label>
+                                        <textarea class="form-control exercicio-obs" rows="2" placeholder="Técnica, dicas, etc."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-success" onclick="addExercicioField()">
+                            <i class="bi bi-plus"></i> Adicionar Exercício
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTreino()">Salvar Treino</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dieta -->
+    <div class="modal fade" id="dietaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Criar Dieta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dietaForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Aluno</label>
+                                <select class="form-select" id="dietaAluno" required>
+                                    <option value="">Selecione um aluno...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nome da Dieta</label>
+                                <input type="text" class="form-control" id="dietaNome" required placeholder="Ex: Dieta para Hipertrofia">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Data Início</label>
+                                <input type="date" class="form-control" id="dietaInicio" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Data Fim</label>
+                                <input type="date" class="form-control" id="dietaFim">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" id="dietaDesc" rows="2" placeholder="Orientações gerais..."></textarea>
+                        </div>
+                        <hr>
+                        <h6>Refeições</h6>
+                        <div id="refeicoesContainer">
+                            <div class="refeicao-item card mb-2 p-3">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label>Tipo de Refeição</label>
+                                        <select class="form-select refeicao-tipo">
+                                            <option>Café da Manhã</option>
+                                            <option>Lanche da Manhã</option>
+                                            <option>Almoço</option>
+                                            <option>Lanche da Tarde</option>
+                                            <option>Jantar</option>
+                                            <option>Ceia</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label>Horário</label>
+                                        <input type="time" class="form-control refeicao-horario">
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <label>Alimentos</label>
+                                        <textarea class="form-control refeicao-alimentos" rows="2" required placeholder="Ex: 2 ovos, 1 fatia de pão integral, 1 banana"></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <label>Observações</label>
+                                        <textarea class="form-control refeicao-obs" rows="1" placeholder="Opções, substituições, etc."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-success" onclick="addRefeicaoField()">
+                            <i class="bi bi-plus"></i> Adicionar Refeição
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDieta()">Salvar Dieta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Medidas -->
+    <div class="modal fade" id="medidaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Medidas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="medidaForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Aluno</label>
+                                <select class="form-select" id="medidaAluno" required>
+                                    <option value="">Selecione um aluno...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Data da Medição</label>
+                                <input type="date" class="form-control" id="medidaData" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Peso (kg)</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPeso">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Altura (cm)</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaAltura">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">% Gordura</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaGordura">
+                            </div>
+                        </div>
+                        <h6>Circunferências (cm)</h6>
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Pescoço</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPescoco">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Ombros</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaOmbros">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Peitoral</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPeitoral">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Cintura</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaCintura">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Abdômen</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaAbdomen">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Quadril</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaQuadril">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Braço D</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaBracoD">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Braço E</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaBracoE">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Coxa D</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaCoxaD">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Coxa E</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaCoxaE">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Panturrilha D</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPanturrilhaD">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label">Panturrilha E</label>
+                                <input type="number" step="0.01" class="form-control" id="medidaPanturrilhaE">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" id="medidaObs" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMedida()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agenda -->
+    <div class="modal fade" id="agendaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agendar Consulta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agendaForm">
+                        <input type="hidden" id="agendaId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Aluno</label>
+                            <select class="form-select" id="agendaAluno" required>
+                                <option value="">Selecione um aluno...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data e Hora</label>
+                            <input type="datetime-local" class="form-control" id="agendaDataHora" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Consulta</label>
+                            <select class="form-select" id="agendaTipo">
+                                <option>Avaliação Física</option>
+                                <option>Revisão de Treino</option>
+                                <option>Revisão de Dieta</option>
+                                <option>Reavaliação</option>
+                                <option>Outro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="agendaStatus">
+                                <option value="agendada">Agendada</option>
+                                <option value="confirmada">Confirmada</option>
+                                <option value="realizada">Realizada</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" id="agendaObs" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAgenda()">Salvar</button>
                 </div>
             </div>
         </div>
@@ -290,41 +612,90 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
-                        <h5 class="modal-title" id="alunoDetailsName">Aluno</h5>
+                        <h5 class="modal-title" id="alunoDetailsName">Carregando...</h5>
                         <small class="text-muted" id="alunoDetailsEmail"></small>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Tabs -->
-                    <ul class="nav nav-tabs mb-3" id="alunoDetailsTabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#alunoInfo">Informações</a>
+                    <ul class="nav nav-tabs mb-3" id="alunoDetailsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button">
+                                <i class="bi bi-info-circle"></i> Informações
+                            </button>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#alunoTreinos">Treinos</a>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="treinos-tab" data-bs-toggle="tab" data-bs-target="#treinos-pane" type="button">
+                                <i class="bi bi-lightning"></i> Treinos
+                            </button>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#alunoDietas">Dietas</a>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="dietas-tab" data-bs-toggle="tab" data-bs-target="#dietas-pane" type="button">
+                                <i class="bi bi-egg-fried"></i> Dietas
+                            </button>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#alunoMedidas">Medidas</a>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="medidas-tab" data-bs-toggle="tab" data-bs-target="#medidas-pane" type="button">
+                                <i class="bi bi-rulers"></i> Medidas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="agenda-tab" data-bs-toggle="tab" data-bs-target="#agenda-pane" type="button">
+                                <i class="bi bi-calendar"></i> Agenda
+                            </button>
                         </li>
                     </ul>
 
                     <!-- Tab Content -->
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="alunoInfo">
+                    <div class="tab-content" id="alunoDetailsTabContent">
+                        <!-- Informações -->
+                        <div class="tab-pane fade show active" id="info-pane">
                             <div id="alunoInfoContent"></div>
                         </div>
-                        <div class="tab-pane fade" id="alunoTreinos">
+
+                        <!-- Treinos -->
+                        <div class="tab-pane fade" id="treinos-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Treinos do Aluno</h6>
+                                <button class="btn btn-sm btn-primary" onclick="quickAddTreinoFromDetails()">
+                                    <i class="bi bi-plus"></i> Novo Treino
+                                </button>
+                            </div>
                             <div id="alunoTreinosContent"></div>
                         </div>
-                        <div class="tab-pane fade" id="alunoDietas">
+
+                        <!-- Dietas -->
+                        <div class="tab-pane fade" id="dietas-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Dietas do Aluno</h6>
+                                <button class="btn btn-sm btn-success" onclick="quickAddDietaFromDetails()">
+                                    <i class="bi bi-plus"></i> Nova Dieta
+                                </button>
+                            </div>
                             <div id="alunoDietasContent"></div>
                         </div>
-                        <div class="tab-pane fade" id="alunoMedidas">
+
+                        <!-- Medidas -->
+                        <div class="tab-pane fade" id="medidas-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Evolução de Medidas</h6>
+                                <button class="btn btn-sm btn-info" onclick="quickAddMedidaFromDetails()">
+                                    <i class="bi bi-plus"></i> Registrar Medidas
+                                </button>
+                            </div>
                             <div id="alunoMedidasContent"></div>
+                        </div>
+
+                        <!-- Agenda -->
+                        <div class="tab-pane fade" id="agenda-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Consultas Agendadas</h6>
+                                <button class="btn btn-sm btn-warning" onclick="quickAddAgendaFromDetails()">
+                                    <i class="bi bi-plus"></i> Agendar Consulta
+                                </button>
+                            </div>
+                            <div id="alunoAgendaContent"></div>
                         </div>
                     </div>
                 </div>
@@ -332,308 +703,9 @@
         </div>
     </div>
 
-    <!-- Modal Cadastro de Treino -->
-    <div class="modal fade" id="treinoModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Cadastrar Treino</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="treinoForm">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Aluno *</label>
-                                <select class="form-select" id="treinoAluno" required>
-                                    <option value="">Selecione o aluno...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Nome do Treino *</label>
-                                <input type="text" class="form-control" id="treinoNome" 
-                                       placeholder="Ex: Treino A - Peito e Tríceps" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Descrição</label>
-                            <textarea class="form-control" id="treinoDescricao" rows="2"></textarea>
-                        </div>
-
-                        <hr>
-
-                        <h6 class="mb-3">Exercícios</h6>
-                        <div id="exerciciosList">
-                            <!-- Exercícios serão adicionados aqui dinamicamente -->
-                        </div>
-
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addExercicio()">
-                            <i class="bi bi-plus-circle"></i> Adicionar Exercício
-                        </button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveTreino()">
-                        <i class="bi bi-check-circle"></i> Salvar Treino
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal Cadastro de Dieta -->
-    <div class="modal fade" id="dietaModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Cadastrar Dieta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="dietaForm">
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Aluno *</label>
-                                <select class="form-select" id="dietaAluno" required>
-                                    <option value="">Selecione o aluno...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Nome da Dieta *</label>
-                                <input type="text" class="form-control" id="dietaNome" 
-                                       placeholder="Ex: Dieta Hipertrofia" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" id="dietaAtiva">
-                                    <option value="true">Ativa</option>
-                                    <option value="false">Inativa</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Data Início</label>
-                                <input type="date" class="form-control" id="dietaDataInicio">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Data Fim</label>
-                                <input type="date" class="form-control" id="dietaDataFim">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Descrição/Orientações</label>
-                            <textarea class="form-control" id="dietaDescricao" rows="3"></textarea>
-                        </div>
-
-                        <hr>
-
-                        <h6 class="mb-3">Refeições</h6>
-                        <div id="refeicoesList">
-                            <!-- Refeições serão adicionadas aqui -->
-                        </div>
-
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addRefeicao()">
-                            <i class="bi bi-plus-circle"></i> Adicionar Refeição
-                        </button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveDieta()">
-                        <i class="bi bi-check-circle"></i> Salvar Dieta
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Cadastro de Medidas -->
-    <div class="modal fade" id="medidaModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Registrar Medidas</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="medidaForm">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Aluno *</label>
-                                <select class="form-select" id="medidaAluno" required>
-                                    <option value="">Selecione o aluno...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Data da Medição *</label>
-                                <input type="date" class="form-control" id="medidaData" required>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Peso (kg)</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaPeso">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Altura (cm)</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaAltura">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">% Gordura</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaGordura">
-                            </div>
-                        </div>
-
-                        <h6 class="mb-2">Circunferências (cm)</h6>
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Pescoço</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaPescoco">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Ombros</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaOmbros">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Tórax</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaTorax">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Cintura</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaCintura">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Abdômen</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaAbdomen">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Quadril</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaQuadril">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Coxa</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaCoxa">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Panturrilha</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaPanturrilha">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Braço Direito</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaBracoDir">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Braço Esquerdo</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaBracoEsq">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Antebraço</label>
-                                <input type="number" step="0.1" class="form-control" id="medidaAntebraco">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Observações</label>
-                            <textarea class="form-control" id="medidaObs" rows="2"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveMedida()">
-                        <i class="bi bi-check-circle"></i> Salvar Medidas
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Cadastro de Agenda -->
-    <div class="modal fade" id="agendaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Agendar Consulta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="agendaForm">
-                        <div class="mb-3">
-                            <label class="form-label">Aluno *</label>
-                            <select class="form-select" id="agendaAluno" required>
-                                <option value="">Selecione o aluno...</option>
-                            </select>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Data *</label>
-                                <input type="date" class="form-control" id="agendaData" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Horário *</label>
-                                <input type="time" class="form-control" id="agendaHorario" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tipo de Consulta *</label>
-                            <select class="form-select" id="agendaTipo" required>
-                                <option value="">Selecione...</option>
-                                <option value="Avaliação Inicial">Avaliação Inicial</option>
-                                <option value="Reavaliação">Reavaliação</option>
-                                <option value="Consulta de Treino">Consulta de Treino</option>
-                                <option value="Consulta Nutricional">Consulta Nutricional</option>
-                                <option value="Acompanhamento">Acompanhamento</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" id="agendaStatus">
-                                <option value="agendada">Agendada</option>
-                                <option value="confirmada">Confirmada</option>
-                                <option value="cancelada">Cancelada</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Observações</label>
-                            <textarea class="form-control" id="agendaObs" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveAgenda()">
-                        <i class="bi bi-check-circle"></i> Agendar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-    <!-- Custom Scripts -->
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/personal-dashboard.js"></script>
