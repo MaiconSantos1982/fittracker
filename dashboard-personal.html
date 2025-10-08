@@ -21,10 +21,13 @@
 <body>
     <!-- Sidebar -->
     <div id="sidebar">
-        <div class="p-4 border-bottom">
-            <h3>FitTracker</h3>
-            <small class="text-muted">Personal Trainer</small>
+    <div class="p-4 border-bottom">
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="bi bi-activity" style="font-size: 24px; color: var(--primary-color);"></i>
+            <h3 class="mb-0">FitTracker</h3>
         </div>
+        <small class="text-muted">Personal Trainer</small>
+    </div>
 
         <ul class="components">
             <li>
@@ -448,7 +451,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Objetivo Principal *</label>
+                            <label class="form-label">Objetivo Principal</label>
                             <select class="form-select" id="protocoloObjetivo" required onchange="toggleObjetivoOutros()">
                                 <option value="">Selecione...</option>
                                 <option value="Adaptação">Adaptação</option>
