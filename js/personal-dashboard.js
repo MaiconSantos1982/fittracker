@@ -1280,3 +1280,87 @@ async function loadAlunosSelect(selectId) {
         console.error(error);
     }
 }
+// ============================================
+// MEDIDAS E AGENDA
+// ============================================
+
+async function openRegistrarMedidasModal() {
+    document.getElementById('medidasForm').reset();
+    await loadAlunosSelect('alunoMedidasSelect');
+    new bootstrap.Modal(document.getElementById('registrarMedidasModal')).show();
+}
+
+async function saveMedidas() {
+    try {
+        const alunoId = document.getElementById('alunoMedidasSelect').value;
+        if (!alunoId) return alert('Selecione um aluno!');
+
+        const medidas = {
+            personal_id: currentUser.id,
+            aluno_id: alunoId,
+            peso: document.getElementById('medidaPeso').value,
+            altura: document.getElementById('medidaAltura').value,
+            imc: document.getElementById('medidaIMC').value,
+            pescoco: document.getElementById('medidaPescoco').value,
+            ombro: document.getElementById('medidaOmbro').value,
+            torax: document.getElementById('medidaTorax').value,
+            cintura: document.getElementById('medidaCintura').value,
+            abdomen: document.getElementById('medidaAbdomen').value,
+            quadril: document.getElementById('medidaQuadril').value,
+            braco_direito: document.getElementById('medidaBracoDireito').value,
+            braco_esquerdo: document.getElementById('medidaBracoEsquerdo').value,
+            antebraco_direito: document.getElementById('medidaAntebracoDireito').value,
+            antebraco_esquerdo: document.getElementById('medidaAntebracoEsquerdo').value,
+            coxa_direita: document.getElementById('medidaCoxaDireita').value,
+            coxa_esquerda: document.getElementById('medidaCoxaEsquerda').value,
+            panturrilha_direita: document.getElementById('medidaPanturrilhaDireita').value,
+            panturrilha_esquerda: document.getElementById('medidaPanturrilhaEsquerda').value,
+            observacoes: document.getElementById('medidaObs').value
+        };
+
+        const { error } = await supabase.from('fit_medidas').insert(medidas);
+        if (error) throw error;
+
+        alert('Medidas registradas com sucesso!');
+        bootstrap.Modal.getInstance(document.getElementById('registrarMedidasModal')).hide();
+    } catch (error) {
+        console.error('Erro ao salvar medidas:', error);
+        alert('Erro ao salvar medidas: ' + error.message);
+    }
+}
+
+async function openNovaConsultaModal() {
+    document.getElementById('agendaForm').reset();
+    await loadAlunosSelect('agendaAluno');
+    const today = new Date().toISOString().slice(0, 16);
+    document.getElementById('agendaData').value = today;
+    new bootstrap.Modal(document.getElementById('novaConsultaModal')).show();
+}
+
+async function saveConsulta() {
+    try {
+        const alunoId = document.getElementById('agendaAluno').value;
+        const dataConsulta = document.getElementById('agendaData').value;
+        const observacoes = document.getElementById('agendaObs').value;
+
+        if (!alunoId || !dataConsulta) {
+            return alert('Preencha aluno e data!');
+        }
+
+        const { error } = await supabase.from('fit_agenda').insert({
+            personal_id: currentUser.id,
+            aluno_id: alunoId,
+            data_consulta: dataConsulta,
+            observacoes: observacoes
+        });
+
+        if (error) throw error;
+
+        alert('Consulta agendada!');
+        bootstrap.Modal.getInstance(document.getElementById('novaConsultaModal')).hide();
+        loadAgenda();
+    } catch (error) {
+        console.error('Erro ao salvar consulta:', error);
+        alert('Erro ao salvar consulta: ' + error.message);
+    }
+}
