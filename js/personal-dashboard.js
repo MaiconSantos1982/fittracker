@@ -1128,4 +1128,136 @@ async function loadAlunosSelect(selectId) {
     }
 }
 
+async function openNovoProtocoloModal() {
+    document.getElementById('protocoloForm').reset();
+    document.getElementById('protocoloId').value = '';
+    document.getElementById('protocoloModalTitle').textContent = 'Novo Protocolo';
+    document.getElementById('protocoloAtivo').checked = true;
+    document.getElementById('objetivoOutrosDiv').style.display = 'none';
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('protocoloDataInicio').value = today;
+    
+    await loadAlunosSelect('protocoloAluno');
+    
+    new bootstrap.Modal(document.getElementById('protocoloModal')).show();
+}
+
+function toggleObjetivoOutros() {
+    const objetivo = document.getElementById('protocoloObjetivo').value;
+    const outrosDiv = document.getElementById('objetivoOutrosDiv');
+    
+    if (objetivo === 'Outros') {
+        outrosDiv.style.display = 'block';
+        document.getElementById('protocoloObjetivoOutros').required = true;
+    } else {
+        outrosDiv.style.display = 'none';
+        document.getElementById('protocoloObjetivoOutros').required = false;
+    }
+}
+
+async function saveProtocolo() {
+    try {
+        const id = document.getElementById('protocoloId').value;
+        const alunoId = document.getElementById('protocoloAluno').value;
+        const nome = document.getElementById('protocoloNome').value;
+        const objetivo = document.getElementById('protocoloObjetivo').value;
+        const objetivoOutros = document.getElementById('protocoloObjetivoOutros').value;
+        const dataInicio = document.getElementById('protocoloDataInicio').value;
+        const dataFim = document.getElementById('protocoloDataFim').value;
+        const ativo = document.getElementById('protocoloAtivo').checked;
+
+        if (!alunoId || !nome || !objetivo) {
+            alert('Preencha todos os campos obrigatórios!');
+            return;
+        }
+
+        const protocoloData = {
+            personal_id: currentUser.id,
+            aluno_id: alunoId,
+            nome: nome,
+            objetivo: objetivo,
+            objetivo_outros: objetivo === 'Outros' ? objetivoOutros : null,
+            data_inicio: dataInicio || null,
+            data_fim: dataFim || null,
+            ativo: ativo
+        };
+
+        let result;
+        if (id) {
+            result = await supabase
+                .from('fit_protocolos')
+                .update(protocoloData)
+                .eq('id', id);
+        } else {
+            result = await supabase
+                .from('fit_protocolos')
+                .insert(protocoloData)
+                .select()
+                .single();
+        }
+
+        if (result.error) throw result.error;
+
+        alert('Protocolo salvo com sucesso!');
+        bootstrap.Modal.getInstance(document.getElementById('protocoloModal')).hide();
+        loadProtocolos();
+    } catch (error) {
+        console.error('Erro ao salvar protocolo:', error);
+        alert('Erro ao salvar protocolo: ' + error.message);
+    }
+}
+
+async function editProtocolo(id) {
+    try {
+        const { data: protocolo, error } = await supabase
+            .from('fit_protocolos')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        document.getElementById('protocoloId').value = protocolo.id;
+        document.getElementById('protocoloNome').value = protocolo.nome;
+        document.getElementById('protocoloObjetivo').value = protocolo.objetivo;
+        document.getElementById('protocoloObjetivoOutros').value = protocolo.objetivo_outros || '';
+        document.getElementById('protocoloDataInicio').value = protocolo.data_inicio || '';
+        document.getElementById('protocoloDataFim').value = protocolo.data_fim || '';
+        document.getElementById('protocoloAtivo').checked = protocolo.ativo;
+        
+        await loadAlunosSelect('protocoloAluno');
+        document.getElementById('protocoloAluno').value = protocolo.aluno_id;
+        
+        toggleObjetivoOutros();
+        
+        document.getElementById('protocoloModalTitle').textContent = 'Editar Protocolo';
+        new bootstrap.Modal(document.getElementById('protocoloModal')).show();
+    } catch (error) {
+        console.error('Erro ao carregar protocolo:', error);
+        alert('Erro ao carregar protocolo: ' + error.message);
+    }
+}
+
+async function deleteProtocolo(id) {
+    if (!confirm('Tem certeza que deseja excluir este protocolo? Todos os treinos vinculados serão removidos!')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabase
+            .from('fit_protocolos')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert('Protocolo excluído com sucesso!');
+        loadProtocolos();
+    } catch (error) {
+        console.error('Erro ao excluir protocolo:', error);
+        alert('Erro ao excluir protocolo: ' + error.message);
+    }
+}
+
 // FIM DO ARQUIVO
