@@ -3,9 +3,7 @@ let currentAlunos = [];
 let selectedAlunoId = null;
 let currentAlunoDetailsId = null;
 
-// ============================================
-// VARIÁVEIS GLOBAIS PARA PROTOCOLOS
-// ============================================
+// VARIÁVEIS GLOBAIS PARA PROTOCOLOS (NOVAS)
 let currentProtocoloId = null;
 let currentTreinoTemp = null;
 let exerciciosTempList = [];
@@ -21,17 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadAlunos();
     setupNavigation();
     loadAlunoSelects();
-    
-    // Inicializar contador de caracteres da dica
-    const dicaTextarea = document.getElementById('exercicioDica');
-    if (dicaTextarea) {
-        dicaTextarea.addEventListener('input', function() {
-            const counter = document.getElementById('dicaCounter');
-            if (counter) {
-                counter.textContent = this.value.length;
-            }
-        });
-    }
 });
 
 // Navegação entre seções
@@ -100,7 +87,6 @@ function showSection(sectionName) {
 // Dashboard Data
 async function loadDashboardData() {
     try {
-        // Total de alunos
         const { data: alunos, error: alunosError } = await supabase
             .from('fit_alunos')
             .select('*', { count: 'exact' })
@@ -111,7 +97,6 @@ async function loadDashboardData() {
             document.getElementById('alunosAtivos').textContent = alunos.filter(a => a.ativo).length;
         }
 
-        // Total de treinos
         const { data: treinos } = await supabase
             .from('fit_treinos')
             .select('*', { count: 'exact' })
@@ -121,7 +106,6 @@ async function loadDashboardData() {
             document.getElementById('totalTreinos').textContent = treinos.length;
         }
 
-        // Consultas hoje
         const today = new Date().toISOString().split('T')[0];
         const { data: consultas } = await supabase
             .from('fit_agenda')
@@ -297,6 +281,14 @@ function saveDieta() {
     console.log('Salvar dieta');
 }
 
+async function logout() {
+    try {
+        await supabase.auth.signOut();
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+    }
+}
 // ============================================
 // FUNÇÕES DE PROTOCOLOS
 // ============================================
@@ -530,6 +522,10 @@ async function deleteProtocolo(id) {
     }
 }
 
+// ============================================
+// FUNÇÕES DE TREINOS DO PROTOCOLO
+// ============================================
+
 async function openGerenciarTreinosModal(protocoloId, protocoloNome) {
     currentProtocoloId = protocoloId;
     document.getElementById('currentProtocoloId').value = protocoloId;
@@ -688,6 +684,10 @@ async function deleteTreino(id) {
         alert('Erro ao excluir treino: ' + error.message);
     }
 }
+
+// ============================================
+// FUNÇÕES DE EXERCÍCIOS
+// ============================================
 
 async function openAdicionarExercicioModal() {
     document.getElementById('exercicioForm').reset();
@@ -1039,11 +1039,17 @@ async function loadAlunosSelect(selectId) {
     }
 }
 
-async function logout() {
-    try {
-        await supabase.auth.signOut();
-        window.location.href = 'index.html';
-    } catch (error) {
-        console.error('Erro ao fazer logout:', error);
+// ============================================
+// INICIALIZAÇÃO AUTOMÁTICA DE CONTADORES
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    const dicaTextarea = document.getElementById('exercicioDica');
+    if (dicaTextarea) {
+        dicaTextarea.addEventListener('input', function() {
+            const counter = document.getElementById('dicaCounter');
+            if (counter) {
+                counter.textContent = this.value.length;
+            }
+        });
     }
-}
+});
