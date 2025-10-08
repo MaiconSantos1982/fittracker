@@ -1112,42 +1112,70 @@ function renderExerciciosTreino(treinoId, exercicios) {
         return;
     }
 
-    let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0">';
-    html += '<thead><tr>';
-    html += '<th style="width: 40px;">#</th>';
-    html += '<th>Exercício</th>';
-    html += '<th>Grupo</th>';
-    html += '<th>Séries</th>';
-    html += '<th>Método</th>';
-    html += '<th style="width: 100px;">Ações</th>';
-    html += '</tr></thead><tbody>';
+    let html = '<div class="exercise-list">';
 
     exercicios.forEach((ex, index) => {
         const seriesInfo = ex.series_detalhes && ex.series_detalhes.length > 0 
             ? `${ex.series_detalhes.length}x ${ex.series_detalhes[0].numero || '-'} reps`
             : `${ex.numero_series || '-'} séries`;
 
-        html += `<tr>`;
-        html += `<td><strong>${index + 1}</strong></td>`;
-        html += `<td>
-            <strong>${ex.nome}</strong>
-            ${ex.dica ? `<br><small class="text-muted"><i class="bi bi-lightbulb"></i> ${ex.dica.substring(0, 60)}${ex.dica.length > 60 ? '...' : ''}</small>` : ''}
-        </td>`;
-        html += `<td><span class="badge bg-secondary">${ex.grupo_muscular || '-'}</span></td>`;
-        html += `<td>${seriesInfo}</td>`;
-        html += `<td>${ex.metodo || '-'}</td>`;
-        html += `<td>
-            <button class="btn btn-sm btn-info" onclick="viewExercicioDetalhes('${ex.id}')" title="Ver detalhes">
-                <i class="bi bi-eye"></i>
-            </button>
-            <button class="btn btn-sm btn-danger" onclick="deleteExercicio('${ex.id}', '${treinoId}')" title="Excluir">
-                <i class="bi bi-trash"></i>
-            </button>
-        </td>`;
-        html += `</tr>`;
+        html += `
+            <div class="exercise-item" data-exercise-id="${ex.id}">
+                <div class="exercise-number">${index + 1}</div>
+                <div class="exercise-content">
+                    <div class="exercise-header">
+                        <div>
+                            <h6 class="exercise-name">${ex.nome}</h6>
+                            <div class="exercise-meta">
+                                <span class="badge rounded-pill bg-secondary">${ex.grupo_muscular || '-'}</span>
+                                <span class="text-muted ms-2">${seriesInfo}</span>
+                                ${ex.metodo ? `<span class="text-muted ms-2">• ${ex.metodo}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    ${ex.dica ? `
+                        <div class="exercise-tip">
+                            <i class="bi bi-lightbulb-fill text-warning"></i>
+                            <small>${ex.dica}</small>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Detalhes das séries (expandível) -->
+                    ${ex.series_detalhes && ex.series_detalhes.length > 0 ? `
+                        <button class="btn btn-link btn-sm p-0 mt-2 text-decoration-none" 
+                                type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#series-${ex.id}">
+                            <i class="bi bi-chevron-down"></i> Ver detalhes das séries
+                        </button>
+                        <div class="collapse mt-2" id="series-${ex.id}">
+                            <div class="series-details">
+                                ${ex.series_detalhes.map((serie, idx) => `
+                                    <div class="serie-row">
+                                        <strong>Série ${idx + 1}:</strong> 
+                                        ${serie.numero} ${serie.unidade_medida || 'reps'}
+                                        ${serie.carga ? ` • ${serie.carga}` : ''}
+                                        ${serie.velocidade ? ` • ${serie.velocidade}` : ''}
+                                        ${serie.pausa_min || serie.pausa_max ? ` • Pausa: ${serie.pausa_min || 0}-${serie.pausa_max || 0}s` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn-icon" onclick="editExercicio('${ex.id}', '${treinoId}')" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-icon btn-icon-danger" onclick="deleteExercicio('${ex.id}', '${treinoId}')" title="Excluir">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
     });
 
-    html += '</tbody></table></div>';
+    html += '</div>';
     container.innerHTML = html;
 }
 
