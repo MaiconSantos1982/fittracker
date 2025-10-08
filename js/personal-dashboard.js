@@ -661,51 +661,191 @@ function renderProtocolos(protocolos) {
         const card = document.createElement('div');
         card.className = 'card mb-3';
         card.innerHTML = `
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0">${protocolo.nome}</h5>
-                    <small class="text-muted">${nomeAluno}</small>
-                </div>
-                <div>
-                    <span class="badge bg-${protocolo.ativo ? 'success' : 'secondary'} me-2">
-                        ${protocolo.ativo ? 'Ativo' : 'Inativo'}
-                    </span>
-                    <button class="btn btn-sm btn-primary" onclick="openGerenciarTreinosModal('${protocolo.id}', '${protocolo.nome.replace(/'/g, "\\'")}')">
-                        <i class="bi bi-list-ul"></i> Gerenciar Treinos
-                    </button>
-                    <button class="btn btn-sm btn-warning" onclick="editProtocolo('${protocolo.id}')">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteProtocolo('${protocolo.id}')">
-                        <i class="bi bi-trash"></i>
-                    </button>
+            <div class="card-header" style="cursor: pointer;" 
+                 data-bs-toggle="collapse" 
+                 data-bs-target="#protocolo-${protocolo.id}" 
+                 aria-expanded="false">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-chevron-right collapse-icon" style="transition: transform 0.2s;"></i>
+                            <div>
+                                <h5 class="mb-0">${protocolo.nome}</h5>
+                                <small class="text-muted">${nomeAluno}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 align-items-center" onclick="event.stopPropagation();">
+                        <span class="badge bg-${protocolo.ativo ? 'success' : 'secondary'}">
+                            ${protocolo.ativo ? 'Ativo' : 'Inativo'}
+                        </span>
+                        <button class="btn btn-sm btn-primary" onclick="openGerenciarTreinosModal('${protocolo.id}', '${protocolo.nome.replace(/'/g, "\\'")}')">
+                            <i class="bi bi-plus-circle"></i> Adicionar Treino
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editProtocolo('${protocolo.id}')">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteProtocolo('${protocolo.id}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        <strong>Objetivo:</strong><br>
-                        ${protocolo.objetivo}
-                        ${protocolo.objetivo_outros ? `<br><small class="text-muted">${protocolo.objetivo_outros}</small>` : ''}
+            
+            <div class="collapse" id="protocolo-${protocolo.id}">
+                <div class="card-body bg-light">
+                    <!-- Informações do Protocolo -->
+                    <div class="row mb-3 pb-3 border-bottom">
+                        <div class="col-md-3">
+                            <strong>Objetivo:</strong><br>
+                            <span class="text-muted">${protocolo.objetivo}</span>
+                            ${protocolo.objetivo_outros ? `<br><small class="text-muted">${protocolo.objetivo_outros}</small>` : ''}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Início:</strong><br>
+                            <span class="text-muted">${dataInicio}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Término Previsto:</strong><br>
+                            <span class="text-muted">${dataFim}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Criado em:</strong><br>
+                            <span class="text-muted">${new Date(protocolo.created_at).toLocaleDateString('pt-BR')}</span>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <strong>Início:</strong><br>
-                        ${dataInicio}
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Término Previsto:</strong><br>
-                        ${dataFim}
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Criado em:</strong><br>
-                        ${new Date(protocolo.created_at).toLocaleDateString('pt-BR')}
+                    
+                    <!-- Lista de Treinos -->
+                    <h6 class="mb-3"><i class="bi bi-list-check"></i> Treinos deste Protocolo</h6>
+                    <div id="treinos-protocolo-${protocolo.id}">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm" role="status"></div>
+                            <span class="ms-2">Carregando treinos...</span>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
         container.appendChild(card);
+
+        // Carregar treinos quando expandir
+        const collapseElement = document.getElementById(`protocolo-${protocolo.id}`);
+        let treinosCarregados = false;
+
+        collapseElement.addEventListener('show.bs.collapse', async () => {
+            if (!treinosCarregados) {
+                await loadTreinosDoProtocolo(protocolo.id);
+                treinosCarregados = true;
+            }
+            
+            // Rotacionar ícone
+            const icon = collapseElement.previousElementSibling.querySelector('.collapse-icon');
+            icon.style.transform = 'rotate(90deg)';
+        });
+
+        collapseElement.addEventListener('hide.bs.collapse', () => {
+            const icon = collapseElement.previousElementSibling.querySelector('.collapse-icon');
+            icon.style.transform = 'rotate(0deg)';
+        });
     });
 }
+
+async function loadTreinosDoProtocolo(protocoloId) {
+    try {
+        const { data: treinos, error } = await supabase
+            .from('fit_treinos')
+            .select(`
+                *,
+                exercicios_count:fit_exercicios(count)
+            `)
+            .eq('protocolo_id', protocoloId)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        renderTreinosDoProtocolo(protocoloId, treinos);
+    } catch (error) {
+        console.error('Erro ao carregar treinos:', error);
+        document.getElementById(`treinos-protocolo-${protocoloId}`).innerHTML = 
+            '<div class="alert alert-danger">Erro ao carregar treinos</div>';
+    }
+}
+
+function renderTreinosDoProtocolo(protocoloId, treinos) {
+    const container = document.getElementById(`treinos-protocolo-${protocoloId}`);
+    if (!container) return;
+
+    if (!treinos || treinos.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum treino cadastrado. Clique em "Adicionar Treino" acima.</div>';
+        return;
+    }
+
+    let html = '';
+
+    treinos.forEach((treino, index) => {
+        const numExercicios = treino.exercicios_count?.[0]?.count || 0;
+        
+        html += `
+            <div class="card mb-2 shadow-sm">
+                <div class="card-header bg-white" style="cursor: pointer;"
+                     data-bs-toggle="collapse" 
+                     data-bs-target="#treino-${treino.id}" 
+                     aria-expanded="false">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="flex-grow-1">
+                            <i class="bi bi-chevron-right collapse-icon-treino" style="transition: transform 0.2s;"></i>
+                            <strong>${treino.nome}</strong>
+                            ${treino.descricao ? `<br><small class="text-muted">${treino.descricao}</small>` : ''}
+                        </div>
+                        <div class="d-flex gap-2 align-items-center" onclick="event.stopPropagation();">
+                            <span class="badge bg-info">${numExercicios} exercícios</span>
+                            <button class="btn btn-sm btn-warning" onclick="editTreinoProtocolo('${treino.id}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteTreino('${treino.id}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="collapse" id="treino-${treino.id}">
+                    <div class="card-body">
+                        <div id="exercicios-treino-${treino.id}">
+                            <div class="text-center py-2">
+                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                <span class="ms-2">Carregando exercícios...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    // Adicionar eventos aos treinos
+    treinos.forEach(treino => {
+        const collapseElement = document.getElementById(`treino-${treino.id}`);
+        let exerciciosCarregados = false;
+
+        collapseElement.addEventListener('show.bs.collapse', async () => {
+            if (!exerciciosCarregados) {
+                await loadExerciciosTreino(treino.id);
+                exerciciosCarregados = true;
+            }
+
+            const icon = collapseElement.previousElementSibling.querySelector('.collapse-icon-treino');
+            icon.style.transform = 'rotate(90deg)';
+        });
+
+        collapseElement.addEventListener('hide.bs.collapse', () => {
+            const icon = collapseElement.previousElementSibling.querySelector('.collapse-icon-treino');
+            icon.style.transform = 'rotate(0deg)';
+        });
+    });
+}
+
 
 async function openNovoProtocoloModal() {
     document.getElementById('protocoloForm').reset();
@@ -1154,6 +1294,13 @@ async function deleteTreino(id) {
     }
 
     try {
+        // Buscar protocolo_id antes de deletar
+        const { data: treino } = await supabase
+            .from('fit_treinos')
+            .select('protocolo_id')
+            .eq('id', id)
+            .single();
+
         const { error } = await supabase
             .from('fit_treinos')
             .delete()
@@ -1162,7 +1309,11 @@ async function deleteTreino(id) {
         if (error) throw error;
 
         alert('Treino excluído com sucesso!');
-        loadTreinosProtocolo(currentProtocoloId);
+        
+        // Recarregar treinos do protocolo
+        if (treino) {
+            await loadTreinosDoProtocolo(treino.protocolo_id);
+        }
     } catch (error) {
         console.error('Erro ao excluir treino:', error);
         alert('Erro ao excluir treino: ' + error.message);
