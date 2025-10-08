@@ -1357,6 +1357,16 @@ async function loadAlunosSelect(selectId) {
         console.error('Erro ao carregar alunos no select:', error);
     }
 }
+async function loadAlunosSelect(selectId) {
+    try {
+        const { data: alunos, error } = await supabase
+            .from('fit_alunos')
+            .select(`
+                id,
+                profile:profile_id(full_name)
+            `)
+            .eq('personal_id', currentUser.id)
+            .eq('ativo', true);
 
         if (error) throw error;
 
@@ -1370,7 +1380,7 @@ async function loadAlunosSelect(selectId) {
         alunos.forEach(aluno => {
             const option = document.createElement('option');
             option.value = aluno.id;
-            option.textContent = aluno.nome || aluno.profile?.full_name || 'Sem nome';
+            option.textContent = aluno.profile?.full_name || 'Sem nome';
             select.appendChild(option);
         });
     } catch (error) {
@@ -1378,17 +1388,4 @@ async function loadAlunosSelect(selectId) {
     }
 }
 
-// ============================================
-// INICIALIZAÇÃO AUTOMÁTICA DE CONTADORES
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    const dicaTextarea = document.getElementById('exercicioDica');
-    if (dicaTextarea) {
-        dicaTextarea.addEventListener('input', function() {
-            const counter = document.getElementById('dicaCounter');
-            if (counter) {
-                counter.textContent = this.value.length;
-            }
-        });
-    }
-});
+// FIM DO ARQUIVO - NÃO ADICIONE MAIS NADA AQUI
