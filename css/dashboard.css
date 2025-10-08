@@ -48,70 +48,388 @@ body {
 }
 
 /* ========================================
-   SIDEBAR
-   SIDEBAR (PERSONAL - PADRÃO)
+   SIDEBAR (PERSONAL)
 ======================================== */
 #sidebar {
     min-width: 260px;
-@@ -228,52 +228,6 @@
-    color: var(--info-color) !important;
+    max-width: 260px;
+    background: var(--sidebar-bg);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 999;
+    transition: all 0.3s;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
 }
 
-/* Efeito 3D com sombra interna */
+#sidebar .p-4 {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#sidebar h3 {
+    color: var(--text-primary);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+#sidebar p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+#sidebar ul.components {
+    padding: 16px 0;
+    list-style: none;
+    flex: 1;
+    overflow-y: auto;
+}
+
+#sidebar ul li {
+    padding: 4px 16px;
+}
+
+#sidebar ul li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s;
+    font-size: 15px;
+}
+
+#sidebar ul li a i {
+    font-size: 18px;
+    width: 24px;
+}
+
+#sidebar ul li a:hover {
+    background: rgba(52, 152, 219, 0.08);
+    color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+#sidebar ul li a.active {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #2980b9 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+/* Sidebar sempre visível no desktop */
+@media (min-width: 769px) {
+    #sidebar {
+        margin-left: 0 !important;
+    }
+    
+    #content {
+        margin-left: 260px;
+    }
+    
+    #sidebar-overlay {
+        display: none !important;
+    }
+    
+    #sidebarCollapse {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   NAVBAR
+======================================== */
+.navbar {
+    background: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 16px 24px;
+}
+
+.navbar-brand {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary) !important;
+}
+
+/* ========================================
+   CARDS DO DASHBOARD - BORDA COLORIDA
+======================================== */
 .card.bg-primary,
 .card.bg-success,
 .card.bg-warning,
 .card.bg-info {
+    background: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.card.bg-primary::before,
-.card.bg-success::before,
-.card.bg-warning::before,
+.card.bg-primary:hover,
+.card.bg-success:hover,
+.card.bg-warning:hover,
+.card.bg-info:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Borda colorida no topo */
+.card.bg-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #0d6efd;
+}
+
+.card.bg-success::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #198754;
+}
+
+.card.bg-warning::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #ffc107;
+}
+
 .card.bg-info::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    border-radius: var(--border-radius);
-    opacity: 0;
-    transition: opacity 0.3s;
+    height: 4px;
+    background: #0dcaf0;
 }
 
-.card.bg-primary:hover::before {
-    background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(52, 152, 219, 0.02) 100%);
-    opacity: 1;
+/* Texto dos cards */
+.card.bg-primary .card-body p,
+.card.bg-success .card-body p,
+.card.bg-warning .card-body p,
+.card.bg-info .card-body p {
+    color: #6c757d !important;
+    font-size: 11px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.card.bg-success:hover::before {
-    background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(46, 204, 113, 0.02) 100%);
-    opacity: 1;
-}
-
-.card.bg-warning:hover::before {
-    background: linear-gradient(135deg, rgba(243, 156, 18, 0.05) 0%, rgba(243, 156, 18, 0.02) 100%);
-    opacity: 1;
-}
-
-.card.bg-info:hover::before {
-    background: linear-gradient(135deg, rgba(26, 188, 156, 0.05) 0%, rgba(26, 188, 156, 0.02) 100%);
-    opacity: 1;
+.card.bg-primary .card-body h2,
+.card.bg-success .card-body h2,
+.card.bg-warning .card-body h2,
+.card.bg-info .card-body h2 {
+    color: #212529 !important;
+    font-weight: 700 !important;
+    font-size: 36px !important;
+    margin-bottom: 0 !important;
 }
 
 /* ========================================
    CARDS DE ALUNOS
 ======================================== */
-.card.h-100 {
-    height: 100%;
+.card {
+    border-radius: var(--border-radius);
+    border: none;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s;
 }
-@@ -495,58 +449,6 @@
-    background: rgba(0, 0, 0, 0.3);
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+}
+
+.card-body {
+    padding: 20px;
 }
 
 /* ========================================
-   RESPONSIVO
+   BOTÕES
+======================================== */
+.btn {
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #2980b9 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #27ae60 100%);
+    border: none;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #e67e22 100%);
+    border: none;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+    border: none;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, var(--info-color) 0%, #16a085 100%);
+    border: none;
+}
+
+/* ========================================
+   MODALS
+======================================== */
+.modal-content {
+    border-radius: var(--border-radius);
+    border: none;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 20px 24px;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 16px 24px;
+}
+
+/* ========================================
+   FORMULÁRIOS
+======================================== */
+.form-control,
+.form-select {
+    border-radius: 10px;
+    border: 1px solid #e0e6ed;
+    padding: 10px 16px;
+    transition: all 0.3s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+/* ========================================
+   CAMPO DE BUSCA
+======================================== */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box i {
+    position: absolute;
+    left: 16px;
+    color: var(--text-secondary);
+    font-size: 16px;
+    z-index: 1;
+}
+
+.search-input {
+    padding-left: 44px !important;
+    border: 2px solid #e0e6ed;
+    border-radius: 12px;
+    height: 48px;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: #a8b3c0;
+}
+
+/* ========================================
+   OVERLAY MOBILE
+======================================== */
+#sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    transition: opacity 0.3s;
+}
+
+#sidebar-overlay.active {
+    display: block;
+}
+
+/* ========================================
+   UTILITÁRIOS
+======================================== */
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.spinner-border {
+    color: var(--primary-color);
+}
+
+/* ========================================
+   RESPONSIVO MOBILE
 ======================================== */
 @media (max-width: 768px) {
     #sidebar {
@@ -123,160 +441,30 @@ body {
     }
     
     #content {
-        margin-left: 0;
+        margin-left: 0 !important;
         width: 100%;
     }
     
     #sidebarCollapse {
         display: block !important;
     }
-}
-
-/* ========================================
-   UTILITÁRIOS
-======================================== */
-.text-muted {
-    color: var(--text-secondary) !important;
-}
-
-.shadow-sm {
-    box-shadow: var(--shadow-sm) !important;
-}
-
-.shadow {
-    box-shadow: var(--shadow-md) !important;
-}
-
-.shadow-lg {
-    box-shadow: var(--shadow-lg) !important;
-}
-
-/* Animações suaves */
-* {
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-/* ========================================
-   SPINNER DE CARREGAMENTO
-======================================== */
-.spinner-border {
-    color: var(--primary-color);
-}
-/* ========================================
-   CAMPO DE BUSCA
-======================================== */
-@@ -586,45 +488,8 @@
-    opacity: 0.6;
-}
-
-/* Animação no resultado da busca */
-#searchResults {
-    font-size: 13px;
-    font-weight: 500;
-    animation: fadeIn 0.3s ease;
-}
-
-#searchResults i {
-    margin-right: 4px;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Destacar cards filtrados */
-#alunosContainer .col-md-6 {
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-/* ========================================
-   OVERLAY MOBILE (quando sidebar aberta)
-   OVERLAY MOBILE
-======================================== */
-#sidebar-overlay {
-    display: none;
-@@ -645,7 +510,30 @@
-}
-
-/* ========================================
-   MOBILE - MELHORIAS
-   UTILITÁRIOS
-======================================== */
-.text-muted {
-    color: var(--text-secondary) !important;
-}
-
-.shadow-sm {
-    box-shadow: var(--shadow-sm) !important;
-}
-
-.shadow {
-    box-shadow: var(--shadow-md) !important;
-}
-
-.shadow-lg {
-    box-shadow: var(--shadow-lg) !important;
-}
-
-.spinner-border {
-    color: var(--primary-color);
-}
-
-/* ========================================
-   RESPONSIVO MOBILE (PERSONAL)
-======================================== */
-@media (max-width: 768px) {
-    #sidebar {
-@@ -657,12 +545,15 @@
-        margin-left: 0;
-    }
-
-    /* Animação suave */
-    #sidebar {
-        transition: margin-left 0.3s ease;
-    #content {
-        margin-left: 0;
-        width: 100%;
-    }
     
-    #sidebarCollapse {
-        display: block !important;
-    }
-
-    /* Navbar mobile */
     .navbar {
         padding: 12px 16px;
     }
-@@ -671,237 +562,15 @@
+    
+    .navbar-brand {
         font-size: 18px;
     }
-
+    
     /* Cards menores no mobile */
     .card.bg-primary .card-body h2,
     .card.bg-success .card-body h2,
     .card.bg-warning .card-body h2,
     .card.bg-info .card-body h2 {
-        font-size: 28px;
+        font-size: 28px !important;
     }
-
-    /* Busca de alunos */
+    
     .search-input {
         font-size: 14px;
         height: 44px;
@@ -284,118 +472,8 @@ body {
 }
 
 /* ========================================
-   TRANSIÇÃO SUAVE DO CONTEÚDO
-======================================== */
-#content {
-    transition: margin-left 0.3s ease;
-}
-
-/* ========================================
-   CORREÇÕES DASHBOARD ALUNO
-   ======================================== */
-
-/* Menu inferior do aluno - remover asteriscos e melhorar espaçamento */
-#sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#sidebar ul li::before {
-    content: none !important; /* Remove asteriscos */
-}
-
-#sidebar ul li {
-    margin: 0;
-    padding: 0;
-}
-
-#sidebar ul li a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 8px;
-    color: #6c757d;
-    text-decoration: none;
-    transition: all 0.3s;
-    font-size: 12px;
-    gap: 4px;
-}
-
-#sidebar ul li a i {
-    font-size: 20px;
-    margin-bottom: 2px;
-}
-
-#sidebar ul li a.active {
-    color: #3498db;
-    background: rgba(52, 152, 219, 0.1);
-    border-radius: 8px;
-}
-
-/* Melhorar margens do conteúdo do aluno */
-@media (max-width: 768px) {
-    #content {
-        padding-bottom: 80px; /* Espaço para menu inferior */
-    }
-    
-    .container-fluid {
-        padding: 16px !important;
-    }
-    
-    .content-section {
-        padding: 16px;
-    }
-    
-    .card {
-        margin-bottom: 16px;
-    }
-    
-    /* Mais espaço entre cards */
-    .card + .card {
-        margin-top: 16px;
-    }
-    
-    h2, h3 {
-        margin-bottom: 16px;
-    }
-}
-/* ========================================
-   SIDEBAR ALUNO (DESKTOP)
-   ======================================== */
-@media (min-width: 769px) {
-    body.aluno-dashboard #sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 260px;
-        height: 100vh;
-        background: var(--sidebar-bg);
-        display: flex;
-        flex-direction: column;
-        box-shadow: 2px 0 16px rgba(0, 0, 0, 0.06);
-        z-index: 999;
-    }
-    
-    body.aluno-dashboard #sidebar .components {
-        flex: 1;
-        overflow-y: auto;
-    }
-    
-    body.aluno-dashboard #content {
-        margin-left: 260px;
-        width: calc(100% - 260px);
-    }
-    
-    body.aluno-dashboard #sidebarCollapse {
-        display: none !important;
-    }
-}
-
-/* ========================================
    SIDEBAR ALUNO (MOBILE - BOTTOM NAV)
-   ======================================== */
+======================================== */
 @media (max-width: 768px) {
     body.aluno-dashboard #sidebar {
         position: fixed !important;
@@ -411,93 +489,42 @@ body {
         z-index: 999 !important;
         display: flex !important;
         align-items: center !important;
-        transition: none !important;
         margin-left: 0 !important;
-        overflow-y: visible !important;
     }
     
     body.aluno-dashboard #sidebar .p-4,
-    body.aluno-dashboard #sidebar .p-3,
-    body.aluno-dashboard #sidebar .border-bottom,
-    body.aluno-dashboard #sidebar .border-top {
+    body.aluno-dashboard #sidebar .border-bottom {
         display: none !important;
     }
     
-    body.aluno-dashboard #sidebar .components {
+    body.aluno-dashboard #sidebar ul.components {
         display: flex !important;
         flex-direction: row !important;
         justify-content: space-around !important;
         width: 100% !important;
         padding: 0 !important;
-        margin: 0 !important;
-        list-style: none !important;
-    }
-    
-    body.aluno-dashboard #sidebar ul {
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        list-style: none !important;
     }
     
     body.aluno-dashboard #sidebar ul li {
         flex: 1 !important;
-        margin: 0 !important;
-        margin-bottom: 0 !important;
         padding: 0 !important;
-    }
-    
-    body.aluno-dashboard #sidebar ul li::before {
-        content: none !important;
-        display: none !important;
     }
     
     body.aluno-dashboard #sidebar ul li a {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        justify-content: center !important;
         padding: 8px 5px !important;
         font-size: 11px !important;
-        text-decoration: none !important;
-        color: #6c757d !important;
-        transition: all 0.2s !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        transform: none !important;
         gap: 4px !important;
-    }
-    
-    body.aluno-dashboard #sidebar ul li a:hover {
-        background: transparent !important;
-        transform: none !important;
     }
     
     body.aluno-dashboard #sidebar ul li a i {
         font-size: 20px !important;
-        margin-bottom: 4px !important;
-        width: auto !important;
-    }
-    
-    body.aluno-dashboard #sidebar ul li a.active {
-        color: #3498db !important;
-        background: rgba(52, 152, 219, 0.1) !important;
-        box-shadow: none !important;
     }
     
     body.aluno-dashboard #content {
         margin-left: 0 !important;
-        width: 100% !important;
         padding-bottom: 90px !important;
-    }
-    
-    body.aluno-dashboard #sidebar-overlay {
-        display: none !important;
-    }
-    
-    body.aluno-dashboard #sidebarCollapse {
-        display: none !important;
     }
 }
