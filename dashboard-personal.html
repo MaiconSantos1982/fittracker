@@ -3,21 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FitTracker">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icons para iOS -->
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    
+    <!-- OneSignal -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "84b83497-ef94-41bd-82e1-c5085a205bce",
+          serviceWorkerPath: "/OneSignalSDKWorker.js",
+          serviceWorkerParam: { scope: '/' },
+          allowLocalhostAsSecureOrigin: true
+        });
+      });
+    </script>
+    
     <title>FitTracker - Personal Trainer</title>
+    
+    <!-- Bootstrap e Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
+
 <body>
     <div class="wrapper">
+        <!-- Overlay para mobile -->
+        <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+        
         <!-- Sidebar -->
-        <nav id="sidebar" class="bg-dark text-white">
+        <nav id="sidebar">
             <div class="p-4">
                 <h3><i class="bi bi-activity"></i> FitTracker</h3>
                 <p class="text-muted">Personal Trainer</p>
             </div>
             <ul class="list-unstyled components">
-                <li><a href="#" data-section="dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="#" data-section="dashboard" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
                 <li><a href="#" data-section="alunos"><i class="bi bi-people"></i> Alunos</a></li>
                 <li><a href="#" data-section="treinos"><i class="bi bi-clipboard-check"></i> Treinos</a></li>
                 <li><a href="#" data-section="dietas"><i class="bi bi-egg-fried"></i> Dietas</a></li>
@@ -44,37 +75,37 @@
             <div class="container-fluid p-4">
                 <!-- Dashboard Section -->
                 <div id="section-dashboard" class="content-section">
-                    <h2>Dashboard</h2>
-                    <div class="row mt-4">
+                    <h2 class="mb-4">Dashboard</h2>
+                    <div class="row g-3">
                         <div class="col-md-3">
                             <div class="card text-white bg-primary">
                                 <div class="card-body">
-                                    <h5>Total de Alunos</h5>
-                                    <h2 id="totalAlunos">0</h2>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Total de Alunos</p>
+                                    <h2 class="mb-0" id="totalAlunos">0</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="card text-white bg-success">
                                 <div class="card-body">
-                                    <h5>Alunos Ativos</h5>
-                                    <h2 id="alunosAtivos">0</h2>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Alunos Ativos</p>
+                                    <h2 class="mb-0" id="alunosAtivos">0</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="card text-white bg-warning">
                                 <div class="card-body">
-                                    <h5>Treinos Criados</h5>
-                                    <h2 id="totalTreinos">0</h2>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Treinos Criados</p>
+                                    <h2 class="mb-0" id="totalTreinos">0</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="card text-white bg-info">
                                 <div class="card-body">
-                                    <h5>Consultas Hoje</h5>
-                                    <h2 id="consultasHoje">0</h2>
+                                    <p class="mb-1" style="font-size: 14px; opacity: 0.9;">Consultas Hoje</p>
+                                    <h2 class="mb-0" id="consultasHoje">0</h2>
                                 </div>
                             </div>
                         </div>
@@ -89,20 +120,25 @@
                             <i class="bi bi-plus-circle"></i> Novo Aluno
                         </button>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Email</th>
-                                    <th>Telefone</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="alunosTable"></tbody>
-                        </table>
+                    
+                    <!-- Campo de busca -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="search-box">
+                                <i class="bi bi-search"></i>
+                                <input 
+                                    type="text" 
+                                    class="form-control search-input" 
+                                    id="searchAluno" 
+                                    placeholder="Buscar aluno por nome, email ou telefone..."
+                                    onkeyup="filterAlunos()"
+                                >
+                            </div>
+                            <small class="text-muted d-block mt-2" id="searchResults"></small>
+                        </div>
                     </div>
+                    
+                    <div id="alunosContainer" class="row g-3"></div>
                 </div>
 
                 <!-- Treinos Section -->
@@ -113,7 +149,11 @@
                             <i class="bi bi-plus-circle"></i> Novo Treino
                         </button>
                     </div>
-                    <div id="treinosList"></div>
+                    <div id="treinosList">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Cadastre alunos primeiro para criar treinos.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Dietas Section -->
@@ -124,7 +164,11 @@
                             <i class="bi bi-plus-circle"></i> Nova Dieta
                         </button>
                     </div>
-                    <div id="dietasList"></div>
+                    <div id="dietasList">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Cadastre alunos primeiro para criar dietas.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Medidas Section -->
@@ -135,12 +179,16 @@
                             <i class="bi bi-plus-circle"></i> Registrar Medidas
                         </button>
                     </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label>Selecionar Aluno</label>
-                            <select class="form-select" id="alunoMedidasSelect" onchange="loadMedidas()">
-                                <option value="">Selecione...</option>
-                            </select>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label>Selecionar Aluno</label>
+                                    <select class="form-select" id="alunoMedidasSelect" onchange="loadMedidas()">
+                                        <option value="">Selecione um aluno...</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div id="medidasContent">
@@ -156,13 +204,15 @@
                             <i class="bi bi-plus-circle"></i> Nova Consulta
                         </button>
                     </div>
-                    <div id="agendaCalendar"></div>
+                    <div id="agendaCalendar">
+                        <div class="alert alert-info">Nenhuma consulta agendada</div>
+                    </div>
                 </div>
 
                 <!-- Notificações Section -->
                 <div id="section-notificacoes" class="content-section" style="display: none;">
-                    <h2>Enviar Notificações Push</h2>
-                    <div class="card mt-4">
+                    <h2 class="mb-4">Enviar Notificações Push</h2>
+                    <div class="card">
                         <div class="card-body">
                             <form id="notificationForm">
                                 <div class="mb-3">
@@ -203,21 +253,42 @@
                 <div class="modal-body">
                     <form id="alunoForm">
                         <input type="hidden" id="alunoId">
+                        
                         <div class="mb-3">
-                            <label class="form-label">Email do Aluno</label>
-                            <input type="email" class="form-control" id="alunoEmail" required>
+                            <label class="form-label">Nome Completo *</label>
+                            <input type="text" class="form-control" id="alunoNome" required placeholder="Nome do aluno">
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="alunoEmail" required placeholder="email@exemplo.com">
+                            <small class="text-muted">Será usado para login do aluno</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" class="form-control" id="alunoTelefone" placeholder="(00) 00000-0000">
+                        </div>
+                        
                         <div class="mb-3">
                             <label class="form-label">Data de Nascimento</label>
                             <input type="date" class="form-control" id="alunoDataNasc">
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Senha Inicial *</label>
+                            <input type="password" class="form-control" id="alunoSenha" minlength="6" required placeholder="Mínimo 6 caracteres">
+                            <small class="text-muted">O aluno poderá alterar depois do primeiro login</small>
+                        </div>
+                        
                         <div class="mb-3">
                             <label class="form-label">Objetivo</label>
-                            <textarea class="form-control" id="alunoObjetivo" rows="3"></textarea>
+                            <textarea class="form-control" id="alunoObjetivo" rows="3" placeholder="Ex: Perder peso, ganhar massa muscular..."></textarea>
                         </div>
+                        
                         <div class="mb-3">
                             <label class="form-label">Observações</label>
-                            <textarea class="form-control" id="alunoObs" rows="3"></textarea>
+                            <textarea class="form-control" id="alunoObs" rows="3" placeholder="Restrições, histórico médico, etc."></textarea>
                         </div>
                     </form>
                 </div>
@@ -241,15 +312,17 @@
                     <form id="treinoForm">
                         <div class="mb-3">
                             <label class="form-label">Aluno</label>
-                            <select class="form-select" id="treinoAluno" required></select>
+                            <select class="form-select" id="treinoAluno" required>
+                                <option value="">Selecione um aluno...</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nome do Treino</label>
-                            <input type="text" class="form-control" id="treinoNome" required>
+                            <input type="text" class="form-control" id="treinoNome" required placeholder="Ex: Treino A - Peito e Tríceps">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Descrição</label>
-                            <textarea class="form-control" id="treinoDesc" rows="2"></textarea>
+                            <textarea class="form-control" id="treinoDesc" rows="2" placeholder="Descrição do treino..."></textarea>
                         </div>
                         <hr>
                         <h6>Exercícios</h6>
@@ -258,19 +331,19 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-2">
                                         <label>Nome do Exercício</label>
-                                        <input type="text" class="form-control exercicio-nome" required>
+                                        <input type="text" class="form-control exercicio-nome" required placeholder="Ex: Supino reto">
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label>Séries</label>
-                                        <input type="number" class="form-control exercicio-series" required>
+                                        <input type="number" class="form-control exercicio-series" required placeholder="3">
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label>Repetições</label>
-                                        <input type="text" class="form-control exercicio-reps" required>
+                                        <input type="text" class="form-control exercicio-reps" required placeholder="10-12">
                                     </div>
                                     <div class="col-md-4 mb-2">
                                         <label>Descanso</label>
-                                        <input type="text" class="form-control exercicio-descanso" placeholder="ex: 60s">
+                                        <input type="text" class="form-control exercicio-descanso" placeholder="60s">
                                     </div>
                                     <div class="col-md-8 mb-2">
                                         <label>Vídeo Demonstrativo</label>
@@ -278,7 +351,7 @@
                                     </div>
                                     <div class="col-12">
                                         <label>Observações</label>
-                                        <textarea class="form-control exercicio-obs" rows="2"></textarea>
+                                        <textarea class="form-control exercicio-obs" rows="2" placeholder="Técnica, dicas, etc."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -309,11 +382,13 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Aluno</label>
-                                <select class="form-select" id="dietaAluno" required></select>
+                                <select class="form-select" id="dietaAluno" required>
+                                    <option value="">Selecione um aluno...</option>
+                                </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nome da Dieta</label>
-                                <input type="text" class="form-control" id="dietaNome" required>
+                                <input type="text" class="form-control" id="dietaNome" required placeholder="Ex: Dieta para Hipertrofia">
                             </div>
                         </div>
                         <div class="row">
@@ -328,7 +403,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Descrição</label>
-                            <textarea class="form-control" id="dietaDesc" rows="2"></textarea>
+                            <textarea class="form-control" id="dietaDesc" rows="2" placeholder="Orientações gerais..."></textarea>
                         </div>
                         <hr>
                         <h6>Refeições</h6>
@@ -352,11 +427,11 @@
                                     </div>
                                     <div class="col-12 mb-2">
                                         <label>Alimentos</label>
-                                        <textarea class="form-control refeicao-alimentos" rows="2" required></textarea>
+                                        <textarea class="form-control refeicao-alimentos" rows="2" required placeholder="Ex: 2 ovos, 1 fatia de pão integral, 1 banana"></textarea>
                                     </div>
                                     <div class="col-12">
                                         <label>Observações</label>
-                                        <textarea class="form-control refeicao-obs" rows="1"></textarea>
+                                        <textarea class="form-control refeicao-obs" rows="1" placeholder="Opções, substituições, etc."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -387,7 +462,9 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Aluno</label>
-                                <select class="form-select" id="medidaAluno" required></select>
+                                <select class="form-select" id="medidaAluno" required>
+                                    <option value="">Selecione um aluno...</option>
+                                </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Data da Medição</label>
@@ -483,9 +560,13 @@
                 </div>
                 <div class="modal-body">
                     <form id="agendaForm">
+                        <input type="hidden" id="agendaId">
+                        
                         <div class="mb-3">
                             <label class="form-label">Aluno</label>
-                            <select class="form-select" id="agendaAluno" required></select>
+                            <select class="form-select" id="agendaAluno" required>
+                                <option value="">Selecione um aluno...</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Data e Hora</label>
@@ -502,6 +583,15 @@
                             </select>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="agendaStatus">
+                                <option value="agendada">Agendada</option>
+                                <option value="confirmada">Confirmada</option>
+                                <option value="realizada">Realizada</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Observações</label>
                             <textarea class="form-control" id="agendaObs" rows="3"></textarea>
                         </div>
@@ -515,10 +605,106 @@
         </div>
     </div>
 
+    <!-- Modal Detalhes do Aluno -->
+    <div class="modal fade" id="alunoDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="alunoDetailsName">Carregando...</h5>
+                        <small class="text-muted" id="alunoDetailsEmail"></small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="alunoDetailsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button">
+                                <i class="bi bi-info-circle"></i> Informações
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="treinos-tab" data-bs-toggle="tab" data-bs-target="#treinos-pane" type="button">
+                                <i class="bi bi-lightning"></i> Treinos
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="dietas-tab" data-bs-toggle="tab" data-bs-target="#dietas-pane" type="button">
+                                <i class="bi bi-egg-fried"></i> Dietas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="medidas-tab" data-bs-toggle="tab" data-bs-target="#medidas-pane" type="button">
+                                <i class="bi bi-rulers"></i> Medidas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="agenda-tab" data-bs-toggle="tab" data-bs-target="#agenda-pane" type="button">
+                                <i class="bi bi-calendar"></i> Agenda
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="alunoDetailsTabContent">
+                        <!-- Informações -->
+                        <div class="tab-pane fade show active" id="info-pane">
+                            <div id="alunoInfoContent"></div>
+                        </div>
+
+                        <!-- Treinos -->
+                        <div class="tab-pane fade" id="treinos-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Treinos do Aluno</h6>
+                                <button class="btn btn-sm btn-primary" onclick="quickAddTreinoFromDetails()">
+                                    <i class="bi bi-plus"></i> Novo Treino
+                                </button>
+                            </div>
+                            <div id="alunoTreinosContent"></div>
+                        </div>
+
+                        <!-- Dietas -->
+                        <div class="tab-pane fade" id="dietas-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Dietas do Aluno</h6>
+                                <button class="btn btn-sm btn-success" onclick="quickAddDietaFromDetails()">
+                                    <i class="bi bi-plus"></i> Nova Dieta
+                                </button>
+                            </div>
+                            <div id="alunoDietasContent"></div>
+                        </div>
+
+                        <!-- Medidas -->
+                        <div class="tab-pane fade" id="medidas-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Evolução de Medidas</h6>
+                                <button class="btn btn-sm btn-info" onclick="quickAddMedidaFromDetails()">
+                                    <i class="bi bi-plus"></i> Registrar Medidas
+                                </button>
+                            </div>
+                            <div id="alunoMedidasContent"></div>
+                        </div>
+
+                        <!-- Agenda -->
+                        <div class="tab-pane fade" id="agenda-pane">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6>Consultas Agendadas</h6>
+                                <button class="btn btn-sm btn-warning" onclick="quickAddAgendaFromDetails()">
+                                    <i class="bi bi-plus"></i> Agendar Consulta
+                                </button>
+                            </div>
+                            <div id="alunoAgendaContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/personal-dashboard.js"></script>
