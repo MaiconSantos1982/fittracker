@@ -1,31 +1,12 @@
 let currentUser = null;
 let currentAlunoId = null;
 
-// Função para atualizar menu ativo
-function updateActiveMenu(sectionName) {
-    // Remove active de todos os links
-    document.querySelectorAll('#sidebar a').forEach(link => {
-        link.classList.remove('active');
-    });
-    
-    // Adiciona active no link clicado
-    const activeLink = document.querySelector(`#sidebar a[data-section="${sectionName}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active');
-    }
-    
-    console.log('Menu ativo atualizado:', sectionName);
-}
-
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
     currentUser = await checkAuth();
     await loadAlunoData();
     loadDashboardData();
     setupNavigation();
-    
-    // Setar dashboard como ativo ao carregar
-    updateActiveMenu('dashboard');
 });
 
 // Carregar dados do aluno
@@ -50,45 +31,39 @@ function setupNavigation() {
     document.querySelectorAll('#sidebar a[data-section]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            const section = link.dataset.section;
-            
-            // Esconde todas as seções
-            document.querySelectorAll('.content-section').forEach(s => {
-                s.style.display = 'none';
-            });
-            
-            // Mostra a seção selecionada
-            const targetSection = document.getElementById(`section-${section}`);
-            if (targetSection) {
-                targetSection.style.display = 'block';
-            }
-            
-            // Atualiza menu ativo
-            updateActiveMenu(section);
-            
-            // Atualiza título da navbar
-            const titles = {
-                'dashboard': 'Início',
-                'treinos': 'Treinos',
-                'dietas': 'Dieta',
-                'medidas': 'Evolução',
-                'agenda': 'Agenda'
-            };
-            document.getElementById('currentSection').textContent = titles[section] || section;
-            
-            // Carrega dados específicos da seção
-            if (section === 'treinos') loadTreinos();
-            if (section === 'dietas') loadDieta();
-            if (section === 'medidas') loadMedidas();
-            if (section === 'agenda') loadAgenda();
+            const section = e.target.closest('a').dataset.section;
+            showSection(section);
         });
     });
 
-    // Toggle sidebar mobile
     document.getElementById('sidebarCollapse')?.addEventListener('click', () => {
         document.getElementById('sidebar').classList.toggle('active');
     });
+}
+
+function showSection(sectionName) {
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    document.getElementById('section-' + sectionName).style.display = 'block';
+    document.getElementById('currentSection').textContent = 
+        sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+
+    // Carregar dados específicos da seção
+    switch(sectionName) {
+        case 'treinos':
+            loadTreinos();
+            break;
+        case 'dietas':
+            loadDieta();
+            break;
+        case 'medidas':
+            loadMedidas();
+            break;
+        case 'agenda':
+            loadAgenda();
+            break;
+    }
 }
 
 // Dashboard Data
