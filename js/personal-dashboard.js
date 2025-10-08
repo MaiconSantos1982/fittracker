@@ -836,44 +836,6 @@ async function saveRefeicao() {
     }
 }
 
-async function editRefeicao(refeicaoId, dietaId) {
-    try {
-        const { data: refeicao, error } = await supabase
-            .from('fit_refeicoes')
-            .select('*')
-            .eq('id', refeicaoId)
-            .single();
-
-        if (error) throw error;
-
-        window.currentDietaId = dietaId;
-        window.editingRefeicaoId = refeicaoId;
-
-        document.getElementById('refeicaoNome').value = refeicao.tipo_refeicao;
-        document.getElementById('refeicaoHorario').value = refeicao.horario || '';
-        document.getElementById('refeicaoDescricao').value = refeicao.observacoes || '';
-        
-        // âœ… PARSE DOS ALIMENTOS
-        let alimentos = [];
-        try {
-            if (typeof refeicao.alimentos === 'string') {
-                alimentos = JSON.parse(refeicao.alimentos);
-            } else if (Array.isArray(refeicao.alimentos)) {
-                alimentos = refeicao.alimentos;
-            }
-        } catch (e) {
-            console.error('Erro ao fazer parse:', e);
-        }
-        
-        window.alimentosTemp = alimentos;
-        renderAlimentosTemp();
-
-        new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
-    } catch (error) {
-        alert('Erro: ' + error.message);
-    }
-}
-
 async function deleteRefeicao(refeicaoId, dietaId) {
     if (!confirm('Excluir esta refeiÃ§Ã£o?')) return;
     
