@@ -13,7 +13,7 @@ let currentExercicioVideoUrl = null;
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Inicializando dashboard do personal...');
     currentUser = await checkAuth();
-    console.log('UsuÃ¡rio atual:', currentUser);
+    console.log('Usuário atual:', currentUser);
     
     loadDashboardData();
     loadAlunos();
@@ -225,7 +225,7 @@ async function deleteAluno(id) {
 
         if (error) throw error;
 
-        alert('Aluno excluÃ­do com sucesso!');
+        alert('Aluno excluí­do com sucesso!');
         loadAlunos();
     } catch (error) {
         console.error('Erro ao excluir aluno:', error);
@@ -350,7 +350,7 @@ async function deleteTreinoLegado(id) {
 
         if (error) throw error;
 
-        alert('Treino excluÃ­do com sucesso!');
+        alert('Treino excluí­do com sucesso!');
         loadTreinos();
     } catch (error) {
         console.error('Erro ao excluir treino:', error);
@@ -885,7 +885,7 @@ async function deleteRefeicao(refeicaoId, dietaId) {
 
         if (error) throw error;
 
-        alert('Refeição excluÃ­da!');
+        alert('Refeição excluí­da!');
         await loadRefeicoesDieta(dietaId);
         await loadDietas();
     } catch (error) {
@@ -919,7 +919,7 @@ async function deleteDietaConfirm(dietaId) {
     try {
         const { error } = await supabase.from('fit_dietas').delete().eq('id', dietaId);
         if (error) throw error;
-        alert('Dieta excluÃ­da!');
+        alert('Dieta excluí­da!');
         loadDietas();
     } catch (error) {
         alert('Erro: ' + error.message);
@@ -1001,7 +1001,7 @@ async function deleteConsulta(id) {
 
         if (error) throw error;
 
-        alert('Consulta excluÃ­da com sucesso!');
+        alert('Consulta excluí­da com sucesso!');
         loadAgenda();
     } catch (error) {
         console.error('Erro ao excluir consulta:', error);
@@ -1457,7 +1457,7 @@ async function deleteExercicioModal(exercicioId, treinoId) {
     if (!confirm('Excluir exercÃ­cio?')) return;
     try {
         await supabase.from('fit_exercicios').delete().eq('id', exercicioId);
-        alert('ExcluÃ­do!');
+        alert('Excluí­do!');
         await loadExerciciosTreino(treinoId);
         await loadTreinosProtocolo(currentProtocoloId);
     } catch (error) {
@@ -1469,7 +1469,7 @@ async function deleteExercicio(exercicioId, treinoId) {
     if (!confirm('Excluir exercÃ­cio?')) return;
     try {
         await supabase.from('fit_exercicios').delete().eq('id', exercicioId);
-        alert('ExcluÃ­do!');
+        alert('Excluí­do!');
         await loadExerciciosTreino(treinoId);
     } catch (error) {
         alert('Erro: ' + error.message);
@@ -1481,7 +1481,7 @@ async function deleteTreinoConfirm(treinoId) {
     try {
         const { data: treino } = await supabase.from('fit_treinos').select('protocolo_id').eq('id', treinoId).single();
         await supabase.from('fit_treinos').delete().eq('id', treinoId);
-        alert('ExcluÃ­do!');
+        alert('Excluí­do!');
         if (treino) await loadTreinosProtocolo(treino.protocolo_id);
     } catch (error) {
         alert('Erro: ' + error.message);
