@@ -716,13 +716,19 @@ async function editRefeicao(refeicaoId, dietaId) {
 
         // Preencher tipo de refeição
         const tiposPreDefinidos = ['Café da manhã', 'Lanche da manhã', 'Almoço', 'Lanche da tarde', 'Jantar', 'Ceia'];
+        
+        const tipoSelect = document.getElementById('refeicaoTipo');
+        const refeicaoOutroDiv = document.getElementById('refeicaoOutroDiv');
+        const refeicaoOutroInput = document.getElementById('refeicaoOutro');
+        
         if (tiposPreDefinidos.includes(refeicao.tipo_refeicao)) {
-            document.getElementById('refeicaoTipo').value = refeicao.tipo_refeicao;
-            document.getElementById('refeicaoOutroDiv').style.display = 'none';
+            tipoSelect.value = refeicao.tipo_refeicao;
+            refeicaoOutroDiv.style.display = 'none';
+            refeicaoOutroInput.value = '';
         } else {
-            document.getElementById('refeicaoTipo').value = 'Outro';
-            document.getElementById('refeicaoOutroDiv').style.display = 'block';
-            document.getElementById('refeicaoOutro').value = refeicao.tipo_refeicao;
+            tipoSelect.value = 'Outro';
+            refeicaoOutroDiv.style.display = 'block';
+            refeicaoOutroInput.value = refeicao.tipo_refeicao;
         }
 
         document.getElementById('refeicaoHorario').value = refeicao.horario || '';
@@ -745,21 +751,25 @@ async function editRefeicao(refeicaoId, dietaId) {
         container.innerHTML = '';
         window.alimentosTemp = [];
         
-        alimentos.forEach(alimento => {
-            adicionarLinhaAlimento();
-            const rows = document.querySelectorAll('.alimento-row');
-            const lastRow = rows[rows.length - 1];
-            lastRow.querySelector('.alimento-nome').value = alimento.nome || '';
-            lastRow.querySelector('.alimento-quantidade').value = alimento.quantidade || '';
-            lastRow.querySelector('.alimento-observacao').value = alimento.observacao || '';
-        });
+        if (alimentos && alimentos.length > 0) {
+            alimentos.forEach(alimento => {
+                adicionarLinhaAlimento();
+                const rows = document.querySelectorAll('.alimento-row');
+                const lastRow = rows[rows.length - 1];
+                lastRow.querySelector('.alimento-nome').value = alimento.nome || '';
+                lastRow.querySelector('.alimento-quantidade').value = alimento.quantidade || '';
+                lastRow.querySelector('.alimento-observacao').value = alimento.observacao || '';
+            });
+        } else {
+            container.innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>';
+        }
 
         new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
     } catch (error) {
-        alert('Erro: ' + error.message);
+        console.error('Erro ao editar refeição:', error);
+        alert('Erro ao carregar refeição: ' + error.message);
     }
 }
-
 
 function adicionarAlimento() {
     const nome = prompt('Nome do alimento:');
