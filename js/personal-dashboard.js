@@ -160,7 +160,7 @@ function renderAlunosTable(alunos) {
     alunos.forEach(aluno => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${aluno.nome || aluno.profile?.full_name || 'Sem nome'}</td>
+            <td>${aluno.profile?.full_name || 'Sem nome'}</td>
             <td>${aluno.profile?.email || '-'}</td>
             <td>${aluno.telefone || '-'}</td>
             <td>
@@ -235,31 +235,39 @@ async function deleteAluno(id) {
 
 // Funções auxiliares
 async function loadAlunoSelects() {
-    const selects = ['treinoAluno', 'dietaAluno', 'alunoMedidasSelect'];
+    const selects = ['treinoAluno', 'dietaAluno', 'alunoMedidasSelect', 'protocoloAluno'];
     
     for (const selectId of selects) {
         const select = document.getElementById(selectId);
         if (!select) continue;
 
         try {
-            const { data: alunos } = await supabase
+            const { data: alunos, error } = await supabase
                 .from('fit_alunos')
-                .select('id, nome, profile:profile_id(full_name)')
+                .select(`
+                    id,
+                    profile:profile_id(full_name)
+                `)
                 .eq('personal_id', currentUser.id)
                 .eq('ativo', true);
 
+            if (error) throw error;
+
+            // Manter apenas a primeira opção
             select.innerHTML = '<option value="">Selecione...</option>';
+            
             alunos?.forEach(aluno => {
                 const option = document.createElement('option');
                 option.value = aluno.id;
-                option.textContent = aluno.nome || aluno.profile?.full_name || 'Sem nome';
+                option.textContent = aluno.profile?.full_name || 'Sem nome';
                 select.appendChild(option);
             });
         } catch (error) {
-            console.error('Erro ao carregar select:', error);
+            console.error(`Erro ao carregar select ${selectId}:`, error);
         }
     }
 }
+
 
 function loadTreinos() {
     console.log('Carregar treinos');
@@ -1018,9 +1026,32 @@ async function loadAlunosSelect(selectId) {
     try {
         const { data: alunos, error } = await supabase
             .from('fit_alunos')
-            .select('id, nome, profile:profile_id(full_name)')
+            .select(`
+                id,
+                profile:profile_id(full_name)
+            `)
             .eq('personal_id', currentUser.id)
             .eq('ativo', true);
+
+        if (error) throw error;
+
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+
+        alunos.forEach(aluno => {
+            const option = document.createElement('option');
+            option.value = aluno.id;
+            option.textContent = aluno.profile?.full_name || 'Sem nome';
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar alunos no select:', error);
+    }
+}
 
         if (error) throw error;
 
