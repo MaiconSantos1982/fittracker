@@ -416,7 +416,7 @@ function renderDietasList(dietas) {
                         </div>
                     </div>
                     <div class="d-flex gap-2" onclick="event.stopPropagation();">
-                        <button class="btn btn-sm btn-success" onclick="openAdicionarRefeicaoModal('${dieta.id}')">
+                        <button class="btn btn-sm btn-success" onclick="event.stopPropagation(); openAdicionarRefeicaoModal('${dieta.id}')">
                             <i class="bi bi-plus-circle"></i> Adicionar Refeição
                         </button>
                         <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
@@ -546,9 +546,7 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
 }
 
 async function openAdicionarRefeicaoModal(dietaId) {
-    // Parar propagação do evento de collapse
-    event?.stopPropagation();
-    
+    // Parar propagação do evento de collapse   
     window.currentDietaId = dietaId;
     delete window.editingRefeicaoId;
     document.getElementById('refeicaoForm').reset();
