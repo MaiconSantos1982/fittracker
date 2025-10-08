@@ -299,11 +299,14 @@ async function loadProtocolos() {
         const statusFiltro = document.getElementById('filtroStatusProtocolos')?.value;
 
         let query = supabase
-            .from('fit_protocolos')
-            .select(`
-                *,
-                aluno:fit_alunos(nome, profile:profile_id(full_name))
-            `)
+    .from('fit_protocolos')
+    .select(`
+        *,
+        aluno:fit_alunos(
+            id,
+            profile:profile_id(full_name)
+        )
+    `)
             .eq('personal_id', currentUser.id)
             .order('created_at', { ascending: false });
 
@@ -340,7 +343,7 @@ function renderProtocolos(protocolos) {
     protocolos.forEach(protocolo => {
         const dataInicio = protocolo.data_inicio ? new Date(protocolo.data_inicio).toLocaleDateString('pt-BR') : '-';
         const dataFim = protocolo.data_fim ? new Date(protocolo.data_fim).toLocaleDateString('pt-BR') : '-';
-        const nomeAluno = protocolo.aluno?.nome || protocolo.aluno?.profile?.full_name || 'Aluno não encontrado';
+        const nomeAluno = protocolo.aluno?.profile?.full_name || 'Aluno não encontrado';
         
         const card = document.createElement('div');
         card.className = 'card mb-3';
