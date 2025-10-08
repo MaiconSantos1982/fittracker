@@ -1,48 +1,21 @@
 /* ========================================
-   FITTRACKER - APPLE INSPIRED DESIGN
-   Mobile-First & Minimalist
+   RESET E VARIÁVEIS
 ======================================== */
-
-/* Importar San Francisco Font (Apple) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 :root {
-    /* Paleta de cores estilo Apple */
-    --primary: #007AFF;
-    --primary-dark: #0051D5;
-    --secondary: #5856D6;
-    --success: #34C759;
-    --danger: #FF3B30;
-    --warning: #FF9500;
-    --light-bg: #F2F2F7;
-    --white: #FFFFFF;
-    --text-primary: #000000;
-    --text-secondary: #8E8E93;
-    --border-color: #E5E5EA;
-    --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
-    --shadow-sm: 0 1px 8px rgba(0, 0, 0, 0.04);
-    
-    /* Espaçamentos */
-    --spacing-xs: 8px;
-    --spacing-sm: 12px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
-    
-    /* Tipografia */
-    --font-system: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-    --font-size-xs: 12px;
-    --font-size-sm: 14px;
-    --font-size-base: 16px;
-    --font-size-lg: 18px;
-    --font-size-xl: 24px;
-    --font-size-2xl: 32px;
-    
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --primary-color: #3498db;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --info-color: #1abc9c;
+    --sidebar-bg: #ffffff;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+    --border-radius: 16px;
 }
 
 * {
@@ -52,395 +25,178 @@
 }
 
 body {
-    font-family: var(--font-system);
-    background-color: var(--light-bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    background-color: var(--bg-color);
     color: var(--text-primary);
-    font-size: var(--font-size-base);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
 }
 
 /* ========================================
-   MOBILE-FIRST LAYOUT (ALUNO)
+   WRAPPER E LAYOUT
 ======================================== */
-
 .wrapper {
     display: flex;
-    flex-direction: column;
+    width: 100%;
     min-height: 100vh;
 }
 
-/* Sidebar para Mobile (Bottom Navigation) */
+#content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+    background-color: var(--bg-color);
+}
+
+/* ========================================
+   SIDEBAR
+   SIDEBAR (PERSONAL - PADRÃO)
+======================================== */
 #sidebar {
-    position: fixed;
-    bottom: 0;
+    min-width: 260px;
+@@ -228,52 +228,6 @@
+    color: var(--info-color) !important;
+}
+
+/* Efeito 3D com sombra interna */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-info {
+    position: relative;
+}
+
+.card.bg-primary::before,
+.card.bg-success::before,
+.card.bg-warning::before,
+.card.bg-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
     left: 0;
     right: 0;
-    background: var(--white);
-    border-top: 1px solid var(--border-color);
-    padding: var(--spacing-xs) 0;
-    z-index: 1000;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    bottom: 0;
+    border-radius: var(--border-radius);
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
-#sidebar .p-4 {
-    display: none; /* Esconder header no mobile */
+.card.bg-primary:hover::before {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(52, 152, 219, 0.02) 100%);
+    opacity: 1;
 }
 
-#sidebar ul {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.card.bg-success:hover::before {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(46, 204, 113, 0.02) 100%);
+    opacity: 1;
 }
 
-#sidebar ul li {
-    flex: 1;
-    text-align: center;
+.card.bg-warning:hover::before {
+    background: linear-gradient(135deg, rgba(243, 156, 18, 0.05) 0%, rgba(243, 156, 18, 0.02) 100%);
+    opacity: 1;
 }
 
-#sidebar ul li a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: var(--spacing-xs);
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-#sidebar ul li a i {
-    font-size: 20px;
-    margin-bottom: 4px;
-}
-
-#sidebar ul li a:hover,
-#sidebar ul li a.active {
-    color: var(--primary);
-}
-
-/* Content área */
-#content {
-    flex: 1;
-    padding-bottom: 80px; /* Espaço para bottom nav */
-}
-
-/* Navbar Mobile */
-.navbar {
-    background: var(--white) !important;
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md);
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    box-shadow: var(--shadow-sm);
-}
-
-.navbar .navbar-brand {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary) !important;
-}
-
-#sidebarCollapse {
-    display: none; /* Não necessário no mobile */
-}
-
-/* Container Mobile-First */
-.container-fluid {
-    padding: var(--spacing-md);
-}
-
-/* ========================================
-   CARDS ESTILO APPLE
-======================================== */
-
-.card {
-    background: var(--white);
-    border: none;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: var(--spacing-md);
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:active {
-    transform: scale(0.98);
-}
-
-.card-header {
-    background: var(--white);
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md);
-    font-weight: 600;
-    font-size: var(--font-size-lg);
-}
-
-.card-body {
-    padding: var(--spacing-md);
-}
-
-.card-body h5 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-}
-
-.card-body p {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-sm);
-}
-
-/* Cards de estatísticas */
-.card.text-white {
-    color: var(--white) !important;
-    border: none;
-}
-
-.card.bg-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
-}
-
-.card.bg-success {
-    background: linear-gradient(135deg, var(--success) 0%, #28A745 100%) !important;
-}
-
-.card.bg-info {
-    background: linear-gradient(135deg, #5AC8FA 0%, var(--primary) 100%) !important;
-}
-
-.card.bg-warning {
-    background: linear-gradient(135deg, var(--warning) 0%, #FF9500 100%) !important;
-}
-
-/* ========================================
-   BOTÕES ESTILO APPLE
-======================================== */
-
-.btn {
-    font-family: var(--font-system);
-    font-weight: 500;
-    font-size: var(--font-size-base);
-    padding: 12px 20px;
-    border-radius: var(--radius-md);
-    border: none;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs);
-    min-height: 44px; /* Touch target mínimo Apple */
-}
-
-.btn:active {
-    transform: scale(0.96);
-}
-
-.btn-primary {
-    background: var(--primary);
-    color: var(--white);
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-    color: var(--white);
-}
-
-.btn-success {
-    background: var(--success);
-    color: var(--white);
-}
-
-.btn-success:hover {
-    background: #28A745;
-    color: var(--white);
-}
-
-.btn-danger {
-    background: var(--danger);
-    color: var(--white);
-}
-
-.btn-danger:hover {
-    background: #D70015;
-    color: var(--white);
-}
-
-.btn-secondary {
-    background: var(--light-bg);
-    color: var(--text-primary);
-}
-
-.btn-secondary:hover {
-    background: var(--border-color);
-    color: var(--text-primary);
-}
-
-.btn-sm {
-    padding: 8px 16px;
-    font-size: var(--font-size-sm);
-    min-height: 36px;
-}
-
-/* ========================================
-   FORMULÁRIOS ESTILO APPLE
-======================================== */
-
-.form-control,
-.form-select {
-    font-family: var(--font-system);
-    font-size: var(--font-size-base);
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background: var(--white);
-    transition: all 0.2s ease;
-    min-height: 44px;
-}
-
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
-    outline: none;
-}
-
-.form-label {
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-}
-
-textarea.form-control {
-    resize: vertical;
-    min-height: 80px;
-}
-
-/* ========================================
-   LISTAS E TABELAS
-======================================== */
-
-.list-group-item {
-    border: none;
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md);
-    background: transparent;
-}
-
-.list-group-item:last-child {
-    border-bottom: none;
-}
-
-.table {
-    font-size: var(--font-size-sm);
-}
-
-.table thead {
-    background: var(--light-bg);
-    font-weight: 600;
-    font-size: var(--font-size-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.table td,
-.table th {
-    padding: var(--spacing-md);
-    vertical-align: middle;
-    border-color: var(--border-color);
-}
-
-/* ========================================
-   BADGES E ALERTS
-======================================== */
-
-.badge {
-    font-weight: 500;
-    padding: 4px 12px;
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-xs);
-}
-
-.alert {
-    border: none;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    font-size: var(--font-size-sm);
-}
-
-.alert-info {
-    background: rgba(0, 122, 255, 0.1);
-    color: var(--primary);
-}
-
-.alert-warning {
-    background: rgba(255, 149, 0, 0.1);
-    color: var(--warning);
-}
-
-/* ========================================
-   MODALS ESTILO APPLE
-======================================== */
-
-.modal-content {
-    border: none;
-    border-radius: var(--radius-xl);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.modal-header {
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-lg);
-}
-
-.modal-title {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-}
-
-.modal-body {
-    padding: var(--spacing-lg);
-}
-
-.modal-footer {
-    border-top: 1px solid var(--border-color);
-    padding: var(--spacing-md) var(--spacing-lg);
-    gap: var(--spacing-sm);
-}
-
-.btn-close {
-    opacity: 0.5;
-}
-
-.btn-close:hover {
+.card.bg-info:hover::before {
+    background: linear-gradient(135deg, rgba(26, 188, 156, 0.05) 0%, rgba(26, 188, 156, 0.02) 100%);
     opacity: 1;
 }
 
 /* ========================================
-   VÍDEOS E MÍDIA
+   CARDS DE ALUNOS
 ======================================== */
-
-video {
-    border-radius: var(--radius-md);
-    width: 100%;
-    height: auto;
-    background: #000;
+.card.h-100 {
+    height: 100%;
+}
+@@ -495,58 +449,6 @@
+    background: rgba(0, 0, 0, 0.3);
 }
 
 /* ========================================
-   ANIMAÇÕES SUAVES
+   RESPONSIVO
 ======================================== */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -260px;
+    }
+    
+    #sidebar.active {
+        margin-left: 0;
+    }
+    
+    #content {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    #sidebarCollapse {
+        display: block !important;
+    }
+}
+
+/* ========================================
+   UTILITÁRIOS
+======================================== */
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Animações suaves */
+* {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ========================================
+   SPINNER DE CARREGAMENTO
+======================================== */
+.spinner-border {
+    color: var(--primary-color);
+}
+/* ========================================
+   CAMPO DE BUSCA
+======================================== */
+@@ -586,45 +488,8 @@
+    opacity: 0.6;
+}
+
+/* Animação no resultado da busca */
+#searchResults {
+    font-size: 13px;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+}
+
+#searchResults i {
+    margin-right: 4px;
+}
 
 @keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Destacar cards filtrados */
+#alunosContainer .col-md-6 {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
     from {
         opacity: 0;
         transform: translateY(10px);
@@ -450,218 +206,298 @@ video {
         transform: translateY(0);
     }
 }
-
-.content-section {
-    animation: fadeIn 0.3s ease;
+/* ========================================
+   OVERLAY MOBILE (quando sidebar aberta)
+   OVERLAY MOBILE
+======================================== */
+#sidebar-overlay {
+    display: none;
+@@ -645,7 +510,30 @@
 }
 
 /* ========================================
-   RESPONSIVO - TABLET (768px+)
+   MOBILE - MELHORIAS
+   UTILITÁRIOS
 ======================================== */
+.text-muted {
+    color: var(--text-secondary) !important;
+}
 
-@media (min-width: 768px) {
-    .container-fluid {
-        padding: var(--spacing-lg);
-    }
-    
-    .card {
-        margin-bottom: var(--spacing-lg);
-    }
-    
-    /* Modals maiores em tablet */
-    .modal-dialog {
-        max-width: 600px;
-    }
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.spinner-border {
+    color: var(--primary-color);
 }
 
 /* ========================================
-   RESPONSIVO - DESKTOP (992px+)
-   Sidebar lateral para Personal Trainer
+   RESPONSIVO MOBILE (PERSONAL)
 ======================================== */
-
-@media (min-width: 992px) {
-    .wrapper {
-        flex-direction: row;
-    }
-    
-    /* Sidebar Desktop (Personal) */
+@media (max-width: 768px) {
     #sidebar {
-        position: relative;
-        width: 260px;
-        min-height: 100vh;
-        bottom: auto;
-        left: auto;
-        right: auto;
-        border-top: none;
-        border-right: 1px solid var(--border-color);
-        padding: 0;
-        box-shadow: none;
+@@ -657,12 +545,15 @@
+        margin-left: 0;
     }
-    
-    #sidebar .p-4 {
-        display: block;
-        padding: var(--spacing-xl) var(--spacing-lg);
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    #sidebar h3 {
-        font-size: var(--font-size-xl);
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-    
-    #sidebar p {
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-        margin-top: var(--spacing-xs);
-    }
-    
-    #sidebar ul {
-        flex-direction: column;
-        padding: var(--spacing-md) 0;
-    }
-    
-    #sidebar ul li {
-        width: 100%;
-        text-align: left;
-    }
-    
-    #sidebar ul li a {
-        flex-direction: row;
-        justify-content: flex-start;
-        padding: var(--spacing-md) var(--spacing-lg);
-        font-size: var(--font-size-base);
-        border-radius: 0;
-        margin: 2px var(--spacing-md);
-    }
-    
-    #sidebar ul li a i {
-        font-size: 18px;
-        margin-bottom: 0;
-        margin-right: var(--spacing-sm);
-        width: 24px;
-    }
-    
-    #sidebar ul li a:hover {
-        background: var(--light-bg);
-        border-radius: var(--radius-md);
-    }
-    
-    #sidebar ul li a.active {
-        background: rgba(0, 122, 255, 0.1);
-        color: var(--primary);
-        border-radius: var(--radius-md);
-    }
-    
-    /* Content Desktop */
+
+    /* Animação suave */
+    #sidebar {
+        transition: margin-left 0.3s ease;
     #content {
-        flex: 1;
-        padding-bottom: 0;
+        margin-left: 0;
+        width: 100%;
     }
     
     #sidebarCollapse {
-        display: inline-block;
+        display: block !important;
     }
-    
-    .container-fluid {
-        padding: var(--spacing-xl);
-        max-width: 1400px;
+
+    /* Navbar mobile */
+    .navbar {
+        padding: 12px 16px;
     }
-    
-    /* Cards em grid no desktop */
-    .row > [class*='col-'] {
-        margin-bottom: var(--spacing-lg);
+@@ -671,237 +562,15 @@
+        font-size: 18px;
+    }
+
+    /* Cards menores no mobile */
+    .card.bg-primary .card-body h2,
+    .card.bg-success .card-body h2,
+    .card.bg-warning .card-body h2,
+    .card.bg-info .card-body h2 {
+        font-size: 28px;
+    }
+
+    /* Busca de alunos */
+    .search-input {
+        font-size: 14px;
+        height: 44px;
     }
 }
 
 /* ========================================
-   DESKTOP LARGE (1200px+)
+   TRANSIÇÃO SUAVE DO CONTEÚDO
 ======================================== */
-
-@media (min-width: 1200px) {
-    .container-fluid {
-        padding: var(--spacing-xl) 48px;
-    }
-    
-    .modal-dialog.modal-lg {
-        max-width: 900px;
-    }
+#content {
+    transition: margin-left 0.3s ease;
 }
 
 /* ========================================
-   TEMA ESCURO (Dark Mode)
-======================================== */
+   CORREÇÕES DASHBOARD ALUNO
+   ======================================== */
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --light-bg: #000000;
-        --white: #1C1C1E;
-        --text-primary: #FFFFFF;
-        --text-secondary: #98989D;
-        --border-color: #38383A;
+/* Menu inferior do aluno - remover asteriscos e melhorar espaçamento */
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#sidebar ul li::before {
+    content: none !important; /* Remove asteriscos */
+}
+
+#sidebar ul li {
+    margin: 0;
+    padding: 0;
+}
+
+#sidebar ul li a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 12px;
+    gap: 4px;
+}
+
+#sidebar ul li a i {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+#sidebar ul li a.active {
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 8px;
+}
+
+/* Melhorar margens do conteúdo do aluno */
+@media (max-width: 768px) {
+    #content {
+        padding-bottom: 80px; /* Espaço para menu inferior */
     }
     
-    body {
-        background-color: var(--light-bg);
+    .container-fluid {
+        padding: 16px !important;
     }
     
-    .navbar,
-    #sidebar,
+    .content-section {
+        padding: 16px;
+    }
+    
     .card {
-        background: var(--white);
-        border-color: var(--border-color);
+        margin-bottom: 16px;
     }
     
-    .form-control,
-    .form-select {
-        background: var(--white);
-        border-color: var(--border-color);
-        color: var(--text-primary);
+    /* Mais espaço entre cards */
+    .card + .card {
+        margin-top: 16px;
     }
     
-    .table thead {
-        background: var(--white);
+    h2, h3 {
+        margin-bottom: 16px;
+    }
+}
+/* ========================================
+   SIDEBAR ALUNO (DESKTOP)
+   ======================================== */
+@media (min-width: 769px) {
+    body.aluno-dashboard #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        background: var(--sidebar-bg);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 16px rgba(0, 0, 0, 0.06);
+        z-index: 999;
+    }
+    
+    body.aluno-dashboard #sidebar .components {
+        flex: 1;
+        overflow-y: auto;
+    }
+    
+    body.aluno-dashboard #content {
+        margin-left: 260px;
+        width: calc(100% - 260px);
+    }
+    
+    body.aluno-dashboard #sidebarCollapse {
+        display: none !important;
     }
 }
 
 /* ========================================
-   LOADING STATES
-======================================== */
-
-.skeleton {
-    background: linear-gradient(90deg, var(--border-color) 25%, var(--light-bg) 50%, var(--border-color) 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s ease-in-out infinite;
-    border-radius: var(--radius-md);
-    height: 20px;
-}
-
-@keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-/* ========================================
-   ACESSIBILIDADE
-======================================== */
-
-:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
-button:disabled,
-.btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-/* Aumentar área de toque em mobile */
-@media (max-width: 767px) {
-    button,
-    .btn,
-    a {
-        min-height: 44px;
-        min-width: 44px;
+   SIDEBAR ALUNO (MOBILE - BOTTOM NAV)
+   ======================================== */
+@media (max-width: 768px) {
+    body.aluno-dashboard #sidebar {
+        position: fixed !important;
+        bottom: 0 !important;
+        top: auto !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 70px !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        background: white !important;
+        box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.1) !important;
+        z-index: 999 !important;
+        display: flex !important;
+        align-items: center !important;
+        transition: none !important;
+        margin-left: 0 !important;
+        overflow-y: visible !important;
+    }
+    
+    body.aluno-dashboard #sidebar .p-4,
+    body.aluno-dashboard #sidebar .p-3,
+    body.aluno-dashboard #sidebar .border-bottom,
+    body.aluno-dashboard #sidebar .border-top {
+        display: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar .components {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        list-style: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul {
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li {
+        flex: 1 !important;
+        margin: 0 !important;
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li::before {
+        content: none !important;
+        display: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li a {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 8px 5px !important;
+        font-size: 11px !important;
+        text-decoration: none !important;
+        color: #6c757d !important;
+        transition: all 0.2s !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        transform: none !important;
+        gap: 4px !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li a:hover {
+        background: transparent !important;
+        transform: none !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li a i {
+        font-size: 20px !important;
+        margin-bottom: 4px !important;
+        width: auto !important;
+    }
+    
+    body.aluno-dashboard #sidebar ul li a.active {
+        color: #3498db !important;
+        background: rgba(52, 152, 219, 0.1) !important;
+        box-shadow: none !important;
+    }
+    
+    body.aluno-dashboard #content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-bottom: 90px !important;
+    }
+    
+    body.aluno-dashboard #sidebar-overlay {
+        display: none !important;
+    }
+    
+    body.aluno-dashboard #sidebarCollapse {
+        display: none !important;
     }
 }
