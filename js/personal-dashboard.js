@@ -396,7 +396,7 @@ function renderDietasList(dietas) {
     container.innerHTML = '';
 
     dietas.forEach(dieta => {
-        const nomeAluno = dieta.aluno?.profile?.full_name || 'Aluno não encontrado';
+        const nomeAluno = dieta.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
         const numRefeicoes = dieta.refeicoes?.[0]?.count || 0;
         
         const card = document.createElement('div');
@@ -411,13 +411,13 @@ function renderDietasList(dietas) {
                             <i class="bi bi-chevron-right collapse-icon-dieta" style="transition: transform 0.2s;"></i>
                             <div>
                                 <h5 class="mb-0">${dieta.nome}</h5>
-                                <small class="text-muted">${nomeAluno} • ${numRefeicoes} refeicoes</small>
+                                <small class="text-muted">${nomeAluno} â€¢ ${numRefeicoes} refeiÃ§Ãµes</small>
                             </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-success" onclick="openAdicionarRefeicaoModal('${dieta.id}')">
-                            <i class="bi bi-plus-circle"></i> Adicionar Refeicao
+                            <i class="bi bi-plus-circle"></i> Adicionar RefeiÃ§Ã£o
                         </button>
                         <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
                             <i class="bi bi-pencil"></i>
@@ -434,7 +434,7 @@ function renderDietasList(dietas) {
                     <div id="refeicoes-dieta-${dieta.id}">
                         <div class="text-center py-3">
                             <div class="spinner-border spinner-border-sm"></div>
-                            <span class="ms-2">Carregando refeicoes...</span>
+                            <span class="ms-2">Carregando refeiÃ§Ãµes...</span>
                         </div>
                     </div>
                 </div>
@@ -831,6 +831,44 @@ async function saveRefeicao() {
         bootstrap.Modal.getInstance(document.getElementById('adicionarRefeicaoModal')).hide();
         await loadRefeicoesDieta(window.currentDietaId);
         await loadDietas();
+    } catch (error) {
+        alert('Erro: ' + error.message);
+    }
+}
+
+async function editRefeicao(refeicaoId, dietaId) {
+    try {
+        const { data: refeicao, error } = await supabase
+            .from('fit_refeicoes')
+            .select('*')
+            .eq('id', refeicaoId)
+            .single();
+
+        if (error) throw error;
+
+        window.currentDietaId = dietaId;
+        window.editingRefeicaoId = refeicaoId;
+
+        document.getElementById('refeicaoNome').value = refeicao.tipo_refeicao;
+        document.getElementById('refeicaoHorario').value = refeicao.horario || '';
+        document.getElementById('refeicaoDescricao').value = refeicao.observacoes || '';
+        
+        // âœ… PARSE DOS ALIMENTOS
+        let alimentos = [];
+        try {
+            if (typeof refeicao.alimentos === 'string') {
+                alimentos = JSON.parse(refeicao.alimentos);
+            } else if (Array.isArray(refeicao.alimentos)) {
+                alimentos = refeicao.alimentos;
+            }
+        } catch (e) {
+            console.error('Erro ao fazer parse:', e);
+        }
+        
+        window.alimentosTemp = alimentos;
+        renderAlimentosTemp();
+
+        new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
     } catch (error) {
         alert('Erro: ' + error.message);
     }
