@@ -1200,3 +1200,798 @@ async function deleteAgenda(agendaId) {
         alert('Erro ao excluir consulta: ' + error.message);
     }
 }
+
+// ============================================
+// VARIÁVEIS GLOBAIS PARA PROTOCOLOS
+// ============================================
+let currentProtocoloId = null;
+let currentTreinoTemp = null;
+let exerciciosTempList = [];
+let currentExercicioVideoUrl = null;
+
+// ============================================
+// FUNÇÕES DE PROTOCOLOS
+// ============================================
+
+// Carregar lista de protocolos
+async function loadProtocolos() {
+    try {
+        const alunoFiltro = document.getElementById('filtroAlunoProtocolos').value;
+        const statusFiltro = document.getElementById('filtroStatusProtocolos').value;
+
+        let query = supabase
+            .from('fit_protocolos')
+            .select(`
+                *,
+                aluno:fit_alunos(nome, email)
+            `)
+            .eq('personal_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        if (alunoFiltro) {
+            query = query.eq('aluno_id', alunoFiltro);
+        }
+
+        if (statusFiltro !== '') {
+            query = query.eq('ativo', statusFiltro === 'true');
+        }
+
+        const { data: protocolos, error } = await query;
+
+        if (error) throw error;
+
+        renderProtocolos(protocolos);
+    } catch (error) {
+        console.error('Erro ao carregar protocolos:', error);
+        alert('Erro ao carregar protocolos: ' + error.message);
+    }
+}
+
+// Renderizar lista de protocolos
+function renderProtocolos(protocolos) {
+    const container = document.getElementById('protocolosList');
+
+    if (!protocolos || protocolos.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum protocolo cadastrado ainda.</div>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    protocolos.forEach(protocolo => {
+        const dataInicio = protocolo.data_inicio ? new Date(protocolo.data_inicio).toLocaleDateString('pt-BR') : '-';
+        const dataFim = protocolo.data_fim ? new Date(protocolo.data_fim).toLocaleDateString('pt-BR') : '-';
+        
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        card.innerHTML = `
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">${protocolo.nome}</h5>
+                    <small class="text-muted">${protocolo.aluno?.nome || 'Aluno não encontrado'}</small>
+                </div>
+                <div>
+                    <span class="badge bg-${protocolo.ativo ? 'success' : 'secondary'} me-2">
+                        ${protocolo.ativo ? 'Ativo' : 'Inativo'}
+                    </span>
+                    <button class="btn btn-sm btn-primary" onclick="openGerenciarTreinosModal('${protocolo.id}', '${protocolo.nome}')">
+                        <i class="bi bi-list-ul"></i> Gerenciar Treinos
+                    </button>
+                    <button class="btn btn-sm btn-warning" onclick="editProtocolo('${protocolo.id}')">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteProtocolo('${protocolo.id}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Objetivo:</strong><br>
+                        ${protocolo.objetivo}
+                        ${protocolo.objetivo_outros ? `<br><small class="text-muted">${protocolo.objetivo_outros}</small>` : ''}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Início:</strong><br>
+                        ${dataInicio}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Término Previsto:</strong><br>
+                        ${dataFim}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Criado em:</strong><br>
+                        ${new Date(protocolo.created_at).toLocaleDateString('pt-BR')}
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// Abrir modal de novo protocolo
+async function openNovoProtocoloModal() {
+    document.getElementById('protocoloForm').reset();
+    document.getElementById('protocoloId').value = '';
+    document.getElementById('protocoloModalTitle').textContent = 'Novo Protocolo';
+    document.getElementById('protocoloAtivo').checked = true;
+    document.getElementById('objetivoOutrosDiv').style.display = 'none';
+    
+    // Setar data de início como hoje
+    document.getElementById('protocoloDataInicio').valueAsDate = new Date();
+    
+    // Carregar alunos
+    await loadAlunosSelect('protocoloAluno');
+    
+    new bootstrap.Modal(document.getElementById('protocoloModal')).show();
+}
+
+// Toggle campo "Outros" no objetivo
+function toggleObjetivoOutros() {
+    const objetivo = document.getElementById('protocoloObjetivo').value;
+    const outrosDiv = document.getElementById('objetivoOutrosDiv');
+    
+    if (objetivo === 'Outros') {
+        outrosDiv.style.display = 'block';
+        document.getElementById('protocoloObjetivoOutros').required = true;
+    } else {
+        outrosDiv.style.display = 'none';
+        document.getElementById('protocoloObjetivoOutros').required = false;
+    }
+}
+
+// Salvar protocolo
+async function saveProtocolo() {
+    try {
+        const id = document.getElementById('protocoloId').value;
+        const alunoId = document.getElementById('protocoloAluno').value;
+        const nome = document.getElementById('protocoloNome').value;
+        const objetivo = document.getElementById('protocoloObjetivo').value;
+        const objetivoOutros = document.getElementById('protocoloObjetivoOutros').value;
+        const dataInicio = document.getElementById('protocoloDataInicio').value;
+        const dataFim = document.getElementById('protocoloDataFim').value;
+        const ativo = document.getElementById('protocoloAtivo').checked;
+
+        if (!alunoId || !nome || !objetivo) {
+            alert('Preencha todos os campos obrigatórios!');
+            return;
+        }
+
+        const protocoloData = {
+            personal_id: currentUser.id,
+            aluno_id: alunoId,
+            nome: nome,
+            objetivo: objetivo,
+            objetivo_outros: objetivo === 'Outros' ? objetivoOutros : null,
+            data_inicio: dataInicio || null,
+            data_fim: dataFim || null,
+            ativo: ativo
+        };
+
+        let result;
+        if (id) {
+            // Atualizar
+            result = await supabase
+                .from('fit_protocolos')
+                .update(protocoloData)
+                .eq('id', id);
+        } else {
+            // Inserir
+            result = await supabase
+                .from('fit_protocolos')
+                .insert(protocoloData)
+                .select()
+                .single();
+        }
+
+        if (result.error) throw result.error;
+
+        alert('Protocolo salvo com sucesso!');
+        bootstrap.Modal.getInstance(document.getElementById('protocoloModal')).hide();
+        loadProtocolos();
+    } catch (error) {
+        console.error('Erro ao salvar protocolo:', error);
+        alert('Erro ao salvar protocolo: ' + error.message);
+    }
+}
+
+// Editar protocolo
+async function editProtocolo(id) {
+    try {
+        const { data: protocolo, error } = await supabase
+            .from('fit_protocolos')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        document.getElementById('protocoloId').value = protocolo.id;
+        document.getElementById('protocoloNome').value = protocolo.nome;
+        document.getElementById('protocoloObjetivo').value = protocolo.objetivo;
+        document.getElementById('protocoloObjetivoOutros').value = protocolo.objetivo_outros || '';
+        document.getElementById('protocoloDataInicio').value = protocolo.data_inicio || '';
+        document.getElementById('protocoloDataFim').value = protocolo.data_fim || '';
+        document.getElementById('protocoloAtivo').checked = protocolo.ativo;
+        
+        await loadAlunosSelect('protocoloAluno');
+        document.getElementById('protocoloAluno').value = protocolo.aluno_id;
+        
+        toggleObjetivoOutros();
+        
+        document.getElementById('protocoloModalTitle').textContent = 'Editar Protocolo';
+        new bootstrap.Modal(document.getElementById('protocoloModal')).show();
+    } catch (error) {
+        console.error('Erro ao carregar protocolo:', error);
+        alert('Erro ao carregar protocolo: ' + error.message);
+    }
+}
+
+// Deletar protocolo
+async function deleteProtocolo(id) {
+    if (!confirm('Tem certeza que deseja excluir este protocolo? Todos os treinos vinculados serão removidos!')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabase
+            .from('fit_protocolos')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert('Protocolo excluído com sucesso!');
+        loadProtocolos();
+    } catch (error) {
+        console.error('Erro ao excluir protocolo:', error);
+        alert('Erro ao excluir protocolo: ' + error.message);
+    }
+}
+
+// ============================================
+// FUNÇÕES DE TREINOS DO PROTOCOLO
+// ============================================
+
+// Abrir modal de gerenciar treinos
+async function openGerenciarTreinosModal(protocoloId, protocoloNome) {
+    currentProtocoloId = protocoloId;
+    document.getElementById('currentProtocoloId').value = protocoloId;
+    document.getElementById('gerenciarTreinosTitle').textContent = 'Gerenciar Treinos';
+    document.getElementById('gerenciarTreinosSubtitle').textContent = `Protocolo: ${protocoloNome}`;
+    
+    await loadTreinosProtocolo(protocoloId);
+    
+    new bootstrap.Modal(document.getElementById('gerenciarTreinosModal')).show();
+}
+
+// Carregar treinos do protocolo
+async function loadTreinosProtocolo(protocoloId) {
+    try {
+        const { data: treinos, error } = await supabase
+            .from('fit_treinos')
+            .select(`
+                *,
+                exercicios:fit_exercicios(count)
+            `)
+            .eq('protocolo_id', protocoloId)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        renderTreinosProtocolo(treinos);
+    } catch (error) {
+        console.error('Erro ao carregar treinos:', error);
+        alert('Erro ao carregar treinos: ' + error.message);
+    }
+}
+
+// Renderizar treinos do protocolo
+function renderTreinosProtocolo(treinos) {
+    const container = document.getElementById('treinosProtocoloList');
+
+    if (!treinos || treinos.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum treino adicionado ainda. Clique em "Adicionar Treino" para começar.</div>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    treinos.forEach((treino, index) => {
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        card.innerHTML = `
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-0">${treino.nome}</h6>
+                    ${treino.descricao ? `<small class="text-muted">${treino.descricao}</small>` : ''}
+                </div>
+                <div>
+                    <span class="badge bg-info me-2">${treino.exercicios?.[0]?.count || 0} exercícios</span>
+                    <button class="btn btn-sm btn-primary" onclick="editTreino('${treino.id}')">
+                        <i class="bi bi-pencil"></i> Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteTreino('${treino.id}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// Abrir modal de adicionar treino
+function openAdicionarTreinoModal() {
+    document.getElementById('treinoForm').reset();
+    document.getElementById('treinoProtocoloId').value = currentProtocoloId;
+    exerciciosTempList = [];
+    renderExerciciosTempList();
+    
+    new bootstrap.Modal(document.getElementById('adicionarTreinoModal')).show();
+}
+
+// Salvar treino
+async function saveTreino() {
+    try {
+        const protocoloId = document.getElementById('treinoProtocoloId').value;
+        const nome = document.getElementById('treinoNome').value;
+        const descricao = document.getElementById('treinoDescricao').value;
+
+        if (!nome) {
+            alert('Informe o nome do treino!');
+            return;
+        }
+
+        if (exerciciosTempList.length === 0) {
+            alert('Adicione pelo menos um exercício ao treino!');
+            return;
+        }
+
+        // Buscar aluno_id do protocolo
+        const { data: protocolo } = await supabase
+            .from('fit_protocolos')
+            .select('aluno_id')
+            .eq('id', protocoloId)
+            .single();
+
+        // Salvar treino
+        const { data: treino, error: treinoError } = await supabase
+            .from('fit_treinos')
+            .insert({
+                protocolo_id: protocoloId,
+                aluno_id: protocolo.aluno_id,
+                personal_id: currentUser.id,
+                nome: nome,
+                descricao: descricao
+            })
+            .select()
+            .single();
+
+        if (treinoError) throw treinoError;
+
+        // Salvar exercícios
+        for (let i = 0; i < exerciciosTempList.length; i++) {
+            const ex = exerciciosTempList[i];
+            ex.treino_id = treino.id;
+            ex.protocolo_id = protocoloId;
+            ex.ordem = i + 1;
+
+            const { error: exError } = await supabase
+                .from('fit_exercicios')
+                .insert(ex);
+
+            if (exError) throw exError;
+        }
+
+        alert('Treino salvo com sucesso!');
+        bootstrap.Modal.getInstance(document.getElementById('adicionarTreinoModal')).hide();
+        loadTreinosProtocolo(protocoloId);
+    } catch (error) {
+        console.error('Erro ao salvar treino:', error);
+        alert('Erro ao salvar treino: ' + error.message);
+    }
+}
+
+// Deletar treino
+async function deleteTreino(id) {
+    if (!confirm('Tem certeza que deseja excluir este treino?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabase
+            .from('fit_treinos')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert('Treino excluído com sucesso!');
+        loadTreinosProtocolo(currentProtocoloId);
+    } catch (error) {
+        console.error('Erro ao excluir treino:', error);
+        alert('Erro ao excluir treino: ' + error.message);
+    }
+}
+
+// ============================================
+// FUNÇÕES DE EXERCÍCIOS
+// ============================================
+
+// Abrir modal de adicionar exercício
+async function openAdicionarExercicioModal() {
+    document.getElementById('exercicioForm').reset();
+    document.getElementById('seriesDetalhesContainer').innerHTML = '';
+    document.getElementById('exercicioPreview').style.display = 'none';
+    document.getElementById('dicaCounter').textContent = '0';
+    currentExercicioVideoUrl = null;
+    
+    // Carregar grupos musculares
+    await loadGruposMusculares();
+    
+    // Gerar 4 séries por padrão
+    document.getElementById('exercicioNumSeries').value = 4;
+    gerarLinhasSeries();
+    
+    new bootstrap.Modal(document.getElementById('adicionarExercicioModal')).show();
+}
+
+// Carregar grupos musculares
+async function loadGruposMusculares() {
+    try {
+        const { data: grupos, error } = await supabase
+            .from('fit_grupos_musculares')
+            .select('*')
+            .order('nome', { ascending: true });
+
+        if (error) throw error;
+
+        const select = document.getElementById('exercicioGrupoMuscular');
+        select.innerHTML = '<option value="">Selecione o grupo...</option>';
+
+        grupos.forEach(grupo => {
+            const option = document.createElement('option');
+            option.value = grupo.id;
+            option.textContent = grupo.nome;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar grupos musculares:', error);
+    }
+}
+
+// Carregar exercícios da biblioteca por grupo
+async function loadExerciciosBiblioteca() {
+    try {
+        const grupoId = document.getElementById('exercicioGrupoMuscular').value;
+        
+        if (!grupoId) {
+            document.getElementById('exercicioBiblioteca').innerHTML = '<option value="">Selecione o exercício...</option>';
+            return;
+        }
+
+        const { data: exercicios, error } = await supabase
+            .from('fit_exercicios_biblioteca')
+            .select('*')
+            .eq('grupo_muscular_id', grupoId)
+            .order('nome', { ascending: true });
+
+        if (error) throw error;
+
+        const select = document.getElementById('exercicioBiblioteca');
+        select.innerHTML = '<option value="">Selecione o exercício...</option>';
+
+        exercicios.forEach(ex => {
+            const option = document.createElement('option');
+            option.value = ex.id;
+            option.textContent = ex.nome;
+            option.dataset.videoUrl = ex.video_url || '';
+            option.dataset.imagemUrl = ex.imagem_url || '';
+            option.dataset.descricao = ex.descricao || '';
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar exercícios:', error);
+    }
+}
+
+// Carregar detalhes do exercício selecionado
+function loadExercicioDetalhes() {
+    const select = document.getElementById('exercicioBiblioteca');
+    const selectedOption = select.options[select.selectedIndex];
+    
+    if (!selectedOption || !selectedOption.value) {
+        document.getElementById('exercicioPreview').style.display = 'none';
+        return;
+    }
+
+    const videoUrl = selectedOption.dataset.videoUrl;
+    const imagemUrl = selectedOption.dataset.imagemUrl;
+    currentExercicioVideoUrl = videoUrl;
+
+    document.getElementById('exercicioPreview').style.display = 'block';
+
+    if (videoUrl) {
+        document.getElementById('exercicioVideo').style.display = 'block';
+        document.getElementById('exercicioVideoSource').src = videoUrl;
+        document.getElementById('exercicioVideo').load();
+        document.getElementById('exercicioImagem').style.display = 'none';
+    } else if (imagemUrl) {
+        document.getElementById('exercicioImagem').style.display = 'block';
+        document.getElementById('exercicioImagem').src = imagemUrl;
+        document.getElementById('exercicioVideo').style.display = 'none';
+    } else {
+        document.getElementById('exercicioPreview').style.display = 'none';
+    }
+}
+
+// Alterar vídeo do exercício
+function alterarVideoExercicio() {
+    document.getElementById('exercicioVideoUpload').click();
+}
+
+// Upload de vídeo customizado
+async function uploadVideoExercicio() {
+    try {
+        const fileInput = document.getElementById('exercicioVideoUpload');
+        const file = fileInput.files[0];
+        
+        if (!file) return;
+
+        // Validar tipo de arquivo
+        if (!file.type.startsWith('video/')) {
+            alert('Por favor, selecione um arquivo de vídeo válido!');
+            return;
+        }
+
+        // Upload para Supabase Storage
+        const fileName = `exercicio_${Date.now()}_${file.name}`;
+        const { data, error } = await supabase.storage
+            .from('videos-exercicios')
+            .upload(fileName, file);
+
+        if (error) throw error;
+
+        // Obter URL pública
+        const { data: urlData } = supabase.storage
+            .from('videos-exercicios')
+            .getPublicUrl(fileName);
+
+        currentExercicioVideoUrl = urlData.publicUrl;
+
+        // Atualizar preview
+        document.getElementById('exercicioVideoSource').src = currentExercicioVideoUrl;
+        document.getElementById('exercicioVideo').load();
+        document.getElementById('exercicioVideo').style.display = 'block';
+        document.getElementById('exercicioImagem').style.display = 'none';
+
+        alert('Vídeo enviado com sucesso!');
+    } catch (error) {
+        console.error('Erro ao fazer upload do vídeo:', error);
+        alert('Erro ao enviar vídeo: ' + error.message);
+    }
+}
+
+// Gerar linhas dinâmicas de séries
+function gerarLinhasSeries() {
+    const numSeries = parseInt(document.getElementById('exercicioNumSeries').value) || 1;
+    const container = document.getElementById('seriesDetalhesContainer');
+    
+    container.innerHTML = '';
+
+    for (let i = 1; i <= numSeries; i++) {
+        adicionarLinhaSerie(i);
+    }
+}
+
+// Adicionar uma linha de série
+function adicionarLinhaSerie(numero) {
+    const container = document.getElementById('seriesDetalhesContainer');
+    
+    const row = document.createElement('div');
+    row.className = 'row mb-3 align-items-end serie-row';
+    row.dataset.serie = numero;
+    row.innerHTML = `
+        <div class="col-md-2">
+            <label class="form-label">Unidade de medida</label>
+            <select class="form-select serie-unidade">
+                <option value="">Selecione uma opção</option>
+                <option value="Repetições" selected>Repetições</option>
+                <option value="Tempo">Tempo</option>
+                <option value="Distância">Distância</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Número de repetições</label>
+            <input type="number" class="form-control serie-numero" placeholder="Ex: 12">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Carga / Intensidade</label>
+            <input type="text" class="form-control serie-carga" placeholder="Ex: 20kg">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Velocidade de execução</label>
+            <select class="form-select serie-velocidade">
+                <option value="">Selecione uma opção</option>
+                <option value="Lenta">Lenta</option>
+                <option value="Moderada" selected>Moderada</option>
+                <option value="Rápida">Rápida</option>
+                <option value="Explosiva">Explosiva</option>
+                <option value="Controlada">Controlada</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">Pausa mín (s)</label>
+            <input type="number" class="form-control serie-pausa-min" placeholder="60">
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">Pausa máx (s)</label>
+            <input type="number" class="form-control serie-pausa-max" placeholder="90">
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger w-100" onclick="removerSerie(this)">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(row);
+}
+
+// Adicionar série extra
+function adicionarSerie() {
+    const container = document.getElementById('seriesDetalhesContainer');
+    const numSeries = container.querySelectorAll('.serie-row').length + 1;
+    adicionarLinhaSerie(numSeries);
+}
+
+// Remover série
+function removerSerie(button) {
+    button.closest('.serie-row').remove();
+}
+
+// Contar caracteres da dica
+document.addEventListener('DOMContentLoaded', () => {
+    const dicaTextarea = document.getElementById('exercicioDica');
+    if (dicaTextarea) {
+        dicaTextarea.addEventListener('input', () => {
+            document.getElementById('dicaCounter').textContent = dicaTextarea.value.length;
+        });
+    }
+});
+
+// Salvar exercício
+async function saveExercicio() {
+    try {
+        const grupoMuscularId = document.getElementById('exercicioGrupoMuscular').value;
+        const exercicioBibliotecaId = document.getElementById('exercicioBiblioteca').value;
+        const numSeries = document.getElementById('exercicioNumSeries').value;
+        const metodo = document.getElementById('exercicioMetodo').value;
+        const objetivo = document.getElementById('exercicioObjetivo').value;
+        const dica = document.getElementById('exercicioDica').value;
+        const dicaPadrao = document.getElementById('exercicioDicaPadrao').checked;
+
+        if (!grupoMuscularId || !exercicioBibliotecaId) {
+            alert('Selecione o grupo muscular e o exercício!');
+            return;
+        }
+
+        // Obter nome do exercício
+        const select = document.getElementById('exercicioBiblioteca');
+        const nomeExercicio = select.options[select.selectedIndex].textContent;
+
+        // Obter nome do grupo muscular
+        const selectGrupo = document.getElementById('exercicioGrupoMuscular');
+        const nomeGrupo = selectGrupo.options[selectGrupo.selectedIndex].textContent;
+
+        // Coletar detalhes das séries
+        const seriesRows = document.querySelectorAll('.serie-row');
+        const seriesDetalhes = [];
+
+        seriesRows.forEach((row, index) => {
+            seriesDetalhes.push({
+                serie: index + 1,
+                unidade_medida: row.querySelector('.serie-unidade').value,
+                numero: row.querySelector('.serie-numero').value,
+                carga: row.querySelector('.serie-carga').value,
+                velocidade: row.querySelector('.serie-velocidade').value,
+                pausa_min: row.querySelector('.serie-pausa-min').value,
+                pausa_max: row.querySelector('.serie-pausa-max').value
+            });
+        });
+
+        // Criar objeto de exercício
+        const exercicio = {
+            exercicio_biblioteca_id: exercicioBibliotecaId,
+            nome: nomeExercicio,
+            grupo_muscular: nomeGrupo,
+            numero_series: parseInt(numSeries),
+            metodo: metodo,
+            objetivo_exercicio: objetivo,
+            series_detalhes: seriesDetalhes,
+            dica: dica,
+            video_url: currentExercicioVideoUrl
+        };
+
+        // Adicionar à lista temporária
+        exerciciosTempList.push(exercicio);
+
+        // Se marcou para usar como padrão, atualizar na biblioteca
+        if (dicaPadrao && dica) {
+            await supabase
+                .from('fit_exercicios_biblioteca')
+                .update({ descricao: dica })
+                .eq('id', exercicioBibliotecaId);
+        }
+
+        alert('Exercício adicionado ao treino!');
+        bootstrap.Modal.getInstance(document.getElementById('adicionarExercicioModal')).hide();
+        renderExerciciosTempList();
+    } catch (error) {
+        console.error('Erro ao adicionar exercício:', error);
+        alert('Erro ao adicionar exercício: ' + error.message);
+    }
+}
+
+// Renderizar lista temporária de exercícios
+function renderExerciciosTempList() {
+    const container = document.getElementById('exerciciosTreinoList');
+
+    if (exerciciosTempList.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum exercício adicionado ainda</div>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    exerciciosTempList.forEach((ex, index) => {
+        const card = document.createElement('div');
+        card.className = 'card mb-2';
+        card.innerHTML = `
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${index + 1}. ${ex.nome}</strong>
+                        <br>
+                        <small class="text-muted">
+                            ${ex.grupo_muscular} | ${ex.numero_series} séries
+                            ${ex.metodo ? ` | ${ex.metodo}` : ''}
+                        </small>
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="removerExercicioTemp(${index})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// Remover exercício da lista temporária
+function removerExercicioTemp(index) {
+    exerciciosTempList.splice(index, 1);
+    renderExerciciosTempList();
+}
+
+// ============================================
+// INICIALIZAÇÃO DA SEÇÃO DE PROTOCOLOS
+// ============================================
+
+// Adicionar no setupNavigation() existente
+const originalSetupNavigation = setupNavigation;
+setupNavigation = function() {
+    originalSetupNavigation();
+    
+    // Adicionar listener para seção de protocolos
+    const protocolosLink = document.querySelector('[data-section="protocolos"]');
+    if (protocolosLink) {
+        protocolosLink.addEventListener('click', async () => {
+            await loadAlunosSelect('filtroAlunoProtocolos');
+            loadProtocolos();
+        });
+    }
+};
