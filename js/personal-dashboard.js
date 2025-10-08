@@ -3,7 +3,7 @@ let currentAlunos = [];
 let selectedAlunoId = null;
 let currentAlunoDetailsId = null;
 
-// VARIÃVEIS GLOBAIS PARA PROTOCOLOS (NOVAS)
+// VARIÁVEIS GLOBAIS PARA PROTOCOLOS (NOVAS)
 let currentProtocoloId = null;
 let currentTreinoTemp = null;
 let exerciciosTempList = [];
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadAlunoSelects();
 });
 
-// Navegação entre seÃ§Ãµes
+// Navegação entre sessões
 function setupNavigation() {
     const overlay = document.getElementById('sidebar-overlay');
     
@@ -48,7 +48,7 @@ function setupNavigation() {
 }
 
 function showSection(sectionName) {
-    // Esconde todas as seÃ§Ãµes
+    // Esconde todas as sessões
     document.querySelectorAll('.content-section').forEach(s => {
         s.style.display = 'none';
     });
@@ -68,11 +68,11 @@ function showSection(sectionName) {
         'dietas': 'Dietas',
         'medidas': 'Medidas e Evolução',
         'agenda': 'Agenda',
-        'notificacoes': 'NotificaÃ§Ãµes'
+        'notificacoes': 'Notificações'
     };
     document.getElementById('currentSection').textContent = titles[sectionName] || sectionName;
     
-    // Carrega dados especÃ­ficos da seção
+    // Carrega dados específicos da seção
     if (sectionName === 'alunos') loadAlunos();
     if (sectionName === 'protocolos') {
         loadAlunosSelect('filtroAlunoProtocolos');
@@ -233,7 +233,7 @@ async function deleteAluno(id) {
     }
 }
 
-// FunÃ§Ãµes auxiliares
+// Funções auxiliares
 async function loadAlunoSelects() {
     const selects = ['treinoAluno', 'dietaAluno', 'alunoMedidasSelect', 'protocoloAluno'];
     
@@ -306,7 +306,7 @@ function renderTreinosList(treinos) {
     container.innerHTML = '';
 
     treinos.forEach(treino => {
-        const nomeAluno = treino.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
+        const nomeAluno = treino.aluno?.profile?.full_name || 'Aluno não encontrado';
         
         const card = document.createElement('div');
         card.className = 'card mb-3';
@@ -396,7 +396,7 @@ function renderDietasList(dietas) {
     container.innerHTML = '';
 
     dietas.forEach(dieta => {
-        const nomeAluno = dieta.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
+        const nomeAluno = dieta.aluno?.profile?.full_name || 'Aluno não encontrado';
         const numRefeicoes = dieta.refeicoes?.[0]?.count || 0;
         
         const card = document.createElement('div');
@@ -411,7 +411,7 @@ function renderDietasList(dietas) {
                             <i class="bi bi-chevron-right collapse-icon-dieta" style="transition: transform 0.2s;"></i>
                             <div>
                                 <h5 class="mb-0">${dieta.nome}</h5>
-                                <small class="text-muted">${nomeAluno} â€¢ ${numRefeicoes} refeiÃ§Ãµes</small>
+                                <small class="text-muted">${nomeAluno} â€¢ ${numRefeicoes} refeições</small>
                             </div>
                         </div>
                     </div>
@@ -434,7 +434,7 @@ function renderDietasList(dietas) {
                     <div id="refeicoes-dieta-${dieta.id}">
                         <div class="text-center py-3">
                             <div class="spinner-border spinner-border-sm"></div>
-                            <span class="ms-2">Carregando refeiÃ§Ãµes...</span>
+                            <span class="ms-2">Carregando refeições...</span>
                         </div>
                     </div>
                 </div>
@@ -472,9 +472,9 @@ async function loadRefeicoesDieta(dietaId) {
         if (error) throw error;
         renderRefeicoesDieta(dietaId, refeicoes);
     } catch (error) {
-        console.error('Erro ao carregar refeiÃ§Ãµes:', error);
+        console.error('Erro ao carregar refeições:', error);
         document.getElementById(`refeicoes-dieta-${dietaId}`).innerHTML = 
-            '<div class="alert alert-danger">Erro ao carregar refeiÃ§Ãµes: ' + error.message + '</div>';
+            '<div class="alert alert-danger">Erro ao carregar refeições: ' + error.message + '</div>';
     }
 }
 
@@ -625,7 +625,7 @@ function removerLinhaAlimento(button) {
         row.dataset.index = newIndex;
     });
     
-    // Se nÃ£o houver mais alimentos, mostrar mensagem
+    // Se não houver mais alimentos, mostrar mensagem
     if (window.alimentosTemp.length === 0) {
         document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para comeÃ§ar</div>';
     }
@@ -651,8 +651,8 @@ async function saveRefeicao() {
         const tipoOutroElement = document.getElementById('refeicaoOutro');
         
         if (!tipoSelectElement) {
-            console.error('Elemento refeicaoTipo nÃ£o encontrado');
-            alert('Erro: Campo "Tipo de Refeição" nÃ£o encontrado no formulÃ¡rio.');
+            console.error('Elemento refeicaoTipo não encontrado');
+            alert('Erro: Campo "Tipo de Refeição" não encontrado no formulÃ¡rio.');
             return;
         }
         
@@ -714,7 +714,7 @@ async function editRefeicao(refeicaoId, dietaId) {
         window.editingRefeicaoId = refeicaoId;
 
         // Preencher tipo de refeição
-        const tiposPreDefinidos = ['CafÃ© da manhÃ£', 'Lanche da manhÃ£', 'AlmoÃ§o', 'Lanche da tarde', 'Jantar', 'Ceia'];
+        const tiposPreDefinidos = ['CafÃ© da manhã', 'Lanche da manhã', 'AlmoÃ§o', 'Lanche da tarde', 'Jantar', 'Ceia'];
         if (tiposPreDefinidos.includes(refeicao.tipo_refeicao)) {
             document.getElementById('refeicaoTipo').value = refeicao.tipo_refeicao;
             document.getElementById('refeicaoOutroDiv').style.display = 'none';
@@ -778,7 +778,7 @@ function renderAlimentosTemp() {
         return;
     }
 
-    let html = '<table class="table table-sm"><thead><tr><th>Alimento</th><th>Qtd</th><th>AÃ§Ãµes</th></tr></thead><tbody>';
+    let html = '<table class="table table-sm"><thead><tr><th>Alimento</th><th>Qtd</th><th>Ações</th></tr></thead><tbody>';
     window.alimentosTemp.forEach((alimento, i) => {
         html += `<tr>
             <td>${alimento.nome}</td>
@@ -915,7 +915,7 @@ async function editDieta(dietaId) {
 }
 
 async function deleteDietaConfirm(dietaId) {
-    if (!confirm('Excluir esta dieta e todas as refeiÃ§Ãµes?')) return;
+    if (!confirm('Excluir esta dieta e todas as refeições?')) return;
     try {
         const { error } = await supabase.from('fit_dietas').delete().eq('id', dietaId);
         if (error) throw error;
@@ -963,7 +963,7 @@ function renderAgendaList(consultas) {
     container.innerHTML = '';
 
     consultas.forEach(consulta => {
-        const nomeAluno = consulta.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
+        const nomeAluno = consulta.aluno?.profile?.full_name || 'Aluno não encontrado';
         const dataConsulta = new Date(consulta.data_consulta).toLocaleString('pt-BR');
         
         const card = document.createElement('div');
@@ -1136,7 +1136,7 @@ function renderProtocolos(protocolos) {
     protocolos.forEach(protocolo => {
         const dataInicio = protocolo.data_inicio ? new Date(protocolo.data_inicio).toLocaleDateString('pt-BR') : '-';
         const dataFim = protocolo.data_fim ? new Date(protocolo.data_fim).toLocaleDateString('pt-BR') : '-';
-        const nomeAluno = protocolo.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
+        const nomeAluno = protocolo.aluno?.profile?.full_name || 'Aluno não encontrado';
         
         const card = document.createElement('div');
         card.className = 'card mb-3';
@@ -1174,7 +1174,7 @@ function renderProtocolos(protocolos) {
             
             <div class="collapse" id="protocolo-${protocolo.id}">
                 <div class="card-body bg-light">
-                    <!-- InformaÃ§Ãµes do Protocolo -->
+                    <!-- Informações do Protocolo -->
                     <div class="row mb-3 pb-3 border-bottom">
                         <div class="col-md-3">
                             <strong>Objetivo:</strong><br>
@@ -1406,7 +1406,7 @@ function renderExerciciosModal(treinoId, exercicios) {
         container.innerHTML = '<div class="alert alert-info">Nenhum exercÃ­cio.</div>';
         return;
     }
-    let html = '<table class="table table-sm"><thead><tr><th>#</th><th>ExercÃ­cio</th><th>Grupo</th><th>SÃ©ries</th><th>AÃ§Ãµes</th></tr></thead><tbody>';
+    let html = '<table class="table table-sm"><thead><tr><th>#</th><th>ExercÃ­cio</th><th>Grupo</th><th>SÃ©ries</th><th>Ações</th></tr></thead><tbody>';
     exercicios.forEach((ex, i) => {
         const series = ex.series_detalhes?.length > 0 ? `${ex.series_detalhes.length}x${ex.series_detalhes[0].numero}` : `${ex.numero_series || '-'}`;
         html += `<tr><td>${i+1}</td><td><strong>${ex.nome}</strong></td><td><span class="badge bg-secondary">${ex.grupo_muscular || '-'}</span></td><td>${series}</td><td>
@@ -1634,7 +1634,7 @@ function adicionarLinhaSerie(num) {
     const row = document.createElement('div');
     row.className = 'row mb-2 serie-row';
     row.innerHTML = `
-        <div class="col-md-2"><select class="form-select serie-unidade"><option>RepetiÃ§Ãµes</option><option>Tempo</option></select></div>
+        <div class="col-md-2"><select class="form-select serie-unidade"><option>Repetições</option><option>Tempo</option></select></div>
         <div class="col-md-2"><input type="number" class="form-control serie-numero" placeholder="12"></div>
         <div class="col-md-2"><input type="text" class="form-control serie-carga" placeholder="20kg"></div>
         <div class="col-md-2"><select class="form-select serie-velocidade"><option>Moderada</option><option>Lenta</option><option>RÃ¡pida</option></select></div>
@@ -1727,7 +1727,7 @@ async function editExercicio(exercicioId, treinoId) {
             const row = document.createElement('div');
             row.className = 'row mb-2 serie-row';
             row.innerHTML = `
-                <div class="col-md-2"><select class="form-select serie-unidade"><option ${serie.unidade_medida === 'RepetiÃ§Ãµes' ? 'selected' : ''}>RepetiÃ§Ãµes</option><option ${serie.unidade_medida === 'Tempo' ? 'selected' : ''}>Tempo</option></select></div>
+                <div class="col-md-2"><select class="form-select serie-unidade"><option ${serie.unidade_medida === 'Repetições' ? 'selected' : ''}>Repetições</option><option ${serie.unidade_medida === 'Tempo' ? 'selected' : ''}>Tempo</option></select></div>
                 <div class="col-md-2"><input type="number" class="form-control serie-numero" value="${serie.numero || ''}"></div>
                 <div class="col-md-2"><input type="text" class="form-control serie-carga" value="${serie.carga || ''}"></div>
                 <div class="col-md-2"><select class="form-select serie-velocidade"><option ${serie.velocidade === 'Moderada' ? 'selected' : ''}>Moderada</option><option ${serie.velocidade === 'Lenta' ? 'selected' : ''}>Lenta</option><option ${serie.velocidade === 'RÃ¡pida' ? 'selected' : ''}>RÃ¡pida</option></select></div>
