@@ -415,14 +415,14 @@ function renderDietasList(dietas) {
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex gap-2" onclick="event.stopPropagation();">
+                    <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-success" onclick="event.stopPropagation(); openAdicionarRefeicaoModal('${dieta.id}')">
                             <i class="bi bi-plus-circle"></i> Adicionar Refeição
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
+                        <button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); editDieta('${dieta.id}')">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteDietaConfirm('${dieta.id}')">
+                        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteDietaConfirm('${dieta.id}')">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
