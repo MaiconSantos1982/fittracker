@@ -685,7 +685,7 @@
     </div>
 <!-- Modal: Adicionar Refeição -->
 <div class="modal fade" id="adicionarRefeicaoModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Adicionar Refeição</h5>
@@ -693,25 +693,46 @@
             </div>
             <div class="modal-body">
                 <form id="refeicaoForm">
-                    <div class="mb-3">
-                        <label class="form-label">Tipo de Refeição *</label>
-                        <input type="text" class="form-control" id="refeicaoNome" placeholder="Ex: Café da Manhã, Almoço, Lanche..." required>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Refeição *</label>
+                            <select class="form-select" id="refeicaoTipo" required onchange="toggleRefeicaoOutro()">
+                                <option value="">Selecione...</option>
+                                <option value="Café da manhã">Café da manhã</option>
+                                <option value="Lanche da manhã">Lanche da manhã</option>
+                                <option value="Almoço">Almoço</option>
+                                <option value="Lanche da tarde">Lanche da tarde</option>
+                                <option value="Jantar">Jantar</option>
+                                <option value="Ceia">Ceia</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="refeicaoOutroDiv" style="display: none;">
+                            <label class="form-label">Especifique o tipo *</label>
+                            <input type="text" class="form-control" id="refeicaoOutro" placeholder="Ex: Pré-treino, Pós-treino...">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Horário</label>
-                        <input type="time" class="form-control" id="refeicaoHorario">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Horário</label>
+                            <input type="time" class="form-control" id="refeicaoHorario">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Observações</label>
+                            <input type="text" class="form-control" id="refeicaoDescricao" placeholder="Observações sobre esta refeição...">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Observações</label>
-                        <textarea class="form-control" id="refeicaoDescricao" rows="2" placeholder="Observações sobre esta refeição..."></textarea>
-                    </div>
+
                     <hr>
+                    
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">Alimentos</h6>
-                        <button type="button" class="btn btn-sm btn-success" onclick="adicionarAlimento()">
+                        <button type="button" class="btn btn-sm btn-success" onclick="adicionarLinhaAlimento()">
                             <i class="bi bi-plus-circle"></i> Adicionar Alimento
                         </button>
                     </div>
+
                     <div id="alimentosList">
                         <div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>
                     </div>
@@ -724,6 +745,7 @@
         </div>
     </div>
 </div>
+
 
     <!-- Fechar tags antes destes scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
