@@ -402,11 +402,11 @@ function renderDietasList(dietas) {
         const card = document.createElement('div');
         card.className = 'card mb-3';
         card.innerHTML = `
-            <div class="card-header" style="cursor: pointer;" 
-                 data-bs-toggle="collapse" 
-                 data-bs-target="#dieta-${dieta.id}">
+            <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="flex-grow-1">
+                    <div class="flex-grow-1" style="cursor: pointer;" 
+                         data-bs-toggle="collapse" 
+                         data-bs-target="#dieta-${dieta.id}">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-chevron-right collapse-icon-dieta" style="transition: transform 0.2s;"></i>
                             <div>
@@ -416,13 +416,13 @@ function renderDietasList(dietas) {
                         </div>
                     </div>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-success" onclick="event.stopPropagation(); openAdicionarRefeicaoModal('${dieta.id}')">
+                        <button class="btn btn-sm btn-success" onclick="openAdicionarRefeicaoModal('${dieta.id}')">
                             <i class="bi bi-plus-circle"></i> Adicionar Refeição
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); editDieta('${dieta.id}')">
+                        <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteDietaConfirm('${dieta.id}')">
+                        <button class="btn btn-sm btn-danger" onclick="deleteDietaConfirm('${dieta.id}')">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
