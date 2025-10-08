@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadAlunoSelects();
 });
 
-// NavegaÃ§Ã£o entre seÃ§Ãµes
+// Navegação entre seÃ§Ãµes
 function setupNavigation() {
     const overlay = document.getElementById('sidebar-overlay');
     
@@ -53,7 +53,7 @@ function showSection(sectionName) {
         s.style.display = 'none';
     });
     
-    // Mostra a seÃ§Ã£o selecionada
+    // Mostra a seção selecionada
     const targetSection = document.getElementById(`section-${sectionName}`);
     if (targetSection) {
         targetSection.style.display = 'block';
@@ -66,13 +66,13 @@ function showSection(sectionName) {
         'protocolos': 'Protocolos de Treino',
         'treinos': 'Treinos',
         'dietas': 'Dietas',
-        'medidas': 'Medidas e EvoluÃ§Ã£o',
+        'medidas': 'Medidas e Evolução',
         'agenda': 'Agenda',
         'notificacoes': 'NotificaÃ§Ãµes'
     };
     document.getElementById('currentSection').textContent = titles[sectionName] || sectionName;
     
-    // Carrega dados especÃ­ficos da seÃ§Ã£o
+    // Carrega dados especÃ­ficos da seção
     if (sectionName === 'alunos') loadAlunos();
     if (sectionName === 'protocolos') {
         loadAlunosSelect('filtroAlunoProtocolos');
@@ -253,7 +253,7 @@ async function loadAlunoSelects() {
 
             if (error) throw error;
 
-            // Manter apenas a primeira opÃ§Ã£o
+            // Manter apenas a primeira opção
             select.innerHTML = '<option value="">Selecione...</option>';
             
             alunos?.forEach(aluno => {
@@ -336,7 +336,7 @@ function renderTreinosList(treinos) {
 }
 
 function viewTreino(id) {
-    alert('FunÃ§Ã£o de visualizar treino em desenvolvimento. ID: ' + id);
+    alert('Função de visualizar treino em desenvolvimento. ID: ' + id);
 }
 
 async function deleteTreinoLegado(id) {
@@ -417,7 +417,7 @@ function renderDietasList(dietas) {
                     </div>
                     <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-success" onclick="openAdicionarRefeicaoModal('${dieta.id}')">
-                            <i class="bi bi-plus-circle"></i> Adicionar RefeiÃ§Ã£o
+                            <i class="bi bi-plus-circle"></i> Adicionar Refeição
                         </button>
                         <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
                             <i class="bi bi-pencil"></i>
@@ -483,7 +483,7 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
     if (!container) return;
 
     if (!refeicoes || refeicoes.length === 0) {
-        container.innerHTML = '<div class="alert alert-info">Nenhuma refeiÃ§Ã£o. Clique em "Adicionar RefeiÃ§Ã£o".</div>';
+        container.innerHTML = '<div class="alert alert-info">Nenhuma refeição. Clique em "Adicionar Refeição".</div>';
         return;
     }
 
@@ -506,7 +506,7 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
                 <div class="card-header bg-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>${index + 1}. ${refeicao.tipo_refeicao || 'RefeiÃ§Ã£o'}</strong>
+                            <strong>${index + 1}. ${refeicao.tipo_refeicao || 'Refeição'}</strong>
                             ${refeicao.horario ? `<small class="text-muted ms-2">(${refeicao.horario})</small>` : ''}
                         </div>
                         <div>
@@ -524,7 +524,7 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
                     ${alimentos && alimentos.length > 0 ? `
                         <div class="table-responsive">
                             <table class="table table-sm mb-0">
-                                <thead><tr><th>Alimento</th><th>Quantidade</th><th>ObservaÃ§Ã£o</th></tr></thead>
+                                <thead><tr><th>Alimento</th><th>Quantidade</th><th>Observação</th></tr></thead>
                                 <tbody>
                                     ${alimentos.map(alimento => `
                                         <tr>
@@ -595,7 +595,7 @@ function adicionarLinhaAlimento() {
             <input type="text" class="form-control alimento-quantidade" placeholder="Ex: 50g, 1 xÃ­cara">
         </div>
         <div class="col-md-4">
-            <label class="form-label">ObservaÃ§Ã£o (opcional)</label>
+            <label class="form-label">Observação (opcional)</label>
             <input type="text" class="form-control alimento-observacao" placeholder="Ex: Com banana">
         </div>
         <div class="col-md-1">
@@ -652,7 +652,7 @@ async function saveRefeicao() {
         
         if (!tipoSelectElement) {
             console.error('Elemento refeicaoTipo nÃ£o encontrado');
-            alert('Erro: Campo "Tipo de RefeiÃ§Ã£o" nÃ£o encontrado no formulÃ¡rio.');
+            alert('Erro: Campo "Tipo de Refeição" nÃ£o encontrado no formulÃ¡rio.');
             return;
         }
         
@@ -662,7 +662,7 @@ async function saveRefeicao() {
         const horario = document.getElementById('refeicaoHorario')?.value || '';
         const observacoes = document.getElementById('refeicaoDescricao')?.value || '';
 
-        if (!tipoRefeicao) return alert('Selecione o tipo de refeiÃ§Ã£o!');
+        if (!tipoRefeicao) return alert('Selecione o tipo de refeição!');
 
         const alimentos = coletarAlimentosDosInputs();
 
@@ -690,7 +690,7 @@ async function saveRefeicao() {
             if (error) throw error;
         }
 
-        alert('RefeiÃ§Ã£o salva!');
+        alert('Refeição salva!');
         bootstrap.Modal.getInstance(document.getElementById('adicionarRefeicaoModal')).hide();
         await loadRefeicoesDieta(window.currentDietaId);
         await loadDietas();
@@ -713,7 +713,7 @@ async function editRefeicao(refeicaoId, dietaId) {
         window.currentDietaId = dietaId;
         window.editingRefeicaoId = refeicaoId;
 
-        // Preencher tipo de refeiÃ§Ã£o
+        // Preencher tipo de refeição
         const tiposPreDefinidos = ['CafÃ© da manhÃ£', 'Lanche da manhÃ£', 'AlmoÃ§o', 'Lanche da tarde', 'Jantar', 'Ceia'];
         if (tiposPreDefinidos.includes(refeicao.tipo_refeicao)) {
             document.getElementById('refeicaoTipo').value = refeicao.tipo_refeicao;
@@ -764,7 +764,7 @@ function adicionarAlimento() {
     const nome = prompt('Nome do alimento:');
     if (!nome) return;
     const quantidade = prompt('Quantidade (ex: 100g, 1 xÃ­cara):');
-    const observacao = prompt('ObservaÃ§Ã£o (opcional):');
+    const observacao = prompt('Observação (opcional):');
 
     window.alimentosTemp = window.alimentosTemp || [];
     window.alimentosTemp.push({ nome, quantidade, observacao });
@@ -801,7 +801,7 @@ async function saveRefeicao() {
         const horario = document.getElementById('refeicaoHorario').value;
         const observacoes = document.getElementById('refeicaoDescricao').value;
 
-        if (!tipoRefeicao) return alert('Informe o tipo de refeiÃ§Ã£o!');
+        if (!tipoRefeicao) return alert('Informe o tipo de refeição!');
 
         const refeicaoData = {
             dieta_id: window.currentDietaId,
@@ -827,7 +827,7 @@ async function saveRefeicao() {
             if (error) throw error;
         }
 
-        alert('RefeiÃ§Ã£o salva!');
+        alert('Refeição salva!');
         bootstrap.Modal.getInstance(document.getElementById('adicionarRefeicaoModal')).hide();
         await loadRefeicoesDieta(window.currentDietaId);
         await loadDietas();
@@ -875,7 +875,7 @@ async function editRefeicao(refeicaoId, dietaId) {
 }
 
 async function deleteRefeicao(refeicaoId, dietaId) {
-    if (!confirm('Excluir esta refeiÃ§Ã£o?')) return;
+    if (!confirm('Excluir esta refeição?')) return;
     
     try {
         const { error } = await supabase
@@ -885,7 +885,7 @@ async function deleteRefeicao(refeicaoId, dietaId) {
 
         if (error) throw error;
 
-        alert('RefeiÃ§Ã£o excluÃ­da!');
+        alert('Refeição excluÃ­da!');
         await loadRefeicoesDieta(dietaId);
         await loadDietas();
     } catch (error) {
