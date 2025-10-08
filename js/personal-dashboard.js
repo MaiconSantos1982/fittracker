@@ -489,6 +489,18 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
 
     let html = '';
     refeicoes.forEach((refeicao, index) => {
+        // ✅ PARSE DO CAMPO ALIMENTOS
+        let alimentos = [];
+        try {
+            if (typeof refeicao.alimentos === 'string') {
+                alimentos = JSON.parse(refeicao.alimentos);
+            } else if (Array.isArray(refeicao.alimentos)) {
+                alimentos = refeicao.alimentos;
+            }
+        } catch (e) {
+            console.error('Erro ao fazer parse de alimentos:', e);
+        }
+
         html += `
             <div class="card mb-2 shadow-sm">
                 <div class="card-header bg-white">
@@ -509,12 +521,12 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
                 </div>
                 <div class="card-body">
                     ${refeicao.observacoes ? `<p class="mb-2"><small><strong>Obs:</strong> ${refeicao.observacoes}</small></p>` : ''}
-                    ${refeicao.alimentos && refeicao.alimentos.length > 0 ? `
+                    ${alimentos && alimentos.length > 0 ? `
                         <div class="table-responsive">
                             <table class="table table-sm mb-0">
                                 <thead><tr><th>Alimento</th><th>Quantidade</th><th>Observação</th></tr></thead>
                                 <tbody>
-                                    ${refeicao.alimentos.map(alimento => `
+                                    ${alimentos.map(alimento => `
                                         <tr>
                                             <td>${alimento.nome}</td>
                                             <td>${alimento.quantidade || '-'}</td>
@@ -534,6 +546,9 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
 }
 
 async function openAdicionarRefeicaoModal(dietaId) {
+    // Parar propagação do evento de collapse
+    event?.stopPropagation();
+    
     window.currentDietaId = dietaId;
     delete window.editingRefeicaoId;
     document.getElementById('refeicaoForm').reset();
@@ -634,7 +649,20 @@ async function editRefeicao(refeicaoId, dietaId) {
         document.getElementById('refeicaoNome').value = refeicao.tipo_refeicao;
         document.getElementById('refeicaoHorario').value = refeicao.horario || '';
         document.getElementById('refeicaoDescricao').value = refeicao.observacoes || '';
-        window.alimentosTemp = refeicao.alimentos || [];
+        
+        // ✅ PARSE DOS ALIMENTOS
+        let alimentos = [];
+        try {
+            if (typeof refeicao.alimentos === 'string') {
+                alimentos = JSON.parse(refeicao.alimentos);
+            } else if (Array.isArray(refeicao.alimentos)) {
+                alimentos = refeicao.alimentos;
+            }
+        } catch (e) {
+            console.error('Erro ao fazer parse:', e);
+        }
+        
+        window.alimentosTemp = alimentos;
         renderAlimentosTemp();
 
         new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
