@@ -647,15 +647,23 @@ function coletarAlimentosDosInputs() {
 
 async function saveRefeicao() {
     try {
-        const tipoSelect = document.getElementById('refeicaoTipo').value;
-        const tipoOutro = document.getElementById('refeicaoOutro').value;
+        const tipoSelectElement = document.getElementById('refeicaoTipo');
+        const tipoOutroElement = document.getElementById('refeicaoOutro');
+        
+        if (!tipoSelectElement) {
+            console.error('Elemento refeicaoTipo não encontrado');
+            alert('Erro: Campo "Tipo de Refeição" não encontrado no formulário.');
+            return;
+        }
+        
+        const tipoSelect = tipoSelectElement.value;
+        const tipoOutro = tipoOutroElement ? tipoOutroElement.value : '';
         const tipoRefeicao = tipoSelect === 'Outro' ? tipoOutro : tipoSelect;
-        const horario = document.getElementById('refeicaoHorario').value;
-        const observacoes = document.getElementById('refeicaoDescricao').value;
+        const horario = document.getElementById('refeicaoHorario')?.value || '';
+        const observacoes = document.getElementById('refeicaoDescricao')?.value || '';
 
         if (!tipoRefeicao) return alert('Selecione o tipo de refeição!');
 
-        // Coletar alimentos dos inputs
         const alimentos = coletarAlimentosDosInputs();
 
         const refeicaoData = {
@@ -687,6 +695,7 @@ async function saveRefeicao() {
         await loadRefeicoesDieta(window.currentDietaId);
         await loadDietas();
     } catch (error) {
+        console.error('Erro completo:', error);
         alert('Erro: ' + error.message);
     }
 }
