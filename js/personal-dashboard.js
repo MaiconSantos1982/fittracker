@@ -739,42 +739,6 @@ async function editRefeicao(refeicaoId, dietaId) {
     }
 }
 
-function adicionarAlimento() {
-    const nome = prompt('Nome do alimento:');
-    if (!nome) return;
-    const quantidade = prompt('Quantidade (ex: 100g, 1 xícara):');
-    const observacao = prompt('Observação (opcional):');
-
-    window.alimentosTemp = window.alimentosTemp || [];
-    window.alimentosTemp.push({ nome, quantidade, observacao });
-    renderAlimentosTemp();
-}
-
-function renderAlimentosTemp() {
-    const container = document.getElementById('alimentosList');
-    if (!window.alimentosTemp || window.alimentosTemp.length === 0) {
-        container.innerHTML = '<div class="alert alert-info">Nenhum alimento</div>';
-        return;
-    }
-
-    let html = '<table class="table table-sm"><thead><tr><th>Alimento</th><th>Qtd</th><th>Ações</th></tr></thead><tbody>';
-    window.alimentosTemp.forEach((alimento, i) => {
-        html += `<tr>
-            <td>${alimento.nome}</td>
-            <td>${alimento.quantidade || '-'}</td>
-            <td><button class="btn btn-sm btn-danger" onclick="removerAlimento(${i})"><i class="bi bi-trash"></i></button></td>
-        </tr>`;
-    });
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
-
-function removerAlimento(index) {
-    window.alimentosTemp.splice(index, 1);
-    renderAlimentosTemp();
-}
-
-
 async function deleteRefeicao(refeicaoId, dietaId) {
     if (!confirm('Excluir esta refeição?')) return;
     
