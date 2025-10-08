@@ -1,21 +1,50 @@
-// Inicializar Supabase
-const supabase = supabase.createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_KEY');
-
+// Aguardar o Supabase ser inicializado (ele vem do config.js)
 let exercicioCounter = 0;
 let exerciciosAdicionados = [];
-
-// Carregar protocolos ao iniciar
-document.addEventListener('DOMContentLoaded', function() {
-    carregarGruposMusculares();
-    carregarAlunos();
-    carregarProtocolos();
-});
-
 let gruposMusculares = [];
 let alunosDisponiveis = [];
 
+// Carregar protocolos ao iniciar
+document.addEventListener('DOMContentLoaded', function() {
+    // Aguardar Supabase estar disponível
+    setTimeout(() => {
+        if (typeof supabase !== 'undefined') {
+            carregarGruposMusculares();
+            carregarAlunosProtocolo();
+        }
+    }, 500);
+    
+    // Configurar evento de mudança no objetivo
+    const objetivoSelect = document.getElementById('objetivoProtocolo');
+    const objetivoOutrosContainer = document.getElementById('objetivoOutrosContainer');
+    
+    if (objetivoSelect) {
+        objetivoSelect.addEventListener('change', function() {
+            if (this.value === 'outros') {
+                objetivoOutrosContainer.style.display = 'block';
+            } else {
+                objetivoOutrosContainer.style.display = 'none';
+            }
+        });
+    }
+});
+
+// Função para verificar quando entrar na seção de protocolos
+document.addEventListener('click', function(e) {
+    if (e.target.closest('[data-section="protocolos"]')) {
+        setTimeout(() => {
+            carregarProtocolos();
+        }, 300);
+    }
+});
+
 // Carregar grupos musculares
 async function carregarGruposMusculares() {
+    if (typeof supabase === 'undefined') {
+        console.error('Supabase não está disponível ainda');
+        return;
+    }
+    
     const { data, error } = await supabase
         .from('fit_grupos_musculares')
         .select('*')
@@ -26,30 +55,44 @@ async function carregarGruposMusculares() {
         return;
     }
     
-    gruposMusculares = data;
+    gruposMusculares = data || [];
 }
 
-// Carregar alunos do personal
-async function carregarAlunos() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { data, error } = await supabase
-        .from('fit_alunos')
-        .select('id, nome')
-        .eq('personal_id', user.id)
-        .order('nome', { ascending: true });
-    
-    if (error) {
-        console.error('Erro ao carregar alunos:', error);
+// Carregar alunos do personal para o protocolo
+async function carregarAlunosProtocolo() {
+    if (typeof supabase === 'undefined') {
+        console.error('Supabase não está disponível ainda');
         return;
     }
     
-    alunosDisponiveis = data;
-    renderizarSelectAlunos();
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+            console.error('Usuário não autenticado');
+            return;
+        }
+        
+        const { data, error } = await supabase
+            .from('fit_alunos')
+            .select('id, nome')
+            .eq('personal_id', user.id)
+            .order('nome', { ascending: true });
+        
+        if (error) {
+            console.error('Erro ao carregar alunos:', error);
+            return;
+        }
+        
+        alunosDisponiveis = data || [];
+        renderizarSelectAlunosProtocolo();
+    } catch (err) {
+        console.error('Erro ao buscar alunos:', err);
+    }
 }
 
-// Renderizar select de alunos no modal
-function renderizarSelectAlunos() {
+// Renderizar select de alunos no modal de protocolo
+function renderizarSelectAlunosProtocolo() {
     const select = document.getElementById('alunoProtocolo');
     if (!select) return;
     
@@ -61,29 +104,44 @@ function renderizarSelectAlunos() {
 
 // Carregar protocolos do banco
 async function carregarProtocolos() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { data, error } = await supabase
-        .from('fit_protocolos')
-        .select(`
-            *,
-            fit_alunos!inner(nome),
-            fit_exercicios(count)
-        `)
-        .eq('personal_id', user.id)
-        .order('created_at', { ascending: false });
-    
-    if (error) {
-        console.error('Erro ao carregar protocolos:', error);
+    if (typeof supabase === 'undefined') {
+        console.error('Supabase não está disponível ainda');
         return;
     }
     
-    renderizarProtocolos(data);
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+            console.error('Usuário não autenticado');
+            return;
+        }
+        
+        const { data, error } = await supabase
+            .from('fit_protocolos')
+            .select(`
+                *,
+                fit_alunos!inner(nome)
+            `)
+            .eq('personal_id', user.id)
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Erro ao carregar protocolos:', error);
+            return;
+        }
+        
+        renderizarProtocolos(data || []);
+    } catch (err) {
+        console.error('Erro ao buscar protocolos:', err);
+    }
 }
 
 // Renderizar cards de protocolos
 function renderizarProtocolos(protocolos) {
     const container = document.getElementById('protocolosContainer');
+    
+    if (!container) return;
     
     if (protocolos.length === 0) {
         container.innerHTML = `
@@ -96,7 +154,6 @@ function renderizarProtocolos(protocolos) {
     }
     
     container.innerHTML = protocolos.map(protocolo => {
-        const totalExercicios = protocolo.fit_exercicios?.[0]?.count || 0;
         const statusBadge = protocolo.ativo 
             ? '<span class="badge bg-success">Ativo</span>' 
             : '<span class="badge bg-secondary">Inativo</span>';
@@ -111,7 +168,6 @@ function renderizarProtocolos(protocolos) {
                             <strong>Objetivo:</strong> ${protocolo.objetivo}
                         </p>
                         ${statusBadge}
-                        <span class="badge bg-secondary">${totalExercicios} exercícios</span>
                     </div>
                     <div class="card-footer bg-transparent">
                         <button class="btn btn-sm btn-outline-primary" onclick="editarProtocolo('${protocolo.id}')">
@@ -129,6 +185,11 @@ function renderizarProtocolos(protocolos) {
 
 // Buscar exercícios da biblioteca
 async function buscarExerciciosBiblioteca(termo, grupoId = null) {
+    if (typeof supabase === 'undefined') {
+        console.error('Supabase não está disponível ainda');
+        return [];
+    }
+    
     let query = supabase
         .from('fit_exercicios_biblioteca')
         .select(`
@@ -149,13 +210,15 @@ async function buscarExerciciosBiblioteca(termo, grupoId = null) {
         return [];
     }
     
-    return data;
+    return data || [];
 }
 
 // Adicionar exercício dinamicamente
-function adicionarExercicio() {
+function adicionarExercicioProtocolo() {
     exercicioCounter++;
-    const container = document.getElementById('exerciciosContainer');
+    const container = document.getElementById('exerciciosProtocoloContainer');
+    
+    if (!container) return;
     
     const gruposOptions = gruposMusculares.map(g => 
         `<option value="${g.id}">${g.nome}</option>`
@@ -166,7 +229,7 @@ function adicionarExercicio() {
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="mb-0">Exercício ${exercicioCounter}</h6>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerExercicio(${exercicioCounter})">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerExercicioProtocolo(${exercicioCounter})">
                         <i class="bi bi-x"></i>
                     </button>
                 </div>
@@ -174,22 +237,12 @@ function adicionarExercicio() {
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Grupo Muscular</label>
-                        <select class="form-select" id="grupoMuscular-${exercicioCounter}" onchange="filtrarExerciciosPorGrupo(${exercicioCounter})">
+                        <select class="form-select" id="grupoMuscular-${exercicioCounter}">
                             <option value="">Selecione o grupo</option>
                             ${gruposOptions}
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Buscar Exercício da Biblioteca</label>
-                        <input type="text" class="form-control" id="buscaExercicio-${exercicioCounter}" 
-                               placeholder="Digite para buscar..."
-                               oninput="buscarExercicioNaBiblioteca(${exercicioCounter})">
-                        <div id="resultadosBusca-${exercicioCounter}" class="list-group mt-2" style="max-height: 200px; overflow-y: auto;"></div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-12 mb-3">
                         <label class="form-label">Nome do Exercício</label>
                         <input type="text" class="form-control" id="nomeExercicio-${exercicioCounter}" required>
                         <input type="hidden" id="exercicioBibliotecaId-${exercicioCounter}">
@@ -198,7 +251,7 @@ function adicionarExercicio() {
                 
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Número de Séries</label>
+                        <label class="form-label">Séries</label>
                         <input type="number" class="form-control" id="numeroSeries-${exercicioCounter}" min="1" value="3">
                     </div>
                     <div class="col-md-3 mb-3">
@@ -254,131 +307,122 @@ function adicionarExercicio() {
     exerciciosAdicionados.push(exercicioCounter);
 }
 
-// Buscar exercício na biblioteca em tempo real
-async function buscarExercicioNaBiblioteca(counterId) {
-    const termo = document.getElementById(`buscaExercicio-${counterId}`).value;
-    const grupoId = document.getElementById(`grupoMuscular-${counterId}`).value;
-    const resultadosDiv = document.getElementById(`resultadosBusca-${counterId}`);
-    
-    if (termo.length < 2) {
-        resultadosDiv.innerHTML = '';
-        return;
-    }
-    
-    const exercicios = await buscarExerciciosBiblioteca(termo, grupoId || null);
-    
-    if (exercicios.length === 0) {
-        resultadosDiv.innerHTML = '<div class="list-group-item text-muted">Nenhum exercício encontrado</div>';
-        return;
-    }
-    
-    resultadosDiv.innerHTML = exercicios.map(ex => `
-        <button type="button" class="list-group-item list-group-item-action" 
-                onclick="selecionarExercicioBiblioteca(${counterId}, '${ex.id}', '${ex.nome.replace(/'/g, "\\'")}', '${ex.grupo_muscular_id}', '${ex.video_url || ''}')">
-            <strong>${ex.nome}</strong><br>
-            <small class="text-muted">${ex.fit_grupos_musculares.nome}</small>
-        </button>
-    `).join('');
-}
-
-// Selecionar exercício da biblioteca
-function selecionarExercicioBiblioteca(counterId, exercicioId, nome, grupoId, videoUrl) {
-    document.getElementById(`nomeExercicio-${counterId}`).value = nome;
-    document.getElementById(`exercicioBibliotecaId-${counterId}`).value = exercicioId;
-    document.getElementById(`grupoMuscular-${counterId}`).value = grupoId;
-    if (videoUrl && videoUrl !== 'null') {
-        document.getElementById(`videoUrl-${counterId}`).value = videoUrl;
-    }
-    document.getElementById(`resultadosBusca-${counterId}`).innerHTML = '';
-    document.getElementById(`buscaExercicio-${counterId}`).value = '';
-}
-
 // Remover exercício
-function removerExercicio(id) {
+function removerExercicioProtocolo(id) {
     const exercicio = document.getElementById(`exercicio-${id}`);
-    exercicio.remove();
-    exerciciosAdicionados = exerciciosAdicionados.filter(e => e !== id);
+    if (exercicio) {
+        exercicio.remove();
+        exerciciosAdicionados = exerciciosAdicionados.filter(e => e !== id);
+    }
 }
 
 // Salvar protocolo no banco
 async function salvarProtocolo() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const alunoId = document.getElementById('alunoProtocolo').value;
-    const nome = document.getElementById('nomeProtocolo').value;
-    const objetivo = document.getElementById('objetivoProtocolo').value;
-    const objetivoOutros = document.getElementById('objetivoOutros')?.value || null;
-    const dataInicio = document.getElementById('dataInicio')?.value || new Date().toISOString().split('T')[0];
-    const dataFim = document.getElementById('dataFim')?.value || null;
-    
-    if (!nome || !alunoId) {
-        alert('Por favor, preencha o nome do protocolo e selecione um aluno');
+    if (typeof supabase === 'undefined') {
+        alert('Sistema ainda carregando. Aguarde um momento.');
         return;
     }
     
-    // Inserir protocolo
-    const { data: protocolo, error: errorProtocolo } = await supabase
-        .from('fit_protocolos')
-        .insert({
-            personal_id: user.id,
-            aluno_id: alunoId,
-            nome: nome,
-            objetivo: objetivo,
-            objetivo_outros: objetivoOutros,
-            ativo: true,
-            data_inicio: dataInicio,
-            data_fim: dataFim
-        })
-        .select()
-        .single();
-    
-    if (errorProtocolo) {
-        console.error('Erro ao salvar protocolo:', errorProtocolo);
-        alert('Erro ao salvar protocolo: ' + errorProtocolo.message);
-        return;
-    }
-    
-    // Coletar e inserir exercícios
-    if (exerciciosAdicionados.length > 0) {
-        const exercicios = exerciciosAdicionados.map(id => ({
-            protocolo_id: protocolo.id,
-            exercicio_biblioteca_id: document.getElementById(`exercicioBibliotecaId-${id}`).value || null,
-            nome: document.getElementById(`nomeExercicio-${id}`).value,
-            grupo_muscular: document.getElementById(`grupoMuscular-${id}`).value,
-            repeticoes: document.getElementById(`repeticoes-${id}`).value,
-            descanso: parseInt(document.getElementById(`descanso-${id}`).value) || 0,
-            ordem: parseInt(document.getElementById(`ordem-${id}`).value) || id,
-            metodo: document.getElementById(`metodo-${id}`).value || 'normal',
-            objetivo_exercicio: document.getElementById(`objetivoExercicio-${id}`).value,
-            video_url: document.getElementById(`videoUrl-${id}`).value || null,
-            numero_series: parseInt(document.getElementById(`numeroSeries-${id}`).value) || 3,
-            dica: document.getElementById(`dica-${id}`).value || null,
-            series_detalhes: []
-        }));
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
         
-        const { error: errorExercicios } = await supabase
-            .from('fit_exercicios')
-            .insert(exercicios);
-        
-        if (errorExercicios) {
-            console.error('Erro ao salvar exercícios:', errorExercicios);
-            alert('Erro ao salvar exercícios: ' + errorExercicios.message);
+        if (!user) {
+            alert('Você precisa estar logado');
             return;
         }
+        
+        const alunoId = document.getElementById('alunoProtocolo').value;
+        const nome = document.getElementById('nomeProtocolo').value;
+        const objetivo = document.getElementById('objetivoProtocolo').value;
+        const objetivoOutros = document.getElementById('objetivoOutros')?.value || null;
+        const dataInicio = document.getElementById('dataInicio')?.value || new Date().toISOString().split('T')[0];
+        const dataFim = document.getElementById('dataFim')?.value || null;
+        
+        if (!nome || !alunoId) {
+            alert('Por favor, preencha o nome do protocolo e selecione um aluno');
+            return;
+        }
+        
+        // Inserir protocolo
+        const { data: protocolo, error: errorProtocolo } = await supabase
+            .from('fit_protocolos')
+            .insert({
+                personal_id: user.id,
+                aluno_id: alunoId,
+                nome: nome,
+                objetivo: objetivo,
+                objetivo_outros: objetivoOutros,
+                ativo: true,
+                data_inicio: dataInicio,
+                data_fim: dataFim
+            })
+            .select()
+            .single();
+        
+        if (errorProtocolo) {
+            console.error('Erro ao salvar protocolo:', errorProtocolo);
+            alert('Erro ao salvar protocolo: ' + errorProtocolo.message);
+            return;
+        }
+        
+        // Coletar e inserir exercícios
+        if (exerciciosAdicionados.length > 0) {
+            const exercicios = exerciciosAdicionados.map(id => ({
+                protocolo_id: protocolo.id,
+                exercicio_biblioteca_id: document.getElementById(`exercicioBibliotecaId-${id}`)?.value || null,
+                nome: document.getElementById(`nomeExercicio-${id}`).value,
+                grupo_muscular: document.getElementById(`grupoMuscular-${id}`).value,
+                repeticoes: document.getElementById(`repeticoes-${id}`).value,
+                descanso: parseInt(document.getElementById(`descanso-${id}`).value) || 0,
+                ordem: parseInt(document.getElementById(`ordem-${id}`).value) || id,
+                metodo: document.getElementById(`metodo-${id}`).value || 'normal',
+                objetivo_exercicio: document.getElementById(`objetivoExercicio-${id}`).value,
+                video_url: document.getElementById(`videoUrl-${id}`).value || null,
+                numero_series: parseInt(document.getElementById(`numeroSeries-${id}`).value) || 3,
+                dica: document.getElementById(`dica-${id}`).value || null,
+                series_detalhes: []
+            }));
+            
+            const { error: errorExercicios } = await supabase
+                .from('fit_exercicios')
+                .insert(exercicios);
+            
+            if (errorExercicios) {
+                console.error('Erro ao salvar exercícios:', errorExercicios);
+                alert('Erro ao salvar exercícios: ' + errorExercicios.message);
+                return;
+            }
+        }
+        
+        // Fechar modal e recarregar
+        const modalElement = document.getElementById('modalNovoProtocolo');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
+        
+        limparFormularioProtocolo();
+        carregarProtocolos();
+        
+        alert('Protocolo salvo com sucesso!');
+    } catch (err) {
+        console.error('Erro geral ao salvar protocolo:', err);
+        alert('Erro ao salvar protocolo: ' + err.message);
     }
-    
-    // Fechar modal e recarregar
-    bootstrap.Modal.getInstance(document.getElementById('modalNovoProtocolo')).hide();
-    limparFormulario();
-    carregarProtocolos();
-    
-    alert('Protocolo salvo com sucesso!');
 }
 
 // Limpar formulário
-function limparFormulario() {
-    document.getElementById('formProtocolo').reset();
-    document.getElementById('exerciciosContainer').innerHTML = '';
+function limparFormularioProtocolo() {
+    const form = document.getElementById('formProtocolo');
+    if (form) {
+        form.reset();
+    }
+    
+    const container = document.getElementById('exerciciosProtocoloContainer');
+    if (container) {
+        container.innerHTML = '';
+    }
+    
     exercicioCounter = 0;
     exerciciosAdicionados = [];
 }
@@ -387,17 +431,32 @@ function limparFormulario() {
 async function excluirProtocolo(id) {
     if (!confirm('Deseja realmente excluir este protocolo? Todos os exercícios serão removidos.')) return;
     
-    const { error } = await supabase
-        .from('fit_protocolos')
-        .delete()
-        .eq('id', id);
-    
-    if (error) {
-        console.error('Erro ao excluir protocolo:', error);
-        alert('Erro ao excluir protocolo');
+    if (typeof supabase === 'undefined') {
+        alert('Sistema ainda carregando. Aguarde um momento.');
         return;
     }
     
-    alert('Protocolo excluído com sucesso!');
-    carregarProtocolos();
+    try {
+        const { error } = await supabase
+            .from('fit_protocolos')
+            .delete()
+            .eq('id', id);
+        
+        if (error) {
+            console.error('Erro ao excluir protocolo:', error);
+            alert('Erro ao excluir protocolo');
+            return;
+        }
+        
+        alert('Protocolo excluído com sucesso!');
+        carregarProtocolos();
+    } catch (err) {
+        console.error('Erro ao excluir:', err);
+        alert('Erro ao excluir protocolo');
+    }
+}
+
+// Editar protocolo (funcionalidade futura)
+function editarProtocolo(id) {
+    alert('Funcionalidade de edição em desenvolvimento');
 }
