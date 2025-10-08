@@ -396,7 +396,7 @@ function renderDietasList(dietas) {
     container.innerHTML = '';
 
     dietas.forEach(dieta => {
-        const nomeAluno = dieta.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
+        const nomeAluno = dieta.aluno?.profile?.full_name || 'Aluno não encontrado';
         const numRefeicoes = dieta.refeicoes?.[0]?.count || 0;
         
         const card = document.createElement('div');
@@ -411,14 +411,14 @@ function renderDietasList(dietas) {
                             <i class="bi bi-chevron-right collapse-icon-dieta" style="transition: transform 0.2s;"></i>
                             <div>
                                 <h5 class="mb-0">${dieta.nome}</h5>
-                                <small class="text-muted">${nomeAluno} â€¢ ${numRefeicoes} refeiÃ§Ãµes</small>
+                                <small class="text-muted">${nomeAluno} • ${numRefeicoes} refeicoes</small>
                             </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-success" onclick="openAdicionarRefeicaoModal('${dieta.id}')">
-    <i class="bi bi-plus-circle"></i> Adicionar Refeicao
-</button>
+                            <i class="bi bi-plus-circle"></i> Adicionar Refeicao
+                        </button>
                         <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
                             <i class="bi bi-pencil"></i>
                         </button>
@@ -434,7 +434,7 @@ function renderDietasList(dietas) {
                     <div id="refeicoes-dieta-${dieta.id}">
                         <div class="text-center py-3">
                             <div class="spinner-border spinner-border-sm"></div>
-                            <span class="ms-2">Carregando refeiÃ§Ãµes...</span>
+                            <span class="ms-2">Carregando refeicoes...</span>
                         </div>
                     </div>
                 </div>
