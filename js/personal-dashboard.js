@@ -545,15 +545,211 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
     container.innerHTML = html;
 }
 
+// ============================================
+// FUNÇÕES DE REFEIÇÕES
+// ============================================
+
 async function openAdicionarRefeicaoModal(dietaId) {
-    // Parar propagação do evento de collapse   
     window.currentDietaId = dietaId;
     delete window.editingRefeicaoId;
     document.getElementById('refeicaoForm').reset();
+    document.getElementById('refeicaoOutroDiv').style.display = 'none';
     document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>';
     window.alimentosTemp = [];
     new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
 }
+
+function toggleRefeicaoOutro() {
+    const tipo = document.getElementById('refeicaoTipo').value;
+    const outroDiv = document.getElementById('refeicaoOutroDiv');
+    
+    if (tipo === 'Outro') {
+        outroDiv.style.display = 'block';
+        document.getElementById('refeicaoOutro').required = true;
+    } else {
+        outroDiv.style.display = 'none';
+        document.getElementById('refeicaoOutro').required = false;
+    }
+}
+
+function adicionarLinhaAlimento() {
+    window.alimentosTemp = window.alimentosTemp || [];
+    
+    const index = window.alimentosTemp.length;
+    const container = document.getElementById('alimentosList');
+    
+    if (window.alimentosTemp.length === 0) {
+        container.innerHTML = '';
+    }
+    
+    const row = document.createElement('div');
+    row.className = 'row mb-2 align-items-end alimento-row';
+    row.dataset.index = index;
+    row.innerHTML = `
+        <div class="col-md-4">
+            <label class="form-label">Alimento</label>
+            <input type="text" class="form-control alimento-nome" placeholder="Ex: Aveia em flocos">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Quantidade</label>
+            <input type="text" class="form-control alimento-quantidade" placeholder="Ex: 50g, 1 xícara">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Observação (opcional)</label>
+            <input type="text" class="form-control alimento-observacao" placeholder="Ex: Com banana">
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-danger w-100" onclick="removerLinhaAlimento(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(row);
+    
+    // Adicionar placeholder no array
+    window.alimentosTemp.push({ nome: '', quantidade: '', observacao: '' });
+}
+
+function removerLinhaAlimento(button) {
+    const row = button.closest('.alimento-row');
+    const index = parseInt(row.dataset.index);
+    
+    row.remove();
+    
+    // Remover do array
+    window.alimentosTemp.splice(index, 1);
+    
+    // Reindexar as linhas restantes
+    document.querySelectorAll('.alimento-row').forEach((row, newIndex) => {
+        row.dataset.index = newIndex;
+    });
+    
+    // Se não houver mais alimentos, mostrar mensagem
+    if (window.alimentosTemp.length === 0) {
+        document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>';
+    }
+}
+
+function coletarAlimentosDosInputs() {
+    const alimentos = [];
+    document.querySelectorAll('.alimento-row').forEach(row => {
+        const nome = row.querySelector('.alimento-nome').value.trim();
+        const quantidade = row.querySelector('.alimento-quantidade').value.trim();
+        const observacao = row.querySelector('.alimento-observacao').value.trim();
+        
+        if (nome) {
+            alimentos.push({ nome, quantidade, observacao });
+        }
+    });
+    return alimentos;
+}
+
+async function saveRefeicao() {
+    try {
+        const tipoSelect = document.getElementById('refeicaoTipo').value;
+        const tipoOutro = document.getElementById('refeicaoOutro').value;
+        const tipoRefeicao = tipoSelect === 'Outro' ? tipoOutro : tipoSelect;
+        const horario = document.getElementById('refeicaoHorario').value;
+        const observacoes = document.getElementById('refeicaoDescricao').value;
+
+        if (!tipoRefeicao) return alert('Selecione o tipo de refeição!');
+
+        // Coletar alimentos dos inputs
+        const alimentos = coletarAlimentosDosInputs();
+
+        const refeicaoData = {
+            dieta_id: window.currentDietaId,
+            tipo_refeicao: tipoRefeicao,
+            horario: horario || null,
+            alimentos: alimentos,
+            observacoes: observacoes || null
+        };
+
+        if (window.editingRefeicaoId) {
+            const { error } = await supabase
+                .from('fit_refeicoes')
+                .update(refeicaoData)
+                .eq('id', window.editingRefeicaoId);
+
+            if (error) throw error;
+            delete window.editingRefeicaoId;
+        } else {
+            const { error } = await supabase
+                .from('fit_refeicoes')
+                .insert(refeicaoData);
+
+            if (error) throw error;
+        }
+
+        alert('Refeição salva!');
+        bootstrap.Modal.getInstance(document.getElementById('adicionarRefeicaoModal')).hide();
+        await loadRefeicoesDieta(window.currentDietaId);
+        await loadDietas();
+    } catch (error) {
+        alert('Erro: ' + error.message);
+    }
+}
+
+async function editRefeicao(refeicaoId, dietaId) {
+    try {
+        const { data: refeicao, error } = await supabase
+            .from('fit_refeicoes')
+            .select('*')
+            .eq('id', refeicaoId)
+            .single();
+
+        if (error) throw error;
+
+        window.currentDietaId = dietaId;
+        window.editingRefeicaoId = refeicaoId;
+
+        // Preencher tipo de refeição
+        const tiposPreDefinidos = ['Café da manhã', 'Lanche da manhã', 'Almoço', 'Lanche da tarde', 'Jantar', 'Ceia'];
+        if (tiposPreDefinidos.includes(refeicao.tipo_refeicao)) {
+            document.getElementById('refeicaoTipo').value = refeicao.tipo_refeicao;
+            document.getElementById('refeicaoOutroDiv').style.display = 'none';
+        } else {
+            document.getElementById('refeicaoTipo').value = 'Outro';
+            document.getElementById('refeicaoOutroDiv').style.display = 'block';
+            document.getElementById('refeicaoOutro').value = refeicao.tipo_refeicao;
+        }
+
+        document.getElementById('refeicaoHorario').value = refeicao.horario || '';
+        document.getElementById('refeicaoDescricao').value = refeicao.observacoes || '';
+        
+        // Parse dos alimentos
+        let alimentos = [];
+        try {
+            if (typeof refeicao.alimentos === 'string') {
+                alimentos = JSON.parse(refeicao.alimentos);
+            } else if (Array.isArray(refeicao.alimentos)) {
+                alimentos = refeicao.alimentos;
+            }
+        } catch (e) {
+            console.error('Erro ao fazer parse:', e);
+        }
+        
+        // Renderizar alimentos
+        const container = document.getElementById('alimentosList');
+        container.innerHTML = '';
+        window.alimentosTemp = [];
+        
+        alimentos.forEach(alimento => {
+            adicionarLinhaAlimento();
+            const rows = document.querySelectorAll('.alimento-row');
+            const lastRow = rows[rows.length - 1];
+            lastRow.querySelector('.alimento-nome').value = alimento.nome || '';
+            lastRow.querySelector('.alimento-quantidade').value = alimento.quantidade || '';
+            lastRow.querySelector('.alimento-observacao').value = alimento.observacao || '';
+        });
+
+        new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
+    } catch (error) {
+        alert('Erro: ' + error.message);
+    }
+}
+
 
 function adicionarAlimento() {
     const nome = prompt('Nome do alimento:');
