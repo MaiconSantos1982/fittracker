@@ -359,8 +359,9 @@ async function deleteTreinoLegado(id) {
 }
 
 // ============================================
-// CARREGAR DIETAS
+// DIETAS - SISTEMA COMPLETO
 // ============================================
+
 async function loadDietas() {
     try {
         const { data: dietas, error } = await supabase
@@ -376,7 +377,6 @@ async function loadDietas() {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-
         renderDietasList(dietas);
     } catch (error) {
         console.error('Erro ao carregar dietas:', error);
@@ -400,17 +400,25 @@ function renderDietasList(dietas) {
         const card = document.createElement('div');
         card.className = 'card mb-3';
         card.innerHTML = `
-            <div class="card-body">
+            <div class="card-header" style="cursor: pointer;" 
+                 data-bs-toggle="collapse" 
+                 data-bs-target="#dieta-${dieta.id}">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-1">${dieta.nome}</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-person"></i> ${nomeAluno}
-                        </small>
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-chevron-right collapse-icon" style="transition: transform 0.2s;"></i>
+                            <div>
+                                <h5 class="mb-0">${dieta.nome}</h5>
+                                <small class="text-muted">${nomeAluno}</small>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <button class="btn btn-sm btn-primary" onclick="viewDieta('${dieta.id}')">
-                            <i class="bi bi-eye"></i> Ver
+                    <div class="d-flex gap-2" onclick="event.stopPropagation();">
+                        <button class="btn btn-sm btn-primary" onclick="openGerenciarDietaModal('${dieta.id}', '${dieta.nome.replace(/'/g, "\\'")}')">
+                            <i class="bi bi-plus-circle"></i> Adicionar Refeição
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
+                            <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-sm btn-danger" onclick="deleteDietaConfirm('${dieta.id}')">
                             <i class="bi bi-trash"></i>
@@ -418,31 +426,291 @@ function renderDietasList(dietas) {
                     </div>
                 </div>
             </div>
+            
+            <div class="collapse" id="dieta-${dieta.id}">
+                <div class="card-body bg-light">
+                    <div id="refeicoes-dieta-${dieta.id}">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm"></div>
+                            <span class="ms-2">Carregando refeições...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
         container.appendChild(card);
+
+        const collapseElement = document.getElementById(`dieta-${dieta.id}`);
+        let refeicoesCarregadas = false;
+
+        collapseElement.addEventListener('show.bs.collapse', async () => {
+            if (!refeicoesCarregadas) {
+                await loadRefeicoesDieta(dieta.id);
+                refeicoesCarregadas = true;
+            }
+            const icon = collapseElement.previousElementSibling.querySelector('.collapse-icon');
+            icon.style.transform = 'rotate(90deg)';
+        });
+
+        collapseElement.addEventListener('hide.bs.collapse', () => {
+            const icon = collapseElement.previousElementSibling.querySelector('.collapse-icon');
+            icon.style.transform = 'rotate(0deg)';
+        });
     });
 }
 
-function viewDieta(id) {
-    alert('Função de visualizar dieta em desenvolvimento. ID: ' + id);
+async function loadRefeicoesDieta(dietaId) {
+    try {
+        const { data: refeicoes, error } = await supabase
+            .from('fit_refeicoes')
+            .select('*')
+            .eq('dieta_id', dietaId)
+            .order('ordem', { ascending: true });
+
+        if (error) throw error;
+        renderRefeicoesDieta(dietaId, refeicoes);
+    } catch (error) {
+        console.error('Erro ao carregar refeições:', error);
+        document.getElementById(`refeicoes-dieta-${dietaId}`).innerHTML = 
+            '<div class="alert alert-danger">Erro ao carregar refeições</div>';
+    }
 }
 
-async function deleteDietaConfirm(id) {
-    if (!confirm('Tem certeza que deseja excluir esta dieta?')) return;
+function renderRefeicoesDieta(dietaId, refeicoes) {
+    const container = document.getElementById(`refeicoes-dieta-${dietaId}`);
+    if (!container) return;
 
+    if (!refeicoes || refeicoes.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhuma refeição. Clique em "Adicionar Refeição".</div>';
+        return;
+    }
+
+    let html = '';
+    refeicoes.forEach((refeicao, index) => {
+        html += `
+            <div class="card mb-2 shadow-sm">
+                <div class="card-header bg-white" style="cursor: pointer;"
+                     data-bs-toggle="collapse" 
+                     data-bs-target="#refeicao-${refeicao.id}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="flex-grow-1">
+                            <i class="bi bi-chevron-right collapse-icon-refeicao" style="transition: transform 0.2s;"></i>
+                            <strong>${refeicao.nome}</strong>
+                            ${refeicao.horario ? `<small class="text-muted ms-2">(${refeicao.horario})</small>` : ''}
+                        </div>
+                        <div class="d-flex gap-2" onclick="event.stopPropagation();">
+                            <button class="btn btn-sm btn-warning" onclick="editRefeicao('${refeicao.id}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteRefeicao('${refeicao.id}', '${dietaId}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="collapse" id="refeicao-${refeicao.id}">
+                    <div class="card-body">
+                        ${refeicao.descricao ? `<p class="mb-2"><small>${refeicao.descricao}</small></p>` : ''}
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead><tr><th>Alimento</th><th>Quantidade</th><th>Calorias</th><th>Observação</th></tr></thead>
+                                <tbody>
+                                    ${refeicao.alimentos && refeicao.alimentos.length > 0 
+                                        ? refeicao.alimentos.map(alimento => `
+                                            <tr>
+                                                <td>${alimento.nome}</td>
+                                                <td>${alimento.quantidade || '-'}</td>
+                                                <td>${alimento.calorias || '-'}</td>
+                                                <td>${alimento.observacao || '-'}</td>
+                                            </tr>
+                                        `).join('')
+                                        : '<tr><td colspan="4" class="text-center">Nenhum alimento adicionado</td></tr>'
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    refeicoes.forEach(refeicao => {
+        const collapseElement = document.getElementById(`refeicao-${refeicao.id}`);
+        collapseElement?.addEventListener('show.bs.collapse', function() {
+            const icon = this.previousElementSibling.querySelector('.collapse-icon-refeicao');
+            icon.style.transform = 'rotate(90deg)';
+        });
+        collapseElement?.addEventListener('hide.bs.collapse', function() {
+            const icon = this.previousElementSibling.querySelector('.collapse-icon-refeicao');
+            icon.style.transform = 'rotate(0deg)';
+        });
+    });
+}
+
+async function openGerenciarDietaModal(dietaId, dietaNome) {
+    window.currentDietaId = dietaId;
+    document.getElementById('gerenciarDietaTitle').textContent = `Refeições - ${dietaNome}`;
+    
+    // Carregar refeições no modal
     try {
-        const { error } = await supabase
-            .from('fit_dietas')
-            .delete()
-            .eq('id', id);
+        const { data: refeicoes, error } = await supabase
+            .from('fit_refeicoes')
+            .select('*')
+            .eq('dieta_id', dietaId)
+            .order('ordem');
 
         if (error) throw error;
 
-        alert('Dieta excluída com sucesso!');
+        const container = document.getElementById('refeicoesModalList');
+        if (!refeicoes || refeicoes.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">Nenhuma refeição. Clique em "Nova Refeição".</div>';
+        } else {
+            container.innerHTML = refeicoes.map((ref, i) => `
+                <div class="card mb-2">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <strong>${ref.nome}</strong>
+                            ${ref.horario ? `<br><small class="text-muted">${ref.horario}</small>` : ''}
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-warning" onclick="editRefeicao('${ref.id}')"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteRefeicao('${ref.id}', '${dietaId}')"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        new bootstrap.Modal(document.getElementById('gerenciarDietaModal')).show();
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+
+async function openNovaRefeicaoModal() {
+    document.getElementById('refeicaoForm').reset();
+    document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Adicione alimentos clicando no botão acima</div>';
+    window.alimentosTemp = [];
+    new bootstrap.Modal(document.getElementById('novaRefeicaoModal')).show();
+}
+
+function adicionarAlimento() {
+    const nome = prompt('Nome do alimento:');
+    if (!nome) return;
+    const quantidade = prompt('Quantidade (ex: 100g, 1 unidade):');
+    const calorias = prompt('Calorias (kcal):');
+    const observacao = prompt('Observação (opcional):');
+
+    window.alimentosTemp = window.alimentosTemp || [];
+    window.alimentosTemp.push({ nome, quantidade, calorias, observacao });
+
+    renderAlimentosTemp();
+}
+
+function renderAlimentosTemp() {
+    const container = document.getElementById('alimentosList');
+    if (!window.alimentosTemp || window.alimentosTemp.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum alimento adicionado</div>';
+        return;
+    }
+
+    let html = '<table class="table table-sm"><thead><tr><th>Alimento</th><th>Qtd</th><th>Cal</th><th>Ações</th></tr></thead><tbody>';
+    window.alimentosTemp.forEach((alimento, i) => {
+        html += `<tr>
+            <td>${alimento.nome}</td>
+            <td>${alimento.quantidade || '-'}</td>
+            <td>${alimento.calorias || '-'}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="removerAlimento(${i})"><i class="bi bi-trash"></i></button></td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function removerAlimento(index) {
+    window.alimentosTemp.splice(index, 1);
+    renderAlimentosTemp();
+}
+
+async function saveRefeicao() {
+    try {
+        const nome = document.getElementById('refeicaoNome').value;
+        const horario = document.getElementById('refeicaoHorario').value;
+        const descricao = document.getElementById('refeicaoDescricao').value;
+
+        if (!nome) return alert('Informe o nome da refeição!');
+
+        const { data: refeicoes } = await supabase
+            .from('fit_refeicoes')
+            .select('ordem')
+            .eq('dieta_id', window.currentDietaId)
+            .order('ordem', { ascending: false })
+            .limit(1);
+
+        const ordem = (refeicoes && refeicoes[0]) ? refeicoes[0].ordem + 1 : 1;
+
+        const { error } = await supabase.from('fit_refeicoes').insert({
+            dieta_id: window.currentDietaId,
+            nome,
+            horario,
+            descricao,
+            alimentos: window.alimentosTemp || [],
+            ordem
+        });
+
+        if (error) throw error;
+
+        alert('Refeição salva!');
+        bootstrap.Modal.getInstance(document.getElementById('novaRefeicaoModal')).hide();
+        openGerenciarDietaModal(window.currentDietaId, 'Dieta');
+        loadRefeicoesDieta(window.currentDietaId);
+    } catch (error) {
+        alert('Erro: ' + error.message);
+    }
+}
+
+async function editDieta(dietaId) {
+    try {
+        const { data: dieta, error } = await supabase
+            .from('fit_dietas')
+            .select('*')
+            .eq('id', dietaId)
+            .single();
+
+        if (error) throw error;
+
+        document.getElementById('dietaAluno').value = dieta.aluno_id;
+        document.getElementById('dietaNome').value = dieta.nome;
+        window.editingDietaId = dietaId;
+
+        new bootstrap.Modal(document.getElementById('criarDietaModal')).show();
+    } catch (error) {
+        alert('Erro: ' + error.message);
+    }
+}
+
+async function deleteDietaConfirm(dietaId) {
+    if (!confirm('Excluir esta dieta e todas as refeições?')) return;
+    try {
+        await supabase.from('fit_dietas').delete().eq('id', dietaId);
+        alert('Dieta excluída!');
         loadDietas();
     } catch (error) {
-        console.error('Erro ao excluir dieta:', error);
-        alert('Erro ao excluir dieta: ' + error.message);
+        alert('Erro: ' + error.message);
+    }
+}
+
+async function deleteRefeicao(refeicaoId, dietaId) {
+    if (!confirm('Excluir esta refeição?')) return;
+    try {
+        await supabase.from('fit_refeicoes').delete().eq('id', refeicaoId);
+        alert('Refeição excluída!');
+        await loadRefeicoesDieta(dietaId);
+    } catch (error) {
+        alert('Erro: ' + error.message);
     }
 }
 
