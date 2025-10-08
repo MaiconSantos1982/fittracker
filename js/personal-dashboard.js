@@ -675,20 +675,20 @@ function renderProtocolos(protocolos) {
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex gap-2 align-items-center" onclick="event.stopPropagation();">
-                        <span class="badge bg-${protocolo.ativo ? 'success' : 'secondary'}">
-                            ${protocolo.ativo ? 'Ativo' : 'Inativo'}
-                        </span>
-                        <button class="btn btn-sm btn-primary" onclick="openGerenciarTreinosModal('${protocolo.id}', '${protocolo.nome.replace(/'/g, "\\'")}')">
-                            <i class="bi bi-plus-circle"></i> Adicionar Treino
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="editProtocolo('${protocolo.id}')">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteProtocolo('${protocolo.id}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
+                    <div class="d-flex gap-2 align-items-center">
+    <span class="badge bg-${protocolo.ativo ? 'success' : 'secondary'}">
+        ${protocolo.ativo ? 'Ativo' : 'Inativo'}
+    </span>
+    <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); openGerenciarTreinosModal('${protocolo.id}', '${protocolo.nome.replace(/'/g, "\\'")}')">
+        <i class="bi bi-plus-circle"></i> Adicionar Treino
+    </button>
+    <button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); editProtocolo('${protocolo.id}')">
+        <i class="bi bi-pencil"></i>
+    </button>
+    <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteProtocolo('${protocolo.id}')">
+        <i class="bi bi-trash"></i>
+    </button>
+</div>
                 </div>
             </div>
             
@@ -846,142 +846,6 @@ function renderTreinosDoProtocolo(protocoloId, treinos) {
     });
 }
 
-
-async function openNovoProtocoloModal() {
-    document.getElementById('protocoloForm').reset();
-    document.getElementById('protocoloId').value = '';
-    document.getElementById('protocoloModalTitle').textContent = 'Novo Protocolo';
-    document.getElementById('protocoloAtivo').checked = true;
-    document.getElementById('objetivoOutrosDiv').style.display = 'none';
-    
-    document.getElementById('protocoloDataInicio').valueAsDate = new Date();
-    
-    await loadAlunosSelect('protocoloAluno');
-    
-    new bootstrap.Modal(document.getElementById('protocoloModal')).show();
-}
-
-function toggleObjetivoOutros() {
-    const objetivo = document.getElementById('protocoloObjetivo').value;
-    const outrosDiv = document.getElementById('objetivoOutrosDiv');
-    
-    if (objetivo === 'Outros') {
-        outrosDiv.style.display = 'block';
-        document.getElementById('protocoloObjetivoOutros').required = true;
-    } else {
-        outrosDiv.style.display = 'none';
-        document.getElementById('protocoloObjetivoOutros').required = false;
-    }
-}
-
-async function saveProtocolo() {
-    try {
-        const id = document.getElementById('protocoloId').value;
-        const alunoId = document.getElementById('protocoloAluno').value;
-        const nome = document.getElementById('protocoloNome').value;
-        const objetivo = document.getElementById('protocoloObjetivo').value;
-        const objetivoOutros = document.getElementById('protocoloObjetivoOutros').value;
-        const dataInicio = document.getElementById('protocoloDataInicio').value;
-        const dataFim = document.getElementById('protocoloDataFim').value;
-        const ativo = document.getElementById('protocoloAtivo').checked;
-
-        if (!alunoId || !nome || !objetivo) {
-            alert('Preencha todos os campos obrigatórios!');
-            return;
-        }
-
-        const protocoloData = {
-            personal_id: currentUser.id,
-            aluno_id: alunoId,
-            nome: nome,
-            objetivo: objetivo,
-            objetivo_outros: objetivo === 'Outros' ? objetivoOutros : null,
-            data_inicio: dataInicio || null,
-            data_fim: dataFim || null,
-            ativo: ativo
-        };
-
-        let result;
-        if (id) {
-            result = await supabase
-                .from('fit_protocolos')
-                .update(protocoloData)
-                .eq('id', id);
-        } else {
-            result = await supabase
-                .from('fit_protocolos')
-                .insert(protocoloData)
-                .select()
-                .single();
-        }
-
-        if (result.error) throw result.error;
-
-        alert('Protocolo salvo com sucesso!');
-        bootstrap.Modal.getInstance(document.getElementById('protocoloModal')).hide();
-        loadProtocolos();
-    } catch (error) {
-        console.error('Erro ao salvar protocolo:', error);
-        alert('Erro ao salvar protocolo: ' + error.message);
-    }
-}
-
-async function editProtocolo(id) {
-    try {
-        const { data: protocolo, error } = await supabase
-            .from('fit_protocolos')
-            .select('*')
-            .eq('id', id)
-            .single();
-
-        if (error) throw error;
-
-        document.getElementById('protocoloId').value = protocolo.id;
-        document.getElementById('protocoloNome').value = protocolo.nome;
-        document.getElementById('protocoloObjetivo').value = protocolo.objetivo;
-        document.getElementById('protocoloObjetivoOutros').value = protocolo.objetivo_outros || '';
-        document.getElementById('protocoloDataInicio').value = protocolo.data_inicio || '';
-        document.getElementById('protocoloDataFim').value = protocolo.data_fim || '';
-        document.getElementById('protocoloAtivo').checked = protocolo.ativo;
-        
-        await loadAlunosSelect('protocoloAluno');
-        document.getElementById('protocoloAluno').value = protocolo.aluno_id;
-        
-        toggleObjetivoOutros();
-        
-        document.getElementById('protocoloModalTitle').textContent = 'Editar Protocolo';
-        new bootstrap.Modal(document.getElementById('protocoloModal')).show();
-    } catch (error) {
-        console.error('Erro ao carregar protocolo:', error);
-        alert('Erro ao carregar protocolo: ' + error.message);
-    }
-}
-
-async function deleteProtocolo(id) {
-    if (!confirm('Tem certeza que deseja excluir este protocolo? Todos os treinos vinculados serão removidos!')) {
-        return;
-    }
-
-    try {
-        const { error } = await supabase
-            .from('fit_protocolos')
-            .delete()
-            .eq('id', id);
-
-        if (error) throw error;
-
-        alert('Protocolo excluído com sucesso!');
-        loadProtocolos();
-    } catch (error) {
-        console.error('Erro ao excluir protocolo:', error);
-        alert('Erro ao excluir protocolo: ' + error.message);
-    }
-}
-
-// ============================================
-// FUNÇÕES DE TREINOS DO PROTOCOLO
-// ============================================
-
 async function openGerenciarTreinosModal(protocoloId, protocoloNome) {
     currentProtocoloId = protocoloId;
     document.getElementById('currentProtocoloId').value = protocoloId;
@@ -1024,7 +888,7 @@ function renderTreinosProtocolo(treinos) {
 
     container.innerHTML = '';
 
-    treinos.forEach((treino, index) => {
+    treinos.forEach((treino) => {
         const card = document.createElement('div');
         card.className = 'card mb-3';
         const numExercicios = treino.exercicios_count?.[0]?.count || 0;
@@ -1044,10 +908,10 @@ function renderTreinosProtocolo(treinos) {
                 </div>
                 <div>
                     <span class="badge bg-info me-2">${numExercicios} exercícios</span>
-                    <button class="btn btn-sm btn-warning" onclick="editTreinoProtocolo('${treino.id}')">
-                        <i class="bi bi-pencil"></i> Editar
+                    <button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); editTreinoProtocolo('${treino.id}')">
+                        <i class="bi bi-pencil"></i> Editar Treino
                     </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteTreino('${treino.id}')">
+                    <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteTreinoConfirm('${treino.id}')">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
@@ -1095,7 +959,14 @@ async function loadExerciciosTreino(treinoId) {
 
         if (error) throw error;
 
-        renderExerciciosTreino(treinoId, exercicios);
+        // Verificar se está dentro do modal gerenciarTreinos
+        const modalOpen = document.getElementById('gerenciarTreinosModal').classList.contains('show');
+        
+        if (modalOpen) {
+            renderExerciciosModal(treinoId, exercicios);
+        } else {
+            renderExerciciosTreino(treinoId, exercicios);
+        }
     } catch (error) {
         console.error('Erro ao carregar exercícios:', error);
         document.getElementById(`exercicios-treino-${treinoId}`).innerHTML = 
@@ -1103,7 +974,7 @@ async function loadExerciciosTreino(treinoId) {
     }
 }
 
-function renderExerciciosTreino(treinoId, exercicios) {
+function renderExerciciosModal(treinoId, exercicios) {
     const container = document.getElementById(`exercicios-treino-${treinoId}`);
     if (!container) return;
 
@@ -1112,663 +983,59 @@ function renderExerciciosTreino(treinoId, exercicios) {
         return;
     }
 
-    let html = '<div class="exercise-list">';
+    let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0">';
+    html += '<thead><tr>';
+    html += '<th style="width: 40px;">#</th>';
+    html += '<th>Exercício</th>';
+    html += '<th>Grupo</th>';
+    html += '<th>Séries</th>';
+    html += '<th>Método</th>';
+    html += '<th style="width: 120px;">Ações</th>';
+    html += '</tr></thead><tbody>';
 
     exercicios.forEach((ex, index) => {
         const seriesInfo = ex.series_detalhes && ex.series_detalhes.length > 0 
             ? `${ex.series_detalhes.length}x ${ex.series_detalhes[0].numero || '-'} reps`
             : `${ex.numero_series || '-'} séries`;
 
-        html += `
-            <div class="exercise-item" data-exercise-id="${ex.id}">
-                <div class="exercise-number">${index + 1}</div>
-                <div class="exercise-content">
-                    <div class="exercise-header">
-                        <div>
-                            <h6 class="exercise-name">${ex.nome}</h6>
-                            <div class="exercise-meta">
-                                <span class="badge rounded-pill bg-secondary">${ex.grupo_muscular || '-'}</span>
-                                <span class="text-muted ms-2">${seriesInfo}</span>
-                                ${ex.metodo ? `<span class="text-muted ms-2">• ${ex.metodo}</span>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                    ${ex.dica ? `
-                        <div class="exercise-tip">
-                            <i class="bi bi-lightbulb-fill text-warning"></i>
-                            <small>${ex.dica}</small>
-                        </div>
-                    ` : ''}
-                    
-                    <!-- Detalhes das séries (expandível) -->
-                    ${ex.series_detalhes && ex.series_detalhes.length > 0 ? `
-                        <button class="btn btn-link btn-sm p-0 mt-2 text-decoration-none" 
-                                type="button" 
-                                data-bs-toggle="collapse" 
-                                data-bs-target="#series-${ex.id}">
-                            <i class="bi bi-chevron-down"></i> Ver detalhes das séries
-                        </button>
-                        <div class="collapse mt-2" id="series-${ex.id}">
-                            <div class="series-details">
-                                ${ex.series_detalhes.map((serie, idx) => `
-                                    <div class="serie-row">
-                                        <strong>Série ${idx + 1}:</strong> 
-                                        ${serie.numero} ${serie.unidade_medida || 'reps'}
-                                        ${serie.carga ? ` • ${serie.carga}` : ''}
-                                        ${serie.velocidade ? ` • ${serie.velocidade}` : ''}
-                                        ${serie.pausa_min || serie.pausa_max ? ` • Pausa: ${serie.pausa_min || 0}-${serie.pausa_max || 0}s` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-                <div class="exercise-actions">
-                    <button class="btn-icon" onclick="editExercicio('${ex.id}', '${treinoId}')" title="Editar">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn-icon btn-icon-danger" onclick="deleteExercicio('${ex.id}', '${treinoId}')" title="Excluir">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
+        html += `<tr>`;
+        html += `<td><strong>${index + 1}</strong></td>`;
+        html += `<td>
+            <strong>${ex.nome}</strong>
+            ${ex.dica ? `<br><small class="text-muted"><i class="bi bi-lightbulb"></i> ${ex.dica.substring(0, 60)}${ex.dica.length > 60 ? '...' : ''}</small>` : ''}
+        </td>`;
+        html += `<td><span class="badge bg-secondary">${ex.grupo_muscular || '-'}</span></td>`;
+        html += `<td>${seriesInfo}</td>`;
+        html += `<td>${ex.metodo || '-'}</td>`;
+        html += `<td>
+            <button class="btn btn-sm btn-warning" onclick="editExercicioModal('${ex.id}', '${treinoId}')" title="Editar">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteExercicioModal('${ex.id}', '${treinoId}')" title="Excluir">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>`;
+        html += `</tr>`;
     });
 
-    html += '</div>';
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
-async function editTreinoProtocolo(treinoId) {
-    try {
-        const { data: treino, error } = await supabase
-            .from('fit_treinos')
-            .select('*')
-            .eq('id', treinoId)
-            .single();
-
-        if (error) throw error;
-
-        // Preencher modal de edição
-        document.getElementById('treinoProtocoloId').value = treino.protocolo_id;
-        document.getElementById('treinoNome').value = treino.nome;
-        document.getElementById('treinoDescricao').value = treino.descricao || '';
-
-        // Carregar exercícios existentes
-        const { data: exercicios, error: exError } = await supabase
-            .from('fit_exercicios')
-            .select('*')
-            .eq('treino_id', treinoId)
-            .order('ordem', { ascending: true });
-
-        if (!exError && exercicios) {
-            exerciciosTempList = exercicios;
-            renderExerciciosTempList();
-        }
-
-        // Armazenar ID do treino sendo editado
-        window.editingTreinoId = treinoId;
-
-        // Abrir modal
-        new bootstrap.Modal(document.getElementById('adicionarTreinoModal')).show();
-    } catch (error) {
-        console.error('Erro ao carregar treino para edição:', error);
-        alert('Erro ao carregar treino: ' + error.message);
-    }
-}
-
-function openAdicionarTreinoModal() {
-    document.getElementById('treinoForm').reset();
-    document.getElementById('treinoProtocoloId').value = currentProtocoloId;
-    exerciciosTempList = [];
-    renderExerciciosTempList();
-    
-    new bootstrap.Modal(document.getElementById('adicionarTreinoModal')).show();
-}
-
-async function saveTreino() {
-    try {
-        const protocoloId = document.getElementById('treinoProtocoloId').value;
-        const nome = document.getElementById('treinoNome').value;
-        const descricao = document.getElementById('treinoDescricao').value;
-
-        if (!nome) {
-            alert('Informe o nome do treino!');
-            return;
-        }
-
-        if (exerciciosTempList.length === 0) {
-            alert('Adicione pelo menos um exercício ao treino!');
-            return;
-        }
-
-        const { data: protocolo } = await supabase
-            .from('fit_protocolos')
-            .select('aluno_id')
-            .eq('id', protocoloId)
-            .single();
-
-        let treinoId;
-
-        // Verificar se está editando ou criando novo
-        if (window.editingTreinoId) {
-            // EDIÇÃO
-            const { error: updateError } = await supabase
-                .from('fit_treinos')
-                .update({
-                    nome: nome,
-                    descricao: descricao
-                })
-                .eq('id', window.editingTreinoId);
-
-            if (updateError) throw updateError;
-
-            // Deletar exercícios antigos
-            await supabase
-                .from('fit_exercicios')
-                .delete()
-                .eq('treino_id', window.editingTreinoId);
-
-            treinoId = window.editingTreinoId;
-            window.editingTreinoId = null;
-        } else {
-            // NOVO TREINO
-            const { data: treino, error: treinoError } = await supabase
-                .from('fit_treinos')
-                .insert({
-                    protocolo_id: protocoloId,
-                    aluno_id: protocolo.aluno_id,
-                    personal_id: currentUser.id,
-                    nome: nome,
-                    descricao: descricao
-                })
-                .select()
-                .single();
-
-            if (treinoError) throw treinoError;
-            treinoId = treino.id;
-        }
-
-        // Inserir exercícios
-        for (let i = 0; i < exerciciosTempList.length; i++) {
-            const ex = { ...exerciciosTempList[i] };
-            ex.treino_id = treinoId;
-            ex.protocolo_id = protocoloId;
-            ex.ordem = i + 1;
-
-            const { error: exError } = await supabase
-                .from('fit_exercicios')
-                .insert(ex);
-
-            if (exError) throw exError;
-        }
-
-        alert('Treino salvo com sucesso!');
-        bootstrap.Modal.getInstance(document.getElementById('adicionarTreinoModal')).hide();
-        loadTreinosProtocolo(protocoloId);
-    } catch (error) {
-        console.error('Erro ao salvar treino:', error);
-        alert('Erro ao salvar treino: ' + error.message);
-    }
-}
-
-function editTreino(id) {
-    console.log('Editar treino:', id);
-}
-
-async function deleteTreino(id) {
-    if (!confirm('Tem certeza que deseja excluir este treino?')) {
-        return;
+async function editExercicioModal(exercicioId, treinoId) {
+    // Fechar modal de gerenciar treinos
+    const gerenciarModal = bootstrap.Modal.getInstance(document.getElementById('gerenciarTreinosModal'));
+    if (gerenciarModal) {
+        gerenciarModal.hide();
     }
 
-    try {
-        // Buscar protocolo_id antes de deletar
-        const { data: treino } = await supabase
-            .from('fit_treinos')
-            .select('protocolo_id')
-            .eq('id', id)
-            .single();
-
-        const { error } = await supabase
-            .from('fit_treinos')
-            .delete()
-            .eq('id', id);
-
-        if (error) throw error;
-
-        alert('Treino excluído com sucesso!');
-        
-        // Recarregar treinos do protocolo
-        if (treino) {
-            await loadTreinosDoProtocolo(treino.protocolo_id);
-        }
-    } catch (error) {
-        console.error('Erro ao excluir treino:', error);
-        alert('Erro ao excluir treino: ' + error.message);
-    }
+    // Esperar um pouco para garantir que o modal fechou
+    setTimeout(async () => {
+        await editExercicio(exercicioId, treinoId);
+    }, 300);
 }
 
-// ============================================
-// FUNÇÕES DE EXERCÍCIOS
-// ============================================
-
-async function openAdicionarExercicioModal() {
-    document.getElementById('exercicioForm').reset();
-    document.getElementById('seriesDetalhesContainer').innerHTML = '';
-    document.getElementById('exercicioPreview').style.display = 'none';
-    document.getElementById('dicaCounter').textContent = '0';
-    currentExercicioVideoUrl = null;
-    
-    await loadGruposMusculares();
-    
-    document.getElementById('exercicioNumSeries').value = 4;
-    gerarLinhasSeries();
-    
-    new bootstrap.Modal(document.getElementById('adicionarExercicioModal')).show();
-}
-
-async function loadGruposMusculares() {
-    try {
-        const { data: grupos, error } = await supabase
-            .from('fit_grupos_musculares')
-            .select('*')
-            .order('nome', { ascending: true });
-
-        if (error) throw error;
-
-        const select = document.getElementById('exercicioGrupoMuscular');
-        select.innerHTML = '<option value="">Selecione o grupo...</option>';
-
-        grupos.forEach(grupo => {
-            const option = document.createElement('option');
-            option.value = grupo.id;
-            option.textContent = grupo.nome;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Erro ao carregar grupos musculares:', error);
-    }
-}
-
-async function loadExerciciosBiblioteca() {
-    try {
-        const grupoId = document.getElementById('exercicioGrupoMuscular').value;
-        
-        if (!grupoId) {
-            document.getElementById('exercicioBiblioteca').innerHTML = '<option value="">Selecione o exercício...</option>';
-            return;
-        }
-
-        const { data: exercicios, error } = await supabase
-            .from('fit_exercicios_biblioteca')
-            .select('*')
-            .eq('grupo_muscular_id', grupoId)
-            .order('nome', { ascending: true });
-
-        if (error) throw error;
-
-        const select = document.getElementById('exercicioBiblioteca');
-        select.innerHTML = '<option value="">Selecione o exercício...</option>';
-
-        exercicios.forEach(ex => {
-            const option = document.createElement('option');
-            option.value = ex.id;
-            option.textContent = ex.nome;
-            option.dataset.videoUrl = ex.video_url || '';
-            option.dataset.imagemUrl = ex.imagem_url || '';
-            option.dataset.descricao = ex.descricao || '';
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Erro ao carregar exercícios:', error);
-    }
-}
-
-function loadExercicioDetalhes() {
-    const select = document.getElementById('exercicioBiblioteca');
-    const selectedOption = select.options[select.selectedIndex];
-    
-    if (!selectedOption || !selectedOption.value) {
-        document.getElementById('exercicioPreview').style.display = 'none';
-        return;
-    }
-
-    const videoUrl = selectedOption.dataset.videoUrl;
-    const imagemUrl = selectedOption.dataset.imagemUrl;
-    currentExercicioVideoUrl = videoUrl;
-
-    document.getElementById('exercicioPreview').style.display = 'block';
-
-    if (videoUrl) {
-        document.getElementById('exercicioVideo').style.display = 'block';
-        document.getElementById('exercicioVideoSource').src = videoUrl;
-        document.getElementById('exercicioVideo').load();
-        document.getElementById('exercicioImagem').style.display = 'none';
-    } else if (imagemUrl) {
-        document.getElementById('exercicioImagem').style.display = 'block';
-        document.getElementById('exercicioImagem').src = imagemUrl;
-        document.getElementById('exercicioVideo').style.display = 'none';
-    } else {
-        document.getElementById('exercicioPreview').style.display = 'none';
-    }
-}
-
-function alterarVideoExercicio() {
-    document.getElementById('exercicioVideoUpload').click();
-}
-
-async function uploadVideoExercicio() {
-    try {
-        const fileInput = document.getElementById('exercicioVideoUpload');
-        const file = fileInput.files[0];
-        
-        if (!file) return;
-
-        if (!file.type.startsWith('video/')) {
-            alert('Por favor, selecione um arquivo de vídeo válido!');
-            return;
-        }
-
-        const fileName = `exercicio_${Date.now()}_${file.name}`;
-        const { data, error } = await supabase.storage
-            .from('videos-exercicios')
-            .upload(fileName, file);
-
-        if (error) throw error;
-
-        const { data: urlData } = supabase.storage
-            .from('videos-exercicios')
-            .getPublicUrl(fileName);
-
-        currentExercicioVideoUrl = urlData.publicUrl;
-
-        document.getElementById('exercicioVideoSource').src = currentExercicioVideoUrl;
-        document.getElementById('exercicioVideo').load();
-        document.getElementById('exercicioVideo').style.display = 'block';
-        document.getElementById('exercicioImagem').style.display = 'none';
-
-        alert('Vídeo enviado com sucesso!');
-    } catch (error) {
-        console.error('Erro ao fazer upload do vídeo:', error);
-        alert('Erro ao enviar vídeo: ' + error.message);
-    }
-}
-
-function gerarLinhasSeries() {
-    const numSeries = parseInt(document.getElementById('exercicioNumSeries').value) || 1;
-    const container = document.getElementById('seriesDetalhesContainer');
-    
-    container.innerHTML = '';
-
-    for (let i = 1; i <= numSeries; i++) {
-        adicionarLinhaSerie(i);
-    }
-}
-
-function adicionarLinhaSerie(numero) {
-    const container = document.getElementById('seriesDetalhesContainer');
-    
-    const row = document.createElement('div');
-    row.className = 'row mb-3 align-items-end serie-row';
-    row.dataset.serie = numero;
-    row.innerHTML = `
-        <div class="col-md-2">
-            <label class="form-label">Unidade de medida</label>
-            <select class="form-select serie-unidade">
-                <option value="">Selecione uma opção</option>
-                <option value="Repetições" selected>Repetições</option>
-                <option value="Tempo">Tempo</option>
-                <option value="Distância">Distância</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label class="form-label">Número de repetições</label>
-            <input type="number" class="form-control serie-numero" placeholder="Ex: 12">
-        </div>
-        <div class="col-md-2">
-            <label class="form-label">Carga / Intensidade</label>
-            <input type="text" class="form-control serie-carga" placeholder="Ex: 20kg">
-        </div>
-        <div class="col-md-2">
-            <label class="form-label">Velocidade de execução</label>
-            <select class="form-select serie-velocidade">
-                <option value="">Selecione uma opção</option>
-                <option value="Lenta">Lenta</option>
-                <option value="Moderada" selected>Moderada</option>
-                <option value="Rápida">Rápida</option>
-                <option value="Explosiva">Explosiva</option>
-                <option value="Controlada">Controlada</option>
-            </select>
-        </div>
-        <div class="col-md-1">
-            <label class="form-label">Pausa mín (s)</label>
-            <input type="number" class="form-control serie-pausa-min" placeholder="60">
-        </div>
-        <div class="col-md-1">
-            <label class="form-label">Pausa máx (s)</label>
-            <input type="number" class="form-control serie-pausa-max" placeholder="90">
-        </div>
-        <div class="col-md-2">
-            <button type="button" class="btn btn-danger w-100" onclick="removerSerie(this)">
-                <i class="bi bi-x"></i>
-            </button>
-        </div>
-    `;
-    
-    container.appendChild(row);
-}
-
-function adicionarSerie() {
-    const container = document.getElementById('seriesDetalhesContainer');
-    const numSeries = container.querySelectorAll('.serie-row').length + 1;
-    adicionarLinhaSerie(numSeries);
-}
-
-function removerSerie(button) {
-    button.closest('.serie-row').remove();
-}
-
-async function saveExercicio() {
-    try {
-        const grupoMuscularId = document.getElementById('exercicioGrupoMuscular').value;
-        const exercicioBibliotecaId = document.getElementById('exercicioBiblioteca').value;
-        const numSeries = document.getElementById('exercicioNumSeries').value;
-        const metodo = document.getElementById('exercicioMetodo').value;
-        const objetivo = document.getElementById('exercicioObjetivo').value;
-        const dica = document.getElementById('exercicioDica').value;
-        const dicaPadrao = document.getElementById('exercicioDicaPadrao').checked;
-
-        if (!grupoMuscularId || !exercicioBibliotecaId) {
-            alert('Selecione o grupo muscular e o exercício!');
-            return;
-        }
-
-        const select = document.getElementById('exercicioBiblioteca');
-        const nomeExercicio = select.options[select.selectedIndex].textContent;
-
-        const selectGrupo = document.getElementById('exercicioGrupoMuscular');
-        const nomeGrupo = selectGrupo.options[selectGrupo.selectedIndex].textContent;
-
-        const seriesRows = document.querySelectorAll('.serie-row');
-        const seriesDetalhes = [];
-
-        seriesRows.forEach((row, index) => {
-            seriesDetalhes.push({
-                serie: index + 1,
-                unidade_medida: row.querySelector('.serie-unidade').value,
-                numero: row.querySelector('.serie-numero').value,
-                carga: row.querySelector('.serie-carga').value,
-                velocidade: row.querySelector('.serie-velocidade').value,
-                pausa_min: row.querySelector('.serie-pausa-min').value,
-                pausa_max: row.querySelector('.serie-pausa-max').value
-            });
-        });
-
-        const exercicio = {
-            exercicio_biblioteca_id: exercicioBibliotecaId,
-            nome: nomeExercicio,
-            grupo_muscular: nomeGrupo,
-            numero_series: parseInt(numSeries),
-            metodo: metodo,
-            objetivo_exercicio: objetivo,
-            series_detalhes: seriesDetalhes,
-            dica: dica,
-            video_url: currentExercicioVideoUrl
-        };
-
-        // Verificar se está editando
-        if (window.editingExercicioId) {
-            // MODO EDIÇÃO
-            const { error } = await supabase
-                .from('fit_exercicios')
-                .update(exercicio)
-                .eq('id', window.editingExercicioId);
-
-            if (error) throw error;
-
-            alert('Exercício atualizado com sucesso!');
-            
-            // Buscar treino_id para recarregar
-            const { data: ex } = await supabase
-                .from('fit_exercicios')
-                .select('treino_id')
-                .eq('id', window.editingExercicioId)
-                .single();
-
-            window.editingExercicioId = null;
-            bootstrap.Modal.getInstance(document.getElementById('adicionarExercicioModal')).hide();
-            
-            if (ex) {
-                await loadExerciciosTreino(ex.treino_id);
-            }
-        } else {
-            // MODO NOVO (mantém o código original)
-            exerciciosTempList.push(exercicio);
-
-            if (dicaPadrao && dica) {
-                await supabase
-                    .from('fit_exercicios_biblioteca')
-                    .update({ descricao: dica })
-                    .eq('id', exercicioBibliotecaId);
-            }
-
-            alert('Exercício adicionado ao treino!');
-            bootstrap.Modal.getInstance(document.getElementById('adicionarExercicioModal')).hide();
-            renderExerciciosTempList();
-        }
-    } catch (error) {
-        console.error('Erro ao salvar exercício:', error);
-        alert('Erro ao salvar exercício: ' + error.message);
-    }
-}
-
-
-function renderExerciciosTempList() {
-    const container = document.getElementById('exerciciosTreinoList');
-    if (!container) return;
-
-    if (exerciciosTempList.length === 0) {
-        container.innerHTML = '<div class="alert alert-info">Nenhum exercício adicionado ainda</div>';
-        return;
-    }
-
-    container.innerHTML = '';
-
-    exerciciosTempList.forEach((ex, index) => {
-        const card = document.createElement('div');
-        card.className = 'card mb-2';
-        card.innerHTML = `
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${index + 1}. ${ex.nome}</strong>
-                        <br>
-                        <small class="text-muted">
-                            ${ex.grupo_muscular} | ${ex.numero_series} séries
-                            ${ex.metodo ? ` | ${ex.metodo}` : ''}
-                        </small>
-                    </div>
-                    <button class="btn btn-sm btn-danger" onclick="removerExercicioTemp(${index})">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-function removerExercicioTemp(index) {
-    exerciciosTempList.splice(index, 1);
-    renderExerciciosTempList();
-}
-
-async function loadAlunosSelect(selectId) {
-    try {
-        const { data: alunos, error } = await supabase
-            .from('fit_alunos')
-            .select(`
-                id,
-                profile:profile_id(full_name)
-            `)
-            .eq('personal_id', currentUser.id)
-            .eq('ativo', true);
-
-        if (error) throw error;
-
-        const select = document.getElementById(selectId);
-        if (!select) return;
-
-        while (select.options.length > 1) {
-            select.remove(1);
-        }
-
-        alunos.forEach(aluno => {
-            const option = document.createElement('option');
-            option.value = aluno.id;
-            option.textContent = aluno.profile?.full_name || 'Sem nome';
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Erro ao carregar alunos no select:', error);
-    }
-}
-async function loadAlunosSelect(selectId) {
-    try {
-        const { data: alunos, error } = await supabase
-            .from('fit_alunos')
-            .select(`
-                id,
-                profile:profile_id(full_name)
-            `)
-            .eq('personal_id', currentUser.id)
-            .eq('ativo', true);
-
-        if (error) throw error;
-
-        const select = document.getElementById(selectId);
-        if (!select) return;
-
-        while (select.options.length > 1) {
-            select.remove(1);
-        }
-
-        alunos.forEach(aluno => {
-            const option = document.createElement('option');
-            option.value = aluno.id;
-            option.textContent = aluno.profile?.full_name || 'Sem nome';
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Erro ao carregar alunos no select:', error);
-    }
-}
-
-function viewExercicioDetalhes(exercicioId) {
-    alert('Função de visualizar detalhes do exercício em desenvolvimento. ID: ' + exercicioId);
-}
-
-async function deleteExercicio(exercicioId, treinoId) {
+async function deleteExercicioModal(exercicioId, treinoId) {
     if (!confirm('Tem certeza que deseja excluir este exercício?')) return;
 
     try {
@@ -1780,7 +1047,19 @@ async function deleteExercicio(exercicioId, treinoId) {
         if (error) throw error;
 
         alert('Exercício excluído com sucesso!');
-        await loadExerciciosTreino(treinoId);
+        
+        // Recarregar lista no modal
+        const { data: exercicios, error: exError } = await supabase
+            .from('fit_exercicios')
+            .select('*')
+            .eq('treino_id', treinoId)
+            .order('ordem', { ascending: true });
+
+        if (!exError) {
+            renderExerciciosModal(treinoId, exercicios);
+        }
+
+        // Recarregar contagem
         await loadTreinosProtocolo(currentProtocoloId);
     } catch (error) {
         console.error('Erro ao excluir exercício:', error);
@@ -1788,112 +1067,65 @@ async function deleteExercicio(exercicioId, treinoId) {
     }
 }
 
-async function editExercicio(exercicioId, treinoId) {
+async function deleteTreinoConfirm(treinoId) {
+    if (!confirm('Tem certeza que deseja excluir este treino?')) {
+        return;
+    }
+
     try {
-        // Buscar exercício completo
-        const { data: exercicio, error } = await supabase
-            .from('fit_exercicios')
-            .select('*')
-            .eq('id', exercicioId)
+        const { data: treino } = await supabase
+            .from('fit_treinos')
+            .select('protocolo_id')
+            .eq('id', treinoId)
             .single();
+
+        const { error } = await supabase
+            .from('fit_treinos')
+            .delete()
+            .eq('id', treinoId);
 
         if (error) throw error;
 
-        // Armazenar ID para edição
-        window.editingExercicioId = exercicioId;
-
-        // Buscar grupo muscular ID
-        const { data: grupos } = await supabase
-            .from('fit_grupos_musculares')
-            .select('id, nome')
-            .ilike('nome', exercicio.grupo_muscular);
-
-        const grupoId = grupos && grupos.length > 0 ? grupos[0].id : null;
-
-        // Preencher modal
-        document.getElementById('exercicioNumSeries').value = exercicio.numero_series || 4;
-        document.getElementById('exercicioMetodo').value = exercicio.metodo || '';
-        document.getElementById('exercicioObjetivo').value = exercicio.objetivo_exercicio || '';
-        document.getElementById('exercicioDica').value = exercicio.dica || '';
+        alert('Treino excluído com sucesso!');
         
-        // Carregar grupos e selecionar
-        await loadGruposMusculares();
-        if (grupoId) {
-            document.getElementById('exercicioGrupoMuscular').value = grupoId;
-            await loadExerciciosBiblioteca();
+        if (treino) {
+            await loadTreinosProtocolo(treino.protocolo_id);
         }
-
-        // Selecionar exercício
-        if (exercicio.exercicio_biblioteca_id) {
-            document.getElementById('exercicioBiblioteca').value = exercicio.exercicio_biblioteca_id;
-            loadExercicioDetalhes();
-        }
-
-        // Renderizar séries existentes
-        const container = document.getElementById('seriesDetalhesContainer');
-        container.innerHTML = '';
-        
-        if (exercicio.series_detalhes && exercicio.series_detalhes.length > 0) {
-            exercicio.series_detalhes.forEach((serie, index) => {
-                const row = document.createElement('div');
-                row.className = 'row mb-3 align-items-end serie-row';
-                row.dataset.serie = index + 1;
-                row.innerHTML = `
-                    <div class="col-md-2">
-                        <label class="form-label">Unidade de medida</label>
-                        <select class="form-select serie-unidade">
-                            <option value="">Selecione uma opção</option>
-                            <option value="Repetições" ${serie.unidade_medida === 'Repetições' ? 'selected' : ''}>Repetições</option>
-                            <option value="Tempo" ${serie.unidade_medida === 'Tempo' ? 'selected' : ''}>Tempo</option>
-                            <option value="Distância" ${serie.unidade_medida === 'Distância' ? 'selected' : ''}>Distância</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Número de repetições</label>
-                        <input type="number" class="form-control serie-numero" value="${serie.numero || ''}" placeholder="Ex: 12">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Carga / Intensidade</label>
-                        <input type="text" class="form-control serie-carga" value="${serie.carga || ''}" placeholder="Ex: 20kg">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Velocidade de execução</label>
-                        <select class="form-select serie-velocidade">
-                            <option value="">Selecione uma opção</option>
-                            <option value="Lenta" ${serie.velocidade === 'Lenta' ? 'selected' : ''}>Lenta</option>
-                            <option value="Moderada" ${serie.velocidade === 'Moderada' ? 'selected' : ''}>Moderada</option>
-                            <option value="Rápida" ${serie.velocidade === 'Rápida' ? 'selected' : ''}>Rápida</option>
-                            <option value="Explosiva" ${serie.velocidade === 'Explosiva' ? 'selected' : ''}>Explosiva</option>
-                            <option value="Controlada" ${serie.velocidade === 'Controlada' ? 'selected' : ''}>Controlada</option>
-                        </select>
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-label">Pausa mín (s)</label>
-                        <input type="number" class="form-control serie-pausa-min" value="${serie.pausa_min || ''}" placeholder="60">
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-label">Pausa máx (s)</label>
-                        <input type="number" class="form-control serie-pausa-max" value="${serie.pausa_max || ''}" placeholder="90">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-danger w-100" onclick="removerSerie(this)">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-        } else {
-            gerarLinhasSeries();
-        }
-
-        // Abrir modal
-        new bootstrap.Modal(document.getElementById('adicionarExercicioModal')).show();
     } catch (error) {
-        console.error('Erro ao carregar exercício para edição:', error);
-        alert('Erro ao carregar exercício: ' + error.message);
+        console.error('Erro ao excluir treino:', error);
+        alert('Erro ao excluir treino: ' + error.message);
     }
 }
 
+async function loadAlunosSelect(selectId) {
+    try {
+        const { data: alunos, error } = await supabase
+            .from('fit_alunos')
+            .select(`
+                id,
+                profile:profile_id(full_name)
+            `)
+            .eq('personal_id', currentUser.id)
+            .eq('ativo', true);
 
-// FIM DO ARQUIVO - NÃO ADICIONE MAIS NADA AQUI
+        if (error) throw error;
+
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+
+        alunos.forEach(aluno => {
+            const option = document.createElement('option');
+            option.value = aluno.id;
+            option.textContent = aluno.profile?.full_name || 'Sem nome';
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar alunos no select:', error);
+    }
+}
+
+// FIM DO ARQUIVO
