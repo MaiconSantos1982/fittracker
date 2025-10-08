@@ -3,7 +3,7 @@ let currentAlunos = [];
 let selectedAlunoId = null;
 let currentAlunoDetailsId = null;
 
-// VARIÁVEIS GLOBAIS PARA PROTOCOLOS (NOVAS)
+// VARIÃVEIS GLOBAIS PARA PROTOCOLOS (NOVAS)
 let currentProtocoloId = null;
 let currentTreinoTemp = null;
 let exerciciosTempList = [];
@@ -13,7 +13,7 @@ let currentExercicioVideoUrl = null;
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Inicializando dashboard do personal...');
     currentUser = await checkAuth();
-    console.log('Usuário atual:', currentUser);
+    console.log('UsuÃ¡rio atual:', currentUser);
     
     loadDashboardData();
     loadAlunos();
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadAlunoSelects();
 });
 
-// Navegação entre seções
+// NavegaÃ§Ã£o entre seÃ§Ãµes
 function setupNavigation() {
     const overlay = document.getElementById('sidebar-overlay');
     
@@ -48,31 +48,31 @@ function setupNavigation() {
 }
 
 function showSection(sectionName) {
-    // Esconde todas as seções
+    // Esconde todas as seÃ§Ãµes
     document.querySelectorAll('.content-section').forEach(s => {
         s.style.display = 'none';
     });
     
-    // Mostra a seção selecionada
+    // Mostra a seÃ§Ã£o selecionada
     const targetSection = document.getElementById(`section-${sectionName}`);
     if (targetSection) {
         targetSection.style.display = 'block';
     }
     
-    // Atualiza título
+    // Atualiza tÃ­tulo
     const titles = {
         'dashboard': 'Dashboard',
         'alunos': 'Gerenciar Alunos',
         'protocolos': 'Protocolos de Treino',
         'treinos': 'Treinos',
         'dietas': 'Dietas',
-        'medidas': 'Medidas e Evolução',
+        'medidas': 'Medidas e EvoluÃ§Ã£o',
         'agenda': 'Agenda',
-        'notificacoes': 'Notificações'
+        'notificacoes': 'NotificaÃ§Ãµes'
     };
     document.getElementById('currentSection').textContent = titles[sectionName] || sectionName;
     
-    // Carrega dados específicos da seção
+    // Carrega dados especÃ­ficos da seÃ§Ã£o
     if (sectionName === 'alunos') loadAlunos();
     if (sectionName === 'protocolos') {
         loadAlunosSelect('filtroAlunoProtocolos');
@@ -225,7 +225,7 @@ async function deleteAluno(id) {
 
         if (error) throw error;
 
-        alert('Aluno excluído com sucesso!');
+        alert('Aluno excluÃ­do com sucesso!');
         loadAlunos();
     } catch (error) {
         console.error('Erro ao excluir aluno:', error);
@@ -233,7 +233,7 @@ async function deleteAluno(id) {
     }
 }
 
-// Funções auxiliares
+// FunÃ§Ãµes auxiliares
 async function loadAlunoSelects() {
     const selects = ['treinoAluno', 'dietaAluno', 'alunoMedidasSelect', 'protocoloAluno'];
     
@@ -253,7 +253,7 @@ async function loadAlunoSelects() {
 
             if (error) throw error;
 
-            // Manter apenas a primeira opção
+            // Manter apenas a primeira opÃ§Ã£o
             select.innerHTML = '<option value="">Selecione...</option>';
             
             alunos?.forEach(aluno => {
@@ -306,7 +306,7 @@ function renderTreinosList(treinos) {
     container.innerHTML = '';
 
     treinos.forEach(treino => {
-        const nomeAluno = treino.aluno?.profile?.full_name || 'Aluno não encontrado';
+        const nomeAluno = treino.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
         
         const card = document.createElement('div');
         card.className = 'card mb-3';
@@ -336,7 +336,7 @@ function renderTreinosList(treinos) {
 }
 
 function viewTreino(id) {
-    alert('Função de visualizar treino em desenvolvimento. ID: ' + id);
+    alert('FunÃ§Ã£o de visualizar treino em desenvolvimento. ID: ' + id);
 }
 
 async function deleteTreinoLegado(id) {
@@ -350,7 +350,7 @@ async function deleteTreinoLegado(id) {
 
         if (error) throw error;
 
-        alert('Treino excluído com sucesso!');
+        alert('Treino excluÃ­do com sucesso!');
         loadTreinos();
     } catch (error) {
         console.error('Erro ao excluir treino:', error);
@@ -396,7 +396,7 @@ function renderDietasList(dietas) {
     container.innerHTML = '';
 
     dietas.forEach(dieta => {
-        const nomeAluno = dieta.aluno?.profile?.full_name || 'Aluno não encontrado';
+        const nomeAluno = dieta.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
         const numRefeicoes = dieta.refeicoes?.[0]?.count || 0;
         
         const card = document.createElement('div');
@@ -411,13 +411,13 @@ function renderDietasList(dietas) {
                             <i class="bi bi-chevron-right collapse-icon-dieta" style="transition: transform 0.2s;"></i>
                             <div>
                                 <h5 class="mb-0">${dieta.nome}</h5>
-                                <small class="text-muted">${nomeAluno} • ${numRefeicoes} refeições</small>
+                                <small class="text-muted">${nomeAluno} â€¢ ${numRefeicoes} refeiÃ§Ãµes</small>
                             </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-success" onclick="openAdicionarRefeicaoModal('${dieta.id}')">
-                            <i class="bi bi-plus-circle"></i> Adicionar Refeição
+                            <i class="bi bi-plus-circle"></i> Adicionar RefeiÃ§Ã£o
                         </button>
                         <button class="btn btn-sm btn-warning" onclick="editDieta('${dieta.id}')">
                             <i class="bi bi-pencil"></i>
@@ -434,7 +434,7 @@ function renderDietasList(dietas) {
                     <div id="refeicoes-dieta-${dieta.id}">
                         <div class="text-center py-3">
                             <div class="spinner-border spinner-border-sm"></div>
-                            <span class="ms-2">Carregando refeições...</span>
+                            <span class="ms-2">Carregando refeiÃ§Ãµes...</span>
                         </div>
                     </div>
                 </div>
@@ -472,9 +472,9 @@ async function loadRefeicoesDieta(dietaId) {
         if (error) throw error;
         renderRefeicoesDieta(dietaId, refeicoes);
     } catch (error) {
-        console.error('Erro ao carregar refeições:', error);
+        console.error('Erro ao carregar refeiÃ§Ãµes:', error);
         document.getElementById(`refeicoes-dieta-${dietaId}`).innerHTML = 
-            '<div class="alert alert-danger">Erro ao carregar refeições: ' + error.message + '</div>';
+            '<div class="alert alert-danger">Erro ao carregar refeiÃ§Ãµes: ' + error.message + '</div>';
     }
 }
 
@@ -483,13 +483,13 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
     if (!container) return;
 
     if (!refeicoes || refeicoes.length === 0) {
-        container.innerHTML = '<div class="alert alert-info">Nenhuma refeição. Clique em "Adicionar Refeição".</div>';
+        container.innerHTML = '<div class="alert alert-info">Nenhuma refeiÃ§Ã£o. Clique em "Adicionar RefeiÃ§Ã£o".</div>';
         return;
     }
 
     let html = '';
     refeicoes.forEach((refeicao, index) => {
-        // ✅ PARSE DO CAMPO ALIMENTOS
+        // âœ… PARSE DO CAMPO ALIMENTOS
         let alimentos = [];
         try {
             if (typeof refeicao.alimentos === 'string') {
@@ -506,7 +506,7 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
                 <div class="card-header bg-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>${index + 1}. ${refeicao.tipo_refeicao || 'Refeição'}</strong>
+                            <strong>${index + 1}. ${refeicao.tipo_refeicao || 'RefeiÃ§Ã£o'}</strong>
                             ${refeicao.horario ? `<small class="text-muted ms-2">(${refeicao.horario})</small>` : ''}
                         </div>
                         <div>
@@ -524,7 +524,7 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
                     ${alimentos && alimentos.length > 0 ? `
                         <div class="table-responsive">
                             <table class="table table-sm mb-0">
-                                <thead><tr><th>Alimento</th><th>Quantidade</th><th>Observação</th></tr></thead>
+                                <thead><tr><th>Alimento</th><th>Quantidade</th><th>ObservaÃ§Ã£o</th></tr></thead>
                                 <tbody>
                                     ${alimentos.map(alimento => `
                                         <tr>
@@ -546,7 +546,7 @@ function renderRefeicoesDieta(dietaId, refeicoes) {
 }
 
 // ============================================
-// FUNÇÕES DE REFEIÇÕES
+// FUNÃ‡Ã•ES DE REFEIÃ‡Ã•ES
 // ============================================
 
 async function openAdicionarRefeicaoModal(dietaId) {
@@ -554,7 +554,7 @@ async function openAdicionarRefeicaoModal(dietaId) {
     delete window.editingRefeicaoId;
     document.getElementById('refeicaoForm').reset();
     document.getElementById('refeicaoOutroDiv').style.display = 'none';
-    document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>';
+    document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para comeÃ§ar</div>';
     window.alimentosTemp = [];
     new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
 }
@@ -592,10 +592,10 @@ function adicionarLinhaAlimento() {
         </div>
         <div class="col-md-3">
             <label class="form-label">Quantidade</label>
-            <input type="text" class="form-control alimento-quantidade" placeholder="Ex: 50g, 1 xícara">
+            <input type="text" class="form-control alimento-quantidade" placeholder="Ex: 50g, 1 xÃ­cara">
         </div>
         <div class="col-md-4">
-            <label class="form-label">Observação (opcional)</label>
+            <label class="form-label">ObservaÃ§Ã£o (opcional)</label>
             <input type="text" class="form-control alimento-observacao" placeholder="Ex: Com banana">
         </div>
         <div class="col-md-1">
@@ -616,14 +616,18 @@ function removerLinhaAlimento(button) {
     const index = parseInt(row.dataset.index);
     
     row.remove();
+    
+    // Remover do array
     window.alimentosTemp.splice(index, 1);
     
+    // Reindexar as linhas restantes
     document.querySelectorAll('.alimento-row').forEach((row, newIndex) => {
         row.dataset.index = newIndex;
     });
     
+    // Se nÃ£o houver mais alimentos, mostrar mensagem
     if (window.alimentosTemp.length === 0) {
-        document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para começar</div>';
+        document.getElementById('alimentosList').innerHTML = '<div class="alert alert-info">Clique em "Adicionar Alimento" para comeÃ§ar</div>';
     }
 }
 
@@ -643,12 +647,12 @@ function coletarAlimentosDosInputs() {
 
 async function saveRefeicao() {
     try {
-        const tipoSelectElement = document.getElementById('refeicaoTipo');  // ✅ CORRETO!
+        const tipoSelectElement = document.getElementById('refeicaoTipo');
         const tipoOutroElement = document.getElementById('refeicaoOutro');
         
         if (!tipoSelectElement) {
-            console.error('Elemento refeicaoTipo não encontrado');
-            alert('Erro: Campo "Tipo de Refeição" não encontrado no formulário.');
+            console.error('Elemento refeicaoTipo nÃ£o encontrado');
+            alert('Erro: Campo "Tipo de RefeiÃ§Ã£o" nÃ£o encontrado no formulÃ¡rio.');
             return;
         }
         
@@ -658,7 +662,7 @@ async function saveRefeicao() {
         const horario = document.getElementById('refeicaoHorario')?.value || '';
         const observacoes = document.getElementById('refeicaoDescricao')?.value || '';
 
-        if (!tipoRefeicao) return alert('Selecione o tipo de refeição!');
+        if (!tipoRefeicao) return alert('Selecione o tipo de refeiÃ§Ã£o!');
 
         const alimentos = coletarAlimentosDosInputs();
 
@@ -686,7 +690,7 @@ async function saveRefeicao() {
             if (error) throw error;
         }
 
-        alert('Refeição salva!');
+        alert('RefeiÃ§Ã£o salva!');
         bootstrap.Modal.getInstance(document.getElementById('adicionarRefeicaoModal')).hide();
         await loadRefeicoesDieta(window.currentDietaId);
         await loadDietas();
@@ -709,33 +713,169 @@ async function editRefeicao(refeicaoId, dietaId) {
         window.currentDietaId = dietaId;
         window.editingRefeicaoId = refeicaoId;
 
-        // Preencher tipo de refeição
-        const tiposPreDefinidos = ['Café da manhã', 'Lanche da manhã', 'Almoço', 'Lanche da tarde', 'Jantar', 'Ceia'];
-        
-        const tipoSelect = document.getElementById('refeicaoTipo');  // ✅ CORRETO
-        const refeicaoOutroDiv = document.getElementById('refeicaoOutroDiv');
-        const refeicaoOutroInput = document.getElementById('refeicaoOutro');
-        
+        // Preencher tipo de refeiÃ§Ã£o
+        const tiposPreDefinidos = ['CafÃ© da manhÃ£', 'Lanche da manhÃ£', 'AlmoÃ§o', 'Lanche da tarde', 'Jantar', 'Ceia'];
         if (tiposPreDefinidos.includes(refeicao.tipo_refeicao)) {
-            tipoSelect.value = refeicao.tipo_refeicao;
-            refeicaoOutroDiv.style.display = 'none';
-            refeicaoOutroInput.value = '';
+            document.getElementById('refeicaoTipo').value = refeicao.tipo_refeicao;
+            document.getElementById('refeicaoOutroDiv').style.display = 'none';
         } else {
-            tipoSelect.value = 'Outro';
-            refeicaoOutroDiv.style.display = 'block';
-            refeicaoOutroInput.value = refeicao.tipo_refeicao;
+            document.getElementById('refeicaoTipo').value = 'Outro';
+            document.getElementById('refeicaoOutroDiv').style.display = 'block';
+            document.getElementById('refeicaoOutro').value = refeicao.tipo_refeicao;
         }
 
         document.getElementById('refeicaoHorario').value = refeicao.horario || '';
         document.getElementById('refeicaoDescricao').value = refeicao.observacoes || '';
         
-        // Parse e renderização dos alimentos...
-        // (resto do código)
+        // Parse dos alimentos
+        let alimentos = [];
+        try {
+            if (typeof refeicao.alimentos === 'string') {
+                alimentos = JSON.parse(refeicao.alimentos);
+            } else if (Array.isArray(refeicao.alimentos)) {
+                alimentos = refeicao.alimentos;
+            }
+        } catch (e) {
+            console.error('Erro ao fazer parse:', e);
+        }
+        
+        // Renderizar alimentos
+        const container = document.getElementById('alimentosList');
+        container.innerHTML = '';
+        window.alimentosTemp = [];
+        
+        alimentos.forEach(alimento => {
+            adicionarLinhaAlimento();
+            const rows = document.querySelectorAll('.alimento-row');
+            const lastRow = rows[rows.length - 1];
+            lastRow.querySelector('.alimento-nome').value = alimento.nome || '';
+            lastRow.querySelector('.alimento-quantidade').value = alimento.quantidade || '';
+            lastRow.querySelector('.alimento-observacao').value = alimento.observacao || '';
+        });
+
+        new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
+    } catch (error) {
+        alert('Erro: ' + error.message);
+    }
+}
+
+
+function adicionarAlimento() {
+    const nome = prompt('Nome do alimento:');
+    if (!nome) return;
+    const quantidade = prompt('Quantidade (ex: 100g, 1 xÃ­cara):');
+    const observacao = prompt('ObservaÃ§Ã£o (opcional):');
+
+    window.alimentosTemp = window.alimentosTemp || [];
+    window.alimentosTemp.push({ nome, quantidade, observacao });
+    renderAlimentosTemp();
+}
+
+function renderAlimentosTemp() {
+    const container = document.getElementById('alimentosList');
+    if (!window.alimentosTemp || window.alimentosTemp.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">Nenhum alimento</div>';
+        return;
+    }
+
+    let html = '<table class="table table-sm"><thead><tr><th>Alimento</th><th>Qtd</th><th>AÃ§Ãµes</th></tr></thead><tbody>';
+    window.alimentosTemp.forEach((alimento, i) => {
+        html += `<tr>
+            <td>${alimento.nome}</td>
+            <td>${alimento.quantidade || '-'}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="removerAlimento(${i})"><i class="bi bi-trash"></i></button></td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function removerAlimento(index) {
+    window.alimentosTemp.splice(index, 1);
+    renderAlimentosTemp();
+}
+
+async function saveRefeicao() {
+    try {
+        const tipoRefeicao = document.getElementById('refeicaoNome').value;
+        const horario = document.getElementById('refeicaoHorario').value;
+        const observacoes = document.getElementById('refeicaoDescricao').value;
+
+        if (!tipoRefeicao) return alert('Informe o tipo de refeiÃ§Ã£o!');
+
+        const refeicaoData = {
+            dieta_id: window.currentDietaId,
+            tipo_refeicao: tipoRefeicao,
+            horario: horario || null,
+            alimentos: window.alimentosTemp || [],
+            observacoes: observacoes || null
+        };
+
+        if (window.editingRefeicaoId) {
+            const { error } = await supabase
+                .from('fit_refeicoes')
+                .update(refeicaoData)
+                .eq('id', window.editingRefeicaoId);
+
+            if (error) throw error;
+            delete window.editingRefeicaoId;
+        } else {
+            const { error } = await supabase
+                .from('fit_refeicoes')
+                .insert(refeicaoData);
+
+            if (error) throw error;
+        }
+
+        alert('RefeiÃ§Ã£o salva!');
+        bootstrap.Modal.getInstance(document.getElementById('adicionarRefeicaoModal')).hide();
+        await loadRefeicoesDieta(window.currentDietaId);
+        await loadDietas();
+    } catch (error) {
+        alert('Erro: ' + error.message);
+    }
+}
+
+async function editRefeicao(refeicaoId, dietaId) {
+    try {
+        const { data: refeicao, error } = await supabase
+            .from('fit_refeicoes')
+            .select('*')
+            .eq('id', refeicaoId)
+            .single();
+
+        if (error) throw error;
+
+        window.currentDietaId = dietaId;
+        window.editingRefeicaoId = refeicaoId;
+
+        document.getElementById('refeicaoNome').value = refeicao.tipo_refeicao;
+        document.getElementById('refeicaoHorario').value = refeicao.horario || '';
+        document.getElementById('refeicaoDescricao').value = refeicao.observacoes || '';
+        
+        // âœ… PARSE DOS ALIMENTOS
+        let alimentos = [];
+        try {
+            if (typeof refeicao.alimentos === 'string') {
+                alimentos = JSON.parse(refeicao.alimentos);
+            } else if (Array.isArray(refeicao.alimentos)) {
+                alimentos = refeicao.alimentos;
+            }
+        } catch (e) {
+            console.error('Erro ao fazer parse:', e);
+        }
+        
+        window.alimentosTemp = alimentos;
+        renderAlimentosTemp();
+
+        new bootstrap.Modal(document.getElementById('adicionarRefeicaoModal')).show();
+    } catch (error) {
+        alert('Erro: ' + error.message);
     }
 }
 
 async function deleteRefeicao(refeicaoId, dietaId) {
-    if (!confirm('Excluir esta refeição?')) return;
+    if (!confirm('Excluir esta refeiÃ§Ã£o?')) return;
     
     try {
         const { error } = await supabase
@@ -745,7 +885,7 @@ async function deleteRefeicao(refeicaoId, dietaId) {
 
         if (error) throw error;
 
-        alert('Refeição excluída!');
+        alert('RefeiÃ§Ã£o excluÃ­da!');
         await loadRefeicoesDieta(dietaId);
         await loadDietas();
     } catch (error) {
@@ -775,11 +915,11 @@ async function editDieta(dietaId) {
 }
 
 async function deleteDietaConfirm(dietaId) {
-    if (!confirm('Excluir esta dieta e todas as refeições?')) return;
+    if (!confirm('Excluir esta dieta e todas as refeiÃ§Ãµes?')) return;
     try {
         const { error } = await supabase.from('fit_dietas').delete().eq('id', dietaId);
         if (error) throw error;
-        alert('Dieta excluída!');
+        alert('Dieta excluÃ­da!');
         loadDietas();
     } catch (error) {
         alert('Erro: ' + error.message);
@@ -823,7 +963,7 @@ function renderAgendaList(consultas) {
     container.innerHTML = '';
 
     consultas.forEach(consulta => {
-        const nomeAluno = consulta.aluno?.profile?.full_name || 'Aluno não encontrado';
+        const nomeAluno = consulta.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
         const dataConsulta = new Date(consulta.data_consulta).toLocaleString('pt-BR');
         
         const card = document.createElement('div');
@@ -861,7 +1001,7 @@ async function deleteConsulta(id) {
 
         if (error) throw error;
 
-        alert('Consulta excluída com sucesso!');
+        alert('Consulta excluÃ­da com sucesso!');
         loadAgenda();
     } catch (error) {
         console.error('Erro ao excluir consulta:', error);
@@ -879,7 +1019,7 @@ async function saveTreinoLegado() {
         const descricao = document.getElementById('treinoDescricaoLegado').value;
 
         if (!alunoId || !nome) {
-            alert('Preencha todos os campos obrigatórios!');
+            alert('Preencha todos os campos obrigatÃ³rios!');
             return;
         }
 
@@ -910,7 +1050,7 @@ async function saveDieta() {
         const nome = document.getElementById('dietaNome').value;
 
         if (!alunoId || !nome) {
-            alert('Preencha todos os campos obrigatórios!');
+            alert('Preencha todos os campos obrigatÃ³rios!');
             return;
         }
 
@@ -943,7 +1083,7 @@ async function logout() {
     }
 }
 // ============================================
-// FUNÇÕES DE PROTOCOLOS
+// FUNÃ‡Ã•ES DE PROTOCOLOS
 // ============================================
 
 async function loadProtocolos() {
@@ -996,7 +1136,7 @@ function renderProtocolos(protocolos) {
     protocolos.forEach(protocolo => {
         const dataInicio = protocolo.data_inicio ? new Date(protocolo.data_inicio).toLocaleDateString('pt-BR') : '-';
         const dataFim = protocolo.data_fim ? new Date(protocolo.data_fim).toLocaleDateString('pt-BR') : '-';
-        const nomeAluno = protocolo.aluno?.profile?.full_name || 'Aluno não encontrado';
+        const nomeAluno = protocolo.aluno?.profile?.full_name || 'Aluno nÃ£o encontrado';
         
         const card = document.createElement('div');
         card.className = 'card mb-3';
@@ -1034,7 +1174,7 @@ function renderProtocolos(protocolos) {
             
             <div class="collapse" id="protocolo-${protocolo.id}">
                 <div class="card-body bg-light">
-                    <!-- Informações do Protocolo -->
+                    <!-- InformaÃ§Ãµes do Protocolo -->
                     <div class="row mb-3 pb-3 border-bottom">
                         <div class="col-md-3">
                             <strong>Objetivo:</strong><br>
@@ -1042,11 +1182,11 @@ function renderProtocolos(protocolos) {
                             ${protocolo.objetivo_outros ? `<br><small class="text-muted">${protocolo.objetivo_outros}</small>` : ''}
                         </div>
                         <div class="col-md-3">
-                            <strong>Início:</strong><br>
+                            <strong>InÃ­cio:</strong><br>
                             <span class="text-muted">${dataInicio}</span>
                         </div>
                         <div class="col-md-3">
-                            <strong>Término Previsto:</strong><br>
+                            <strong>TÃ©rmino Previsto:</strong><br>
                             <span class="text-muted">${dataFim}</span>
                         </div>
                         <div class="col-md-3">
@@ -1078,7 +1218,7 @@ function renderProtocolos(protocolos) {
                 treinosCarregados = true;
             }
             
-            // Rotacionar ícone
+            // Rotacionar Ã­cone
             const icon = collapseElement.previousElementSibling.querySelector('.collapse-icon');
             icon.style.transform = 'rotate(90deg)';
         });
@@ -1138,7 +1278,7 @@ function renderTreinosDoProtocolo(protocoloId, treinos) {
                             ${treino.descricao ? `<br><small class="text-muted">${treino.descricao}</small>` : ''}
                         </div>
                         <div class="d-flex gap-2 align-items-center" onclick="event.stopPropagation();">
-                            <span class="badge bg-info">${numExercicios} exercícios</span>
+                            <span class="badge bg-info">${numExercicios} exercÃ­cios</span>
                             <button class="btn btn-sm btn-warning" onclick="editTreinoProtocolo('${treino.id}')">
                                 <i class="bi bi-pencil"></i>
                             </button>
@@ -1153,7 +1293,7 @@ function renderTreinosDoProtocolo(protocoloId, treinos) {
                         <div id="exercicios-treino-${treino.id}">
                             <div class="text-center py-2">
                                 <div class="spinner-border spinner-border-sm" role="status"></div>
-                                <span class="ms-2">Carregando exercícios...</span>
+                                <span class="ms-2">Carregando exercÃ­cios...</span>
                             </div>
                         </div>
                     </div>
@@ -1187,7 +1327,7 @@ function renderTreinosDoProtocolo(protocoloId, treinos) {
 }
 
 // ============================================
-// FUNÇÕES DO MODAL GERENCIAR TREINOS
+// FUNÃ‡Ã•ES DO MODAL GERENCIAR TREINOS
 // ============================================
 
 // ============================================
@@ -1263,10 +1403,10 @@ function renderExerciciosModal(treinoId, exercicios) {
     const container = document.getElementById(`exercicios-treino-${treinoId}`);
     if (!container) return;
     if (!exercicios?.length) {
-        container.innerHTML = '<div class="alert alert-info">Nenhum exercício.</div>';
+        container.innerHTML = '<div class="alert alert-info">Nenhum exercÃ­cio.</div>';
         return;
     }
-    let html = '<table class="table table-sm"><thead><tr><th>#</th><th>Exercício</th><th>Grupo</th><th>Séries</th><th>Ações</th></tr></thead><tbody>';
+    let html = '<table class="table table-sm"><thead><tr><th>#</th><th>ExercÃ­cio</th><th>Grupo</th><th>SÃ©ries</th><th>AÃ§Ãµes</th></tr></thead><tbody>';
     exercicios.forEach((ex, i) => {
         const series = ex.series_detalhes?.length > 0 ? `${ex.series_detalhes.length}x${ex.series_detalhes[0].numero}` : `${ex.numero_series || '-'}`;
         html += `<tr><td>${i+1}</td><td><strong>${ex.nome}</strong></td><td><span class="badge bg-secondary">${ex.grupo_muscular || '-'}</span></td><td>${series}</td><td>
@@ -1282,7 +1422,7 @@ function renderExerciciosTreino(treinoId, exercicios) {
     const container = document.getElementById(`exercicios-treino-${treinoId}`);
     if (!container) return;
     if (!exercicios?.length) {
-        container.innerHTML = '<div class="alert alert-info">Nenhum exercício.</div>';
+        container.innerHTML = '<div class="alert alert-info">Nenhum exercÃ­cio.</div>';
         return;
     }
     let html = '<div class="exercise-list">';
@@ -1294,7 +1434,7 @@ function renderExerciciosTreino(treinoId, exercicios) {
                 <h6 class="exercise-name">${ex.nome}</h6>
                 <div class="exercise-meta">
                     <span class="badge bg-secondary">${ex.grupo_muscular || '-'}</span>
-                    <span class="text-muted">${series} séries</span>
+                    <span class="text-muted">${series} sÃ©ries</span>
                 </div>
                 ${ex.dica ? `<div class="exercise-tip"><i class="bi bi-lightbulb-fill text-warning"></i><small>${ex.dica}</small></div>` : ''}
             </div>
@@ -1314,10 +1454,10 @@ async function editExercicioModal(exercicioId, treinoId) {
 }
 
 async function deleteExercicioModal(exercicioId, treinoId) {
-    if (!confirm('Excluir exercício?')) return;
+    if (!confirm('Excluir exercÃ­cio?')) return;
     try {
         await supabase.from('fit_exercicios').delete().eq('id', exercicioId);
-        alert('Excluído!');
+        alert('ExcluÃ­do!');
         await loadExerciciosTreino(treinoId);
         await loadTreinosProtocolo(currentProtocoloId);
     } catch (error) {
@@ -1326,10 +1466,10 @@ async function deleteExercicioModal(exercicioId, treinoId) {
 }
 
 async function deleteExercicio(exercicioId, treinoId) {
-    if (!confirm('Excluir exercício?')) return;
+    if (!confirm('Excluir exercÃ­cio?')) return;
     try {
         await supabase.from('fit_exercicios').delete().eq('id', exercicioId);
-        alert('Excluído!');
+        alert('ExcluÃ­do!');
         await loadExerciciosTreino(treinoId);
     } catch (error) {
         alert('Erro: ' + error.message);
@@ -1341,7 +1481,7 @@ async function deleteTreinoConfirm(treinoId) {
     try {
         const { data: treino } = await supabase.from('fit_treinos').select('protocolo_id').eq('id', treinoId).single();
         await supabase.from('fit_treinos').delete().eq('id', treinoId);
-        alert('Excluído!');
+        alert('ExcluÃ­do!');
         if (treino) await loadTreinosProtocolo(treino.protocolo_id);
     } catch (error) {
         alert('Erro: ' + error.message);
@@ -1365,8 +1505,8 @@ async function saveTreino() {
         const protocoloId = document.getElementById('treinoProtocoloId').value;
         const nome = document.getElementById('treinoNome').value;
         const descricao = document.getElementById('treinoDescricao').value;
-        if (!nome) return alert('Nome obrigatório!');
-        if (!exerciciosTempList.length) return alert('Adicione exercícios!');
+        if (!nome) return alert('Nome obrigatÃ³rio!');
+        if (!exerciciosTempList.length) return alert('Adicione exercÃ­cios!');
 
         const { data: protocolo } = await supabase.from('fit_protocolos').select('aluno_id').eq('id', protocoloId).single();
         let treinoId;
@@ -1422,7 +1562,7 @@ function renderExerciciosTempList() {
     const container = document.getElementById('exerciciosTreinoList');
     if (!container) return;
     if (!exerciciosTempList.length) {
-        container.innerHTML = '<div class="alert alert-info">Nenhum exercício</div>';
+        container.innerHTML = '<div class="alert alert-info">Nenhum exercÃ­cio</div>';
         return;
     }
     container.innerHTML = '';
@@ -1430,7 +1570,7 @@ function renderExerciciosTempList() {
         const card = document.createElement('div');
         card.className = 'card mb-2';
         card.innerHTML = `<div class="card-body d-flex justify-content-between">
-            <div><strong>${i+1}. ${ex.nome}</strong><br><small>${ex.grupo_muscular} | ${ex.numero_series} séries</small></div>
+            <div><strong>${i+1}. ${ex.nome}</strong><br><small>${ex.grupo_muscular} | ${ex.numero_series} sÃ©ries</small></div>
             <button class="btn btn-sm btn-danger" onclick="removerExercicioTemp(${i})"><i class="bi bi-trash"></i></button>
         </div>`;
         container.appendChild(card);
@@ -1443,7 +1583,7 @@ function removerExercicioTemp(index) {
 }
 
 // ============================================
-// ADICIONAR/EDITAR EXERCÍCIO
+// ADICIONAR/EDITAR EXERCÃCIO
 // ============================================
 
 async function openAdicionarExercicioModal() {
@@ -1494,10 +1634,10 @@ function adicionarLinhaSerie(num) {
     const row = document.createElement('div');
     row.className = 'row mb-2 serie-row';
     row.innerHTML = `
-        <div class="col-md-2"><select class="form-select serie-unidade"><option>Repetições</option><option>Tempo</option></select></div>
+        <div class="col-md-2"><select class="form-select serie-unidade"><option>RepetiÃ§Ãµes</option><option>Tempo</option></select></div>
         <div class="col-md-2"><input type="number" class="form-control serie-numero" placeholder="12"></div>
         <div class="col-md-2"><input type="text" class="form-control serie-carga" placeholder="20kg"></div>
-        <div class="col-md-2"><select class="form-select serie-velocidade"><option>Moderada</option><option>Lenta</option><option>Rápida</option></select></div>
+        <div class="col-md-2"><select class="form-select serie-velocidade"><option>Moderada</option><option>Lenta</option><option>RÃ¡pida</option></select></div>
         <div class="col-md-1"><input type="number" class="form-control serie-pausa-min" placeholder="60"></div>
         <div class="col-md-1"><input type="number" class="form-control serie-pausa-max" placeholder="90"></div>
         <div class="col-md-2"><button class="btn btn-danger w-100" onclick="removerSerie(this)"><i class="bi bi-x"></i></button></div>
@@ -1512,7 +1652,7 @@ function removerSerie(btn) {
 async function saveExercicio() {
     const grupoId = document.getElementById('exercicioGrupoMuscular').value;
     const exId = document.getElementById('exercicioBiblioteca').value;
-    if (!grupoId || !exId) return alert('Selecione grupo e exercício!');
+    if (!grupoId || !exId) return alert('Selecione grupo e exercÃ­cio!');
 
     const select = document.getElementById('exercicioBiblioteca');
     const nomeEx = select.options[select.selectedIndex].text;
@@ -1587,10 +1727,10 @@ async function editExercicio(exercicioId, treinoId) {
             const row = document.createElement('div');
             row.className = 'row mb-2 serie-row';
             row.innerHTML = `
-                <div class="col-md-2"><select class="form-select serie-unidade"><option ${serie.unidade_medida === 'Repetições' ? 'selected' : ''}>Repetições</option><option ${serie.unidade_medida === 'Tempo' ? 'selected' : ''}>Tempo</option></select></div>
+                <div class="col-md-2"><select class="form-select serie-unidade"><option ${serie.unidade_medida === 'RepetiÃ§Ãµes' ? 'selected' : ''}>RepetiÃ§Ãµes</option><option ${serie.unidade_medida === 'Tempo' ? 'selected' : ''}>Tempo</option></select></div>
                 <div class="col-md-2"><input type="number" class="form-control serie-numero" value="${serie.numero || ''}"></div>
                 <div class="col-md-2"><input type="text" class="form-control serie-carga" value="${serie.carga || ''}"></div>
-                <div class="col-md-2"><select class="form-select serie-velocidade"><option ${serie.velocidade === 'Moderada' ? 'selected' : ''}>Moderada</option><option ${serie.velocidade === 'Lenta' ? 'selected' : ''}>Lenta</option><option ${serie.velocidade === 'Rápida' ? 'selected' : ''}>Rápida</option></select></div>
+                <div class="col-md-2"><select class="form-select serie-velocidade"><option ${serie.velocidade === 'Moderada' ? 'selected' : ''}>Moderada</option><option ${serie.velocidade === 'Lenta' ? 'selected' : ''}>Lenta</option><option ${serie.velocidade === 'RÃ¡pida' ? 'selected' : ''}>RÃ¡pida</option></select></div>
                 <div class="col-md-1"><input type="number" class="form-control serie-pausa-min" value="${serie.pausa_min || ''}"></div>
                 <div class="col-md-1"><input type="number" class="form-control serie-pausa-max" value="${serie.pausa_max || ''}"></div>
                 <div class="col-md-2"><button class="btn btn-danger w-100" onclick="removerSerie(this)"><i class="bi bi-x"></i></button></div>
